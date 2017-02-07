@@ -1,7 +1,6 @@
 //////////////////////////////////////////
 // Fade in and out effect
 
-
 class EffectFadeInOut: public Effect{
   public:
     EffectFadeInOut();
