@@ -1,3 +1,6 @@
+////////////////////////////
+// Simple potentiometer
+
 #define POT_MIN 0
 #define POT_MAX 1023
 
