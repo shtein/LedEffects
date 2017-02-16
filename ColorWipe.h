@@ -1,3 +1,8 @@
+#ifndef __COLORWIPE_H
+#define __COLORWIPE_H
+
+#endif //__COLORWIPE_H
+
 //////////////////////////////
 // Color Wipe Effect
 
@@ -39,7 +44,7 @@ inline void EffectColorWipe::proceed(int speedDelay){
   }
   else if (_step == 2 * _numLeds) { //set color
     _step = 0;
-    _color = 0xFF00FF;
+    _color = selectRandomColor();
   }
 }
     

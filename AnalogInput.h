@@ -1,3 +1,6 @@
+#ifndef __ANALOGINPUT_H
+#define __ANALOGINPUT_H
+
 ////////////////////////////
 // Simple potentiometer
 
@@ -12,22 +15,9 @@ class Potentiometer{
     float value() const;
 
   protected:
-    int _pin;  
+    int   _pin;  
     float _min;
     float _max;
 };
 
-inline Potentiometer::Potentiometer(int pin, float min, float max){
-  _pin = pin;
-  _min = min;
-  _max = max;
-}
-
-inline Potentiometer::~Potentiometer(){
-}
-
-inline float Potentiometer::value() const{
-  int val = analogRead(_pin);
-
-  return _min + (val - POT_MIN) * (_max - _min) / (POT_MAX - POT_MIN);
-}
+#endif //__ANALOGINPUT_H

@@ -1,3 +1,6 @@
+#ifndef __RAINBOW_H
+#define __RAINBOW_H
+
 //////////////////////////////
 // Rainbow effect 
 
@@ -93,8 +96,7 @@ inline void EffectTheaterChaseRainbow::proceed(int speedDelay){
     byte *c = wheel((counters[0] + i) % 255);
     setPixel((i + counters[1] ) % _numLeds, *c, *(c+1), *(c+2));    
   }
-
-  Serial.print(_step);
-  Serial.print("\n");
 }
 
+
+#endif //__RAINBOW_H

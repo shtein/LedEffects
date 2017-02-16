@@ -1,3 +1,6 @@
+#ifndef __RUNNING_LIGHS
+#define __RUNNING_LIGHS
+
 ////////////////////
 // Running Lights Effect
 
@@ -36,10 +39,9 @@ inline void EffectRunningLights::proceed(int speedDelay){
     float f = (sin((i + _step) ) * 127 + 128) / 255; 
     
     setPixel(i,f * _color.r, f * _color.g, f * _color.b);
-  }
-    
+  }  
   
   _step = (_step + 1) % (_numLeds * 2);
 }
 
-  
+#endif //_RUNNING_LIGHS

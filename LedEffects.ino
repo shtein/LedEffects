@@ -1,54 +1,51 @@
-#include "FastLED.h"
+#include "precomp.h"
+#include "LedEffects.h"
+#include "EffectEngine.h"
 
-#include "AnalogInput.h"
-
-#include "Effect.h"
-#include "Rainbow.h"
-#include "FadeInOut.h"
-#include "RunningLights.h"
-#include "ColorWipe.h"
-
-
-#define NUM_LEDS 50 
-
-CRGB leds[NUM_LEDS];
-#define PIN 11
-#define CLOCK 13
-
+//Input
 Potentiometer speed(0, 0, 100);
 
-
+//Effects
 EffectRainbow             eRainbow;
 EffectFadeInOut           eFadeInOut;
 EffectRunningLights       eRunningLights;
 EffectColorWipe           eColorWipe;
 EffectTheaterChaseRainbow eTheaterChaseRainbow;
-Effect *effect = NULL;
 
+//Effect Engine
+EffectEngine ee;
 
 void setup()
 {
   Serial.begin(57600);  
 
-  FastLED.addLeds<WS2801, PIN, CLOCK, RGB>(leds, NUM_LEDS).setCorrection( TypicalLEDStrip );
+  //Add effects
+  ee.addEffect(&eTheaterChaseRainbow);
+  ee.addEffect(&eFadeInOut);
+  ee.addEffect(&eRainbow);
+  ee.addEffect(&eColorWipe);
+  ee.addEffect(&eRunningLights);
 
-  effect = &eTheaterChaseRainbow;
-  effect->init(leds, NUM_LEDS);
+  //Init
+  ee.init();
 
+  EffectEngineCtx ctx;
+  for( ;; ){
+      ctx.mode       = 0;
+      ctx.speedDelay = speed.value();
+      ctx.numLeds    = 50;
+      ctx.effectNum  = 2;
+      ee.loop(ctx);
+  }
 }
 
 
 
-void loop() {
-  //Read input from analong and digital
-  int sp = speed.value();
-
-  //process effect
-  effect->loop(sp);
+void loop(){
 }
 
-///////////////////////////////////
-// Theater Chase Rainbow
+
+
 /*
 ////////////////////////////////////
 // TwinkleRandom
@@ -126,7 +123,7 @@ void bouncingColoredBalls() {
 }
 
 */
-
+/*
 
 // *** REPLACE TO HERE ***
 
@@ -160,3 +157,6 @@ void setAll(byte red, byte green, byte blue) {
   }
   showStrip();
 }
+
+
+*/
