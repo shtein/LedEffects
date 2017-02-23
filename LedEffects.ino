@@ -2,22 +2,22 @@
 #include "LedEffects.h"
 #include "EffectEngine.h"
 
-//Input
-Potentiometer speed(0, 0, 100);
-
-//Effects
-EffectRainbow             eRainbow;
-EffectFadeInOut           eFadeInOut;
-EffectRunningLights       eRunningLights;
-EffectColorWipe           eColorWipe;
-EffectTheaterChaseRainbow eTheaterChaseRainbow;
-
-//Effect Engine
-EffectEngine ee;
 
 void setup()
 {
   Serial.begin(57600);  
+
+  //Effects
+  EffectRainbow             eRainbow;
+  EffectFadeInOut           eFadeInOut;
+  EffectRunningLights       eRunningLights;
+  EffectColorWipe           eColorWipe;
+  EffectTheaterChaseRainbow eTheaterChaseRainbow;
+
+
+  //Effect Engine
+  EffectEngine ee;
+
 
   //Add effects
   ee.addEffect(&eTheaterChaseRainbow);
@@ -29,13 +29,21 @@ void setup()
   //Init
   ee.init();
 
+  //Effect Control
+  
   EffectEngineCtx ctx;
+  ctx.speedDelay = 100;
+  ctx.numLeds    = 50;
+  ctx.effectNum  = 2;
+  ctx.maxEffects = 5;
+
+  EffectControls ec;
+  ec.init(ctx);
+  
   for( ;; ){
-      ctx.mode       = 0;
-      ctx.speedDelay = speed.value();
-      ctx.numLeds    = 50;
-      ctx.effectNum  = 2;
-      ee.loop(ctx);
+      
+      ee.loop(ctx);   
+      ec.loop(ctx); 
   }
 }
 

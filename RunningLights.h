@@ -16,13 +16,13 @@ class EffectRunningLights: public Effect{
 
   protected:
     int  _step;
-    CRGB _color;
 };
 
 
 inline EffectRunningLights::EffectRunningLights(){
   _step = 0;
-  _color = 0xFFFF00;
+  setColor( 0xFFFF00 );
+  setSpeedDelay(20);
 }
 
 inline EffectRunningLights::~EffectRunningLights(){
@@ -30,7 +30,6 @@ inline EffectRunningLights::~EffectRunningLights(){
 
 inline void EffectRunningLights::reset(){
   _step = 0;
-  _color = 0xC71585;
 }
 
 inline void EffectRunningLights::proceed(int speedDelay){

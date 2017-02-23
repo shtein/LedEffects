@@ -17,7 +17,6 @@ class EffectFadeInOut: public Effect{
   protected:
     int  _fade; //-1 - fade in, 1, fade out
     int  _step; //cycle
-    CRGB _color;
 };
 
 
@@ -33,7 +32,7 @@ inline EffectFadeInOut::~EffectFadeInOut(){
 inline void EffectFadeInOut::reset(){ 
   _fade  = -1;
   _step  = 0xFF;
-  _color = selectRandomColor();
+  setRandomColor();
 }
 
 inline void EffectFadeInOut::proceed(int speedDelay){
@@ -43,7 +42,7 @@ inline void EffectFadeInOut::proceed(int speedDelay){
     _fade = -_fade; 
 
   if(_step == 0xFF )
-    _color = selectRandomColor();
+    setRandomColor();
 
   //get current color
   CRGB color = _color;

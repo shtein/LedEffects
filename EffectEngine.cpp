@@ -1,6 +1,7 @@
 #include "precomp.h"
 #include "Effect.h"
 #include "EffectEngine.h"
+#include "EffectEngineCtx.h"
 
 EffectEngine::EffectEngine(){
   _curEffect  = NULL;
@@ -35,53 +36,85 @@ void EffectEngine::showStrip() {
   FastLED.show();
 }
 
-void EffectEngine::checkSetNumLeds(int numLeds){
+void EffectEngine::onEffectChange(struct EffectEngineCtx &ctx){
+  //Black the leds
+  fill_solid(_leds, MAX_LEDS, CRGB::Black);
 
-  //Check if number of leds changed
-  if(numLeds == _numLeds)
-    return;
+  //Change effect
+  _curEffect = (ctx.effectNum < 0 || ctx.effectNum >= _numEffects ) ? NULL : _effects[ctx.effectNum];
+}
+
+
+void EffectEngine::onNumLedsChange(struct EffectEngineCtx &ctx){
+  //Black the leds
+  fill_solid(_leds, MAX_LEDS, CRGB::Black);
+
+  //Remember number of leds
+  _numLeds = (ctx.numLeds < 0 || ctx.numLeds >= MAX_LEDS) ? _numLeds : ctx.numLeds;
+}
+
+void EffectEngine::onModeChange(struct EffectEngineCtx &ctx){
+  //Black the lights
+  fill_solid(_leds, MAX_LEDS, CRGB::Black);
+  
+  switch(ctx.mode){
+    case EEM_OFF: //Off
+      _curEffect = NULL;
+      Serial.print("mode off\n");
+    break;
+    case EEM_STATIC: //Static light
+      _curEffect = &_eStatic;
+      Serial.print("mode static\n");
+     break;
+     case EEM_EFFECT: case EEM_RANDOM:
+      onEffectChange(ctx);
+      Serial.print("mode effect\n");
+     break;
+  }
+}
+
+void EffectEngine::loop(struct EffectEngineCtx &ctx){
+
+  //Check if mode changed
+  if(ctx.cf & EEMC_MODE){
+    onModeChange(ctx);
+  }
     
-  //Check bounds
-  if(numLeds < 0 || numLeds >= MAX_LEDS)
-    return;
-
-  //Black the leds
-  fill_solid(_leds, MAX_LEDS, CRGB::Black);
-  
-  //Init current effect if any and remember number of leds
-  _numLeds = numLeds;
-
-  //Reset effect
-  checkSetEffect(_curEffect, true);
-}
-
-
-void EffectEngine::checkSetEffect( Effect *effect, bool force){
-  
-  //Nothing to change?
-  if(effect == _curEffect && !force)
-    return;
-
-  //Black the leds
-  fill_solid(_leds, MAX_LEDS, CRGB::Black);
-  
-  //Change and init
-  _curEffect = effect;
-
-  if(_curEffect){
-    _curEffect->init(_leds, _numLeds);
+  //Check if effect is different
+  if(ctx.mode == EEM_EFFECT && ctx.cf & EEMC_EFFECT ){
+    onEffectChange(ctx);
   }
-}
 
-void EffectEngine::loop(const struct EffectEngineCtx &ctx){ 
-  //Adjust if necessary
-  checkSetNumLeds(ctx.numLeds);
-  checkSetEffect(( ctx.effectNum < 0 || ctx.effectNum >= _numEffects ) ? NULL : _effects[ctx.effectNum]);
-  
-  //if new effect is -1, i.e. none, then black the leds
+  //Number of leds changed
+  if(ctx.mode != EEM_OFF && ctx.cf & EEMC_NUMLEDS){
+    onNumLedsChange(ctx);
+  }
+
+  //process with current effect
   if(_curEffect != NULL){
-    _curEffect->loop(ctx.speedDelay);
+    
+    //Check if we just changed the effect
+    if(ctx.cf & (EEMC_EFFECT | EEMC_NUMLEDS | EEMC_MODE) ){
+      //Init
+      _curEffect->init(_leds, _numLeds);        
+      //Save speed
+      ctx.speedDelay = _curEffect->getSpeedDelay();
+      //Save color
+      ctx.color      = _curEffect->getColor();
+    }
+    
+    //Check if speed has changed
+    if(ctx.cf & EEMC_SPEED){
+      _curEffect->setSpeedDelay(ctx.speedDelay);
+    }
+
+    //Check if color has changed
+    if(ctx.cf && EEMC_COLOR){
+      _curEffect->setColor(ctx.color);
+    }
+
+    _curEffect->loop();
   }
- 
-  showStrip();
+  
+   showStrip();
 }

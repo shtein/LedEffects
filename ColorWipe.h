@@ -17,7 +17,6 @@ class EffectColorWipe: public Effect{
    
   protected:
     int  _step; //cycle
-    CRGB _color;
 };
 
 
@@ -31,7 +30,7 @@ inline EffectColorWipe::~EffectColorWipe(){
 
 void EffectColorWipe::reset(){
   _step = 0;
-  _color = selectRandomColor();
+  setRandomColor();
 }
  
 inline void EffectColorWipe::proceed(int speedDelay){
@@ -44,7 +43,7 @@ inline void EffectColorWipe::proceed(int speedDelay){
   }
   else if (_step == 2 * _numLeds) { //set color
     _step = 0;
-    _color = selectRandomColor();
+    setRandomColor();
   }
 }
     

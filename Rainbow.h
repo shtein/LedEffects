@@ -70,11 +70,16 @@ inline byte * EffectRainbow::wheel(byte wheelPos) const{
 /////////////////////////////////////
 // Theater Chase Rainbow Effect
 class EffectTheaterChaseRainbow: public EffectRainbow{
+  public:
+    EffectTheaterChaseRainbow();
   protected:
     void proceed(int speedDelay);  
 
 };
 
+inline EffectTheaterChaseRainbow::EffectTheaterChaseRainbow(){
+  setSpeedDelay(50);
+}
 
 inline void EffectTheaterChaseRainbow::proceed(int speedDelay){
   byte *counters = (byte *)&_step; //counter[0] - color for colorwheel, counter[1] - pixel (from 0 to 2)

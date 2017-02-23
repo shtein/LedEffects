@@ -2,9 +2,10 @@
 #include "effect.h"
 
 Effect::Effect(){
-  _numLeds = 0;
-  _leds    = NULL;
-  _millis   = 0;
+  _numLeds    = 0;
+  _leds       = NULL;
+  _millis     = 0;
+  _speedDelay = 10;
 }
 
 Effect::~Effect(){
@@ -21,16 +22,24 @@ void Effect::init(CRGB *leds, int numLeds){
 }
 
 
-void Effect::loop(int speedDelay){
+void Effect::loop(){
   //Check timer
   if(!timeToProceed())
     return;
     
-  proceed(speedDelay);
+  proceed(_speedDelay);
 
   //if next time to proceed is not set then set it by default
   if(timeToProceed())
-    nextProceedIn(speedDelay);
+    nextProceedIn(_speedDelay);
+}
+
+CRGB Effect::getColor() const{
+  return _color;
+}
+
+void Effect::setColor(const CRGB &color){
+  _color = color;
 }
 
 void Effect::nextProceedIn(int delta){
@@ -61,11 +70,17 @@ void Effect::setAll(const CRGB &color) {
 }
 
 
-CRGB Effect::selectRandomColor() const {
+void Effect::setRandomColor(){
   CRGB color(0xFF00FF);
   color.setHue(random(256));
    
-  return color;
+  _color = color;
 }
 
+void Effect::setSpeedDelay(int speedDelay){
+  _speedDelay = speedDelay;
+}
 
+int Effect::getSpeedDelay() const{
+  return _speedDelay;
+}

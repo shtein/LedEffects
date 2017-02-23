@@ -1,9 +1,6 @@
 #ifndef __LEDEFFECTS_H
 #define __LEDEFFECTS_H
 
-//LEDs
-#include "FastLED.h"
-
 //Controls
 #include "AnalogInput.h"
 
@@ -14,5 +11,10 @@
 #include "FadeInOut.h"
 #include "RunningLights.h"
 #include "ColorWipe.h"
+#include "Static.h"
+#include "EffectEngineCtx.h"
+#include "EffectEngine.h"
+#include "EffectControls.h"
+
 
 #endif //__LEDEFFECTS_H

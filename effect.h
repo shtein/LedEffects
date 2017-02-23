@@ -11,8 +11,15 @@ class Effect{
 
     //Two functions to proceed: init and proceed
     void init(CRGB *leds, int numLeds);
-    void loop(int speedDelay);
-    
+    void loop();
+
+    //Color
+    CRGB getColor() const;
+    void setColor(const CRGB &color);
+
+    //Speed delay
+    void setSpeedDelay(int speedDelay);
+    int  getSpeedDelay() const;
 
   protected:
     virtual void reset() = 0;
@@ -23,7 +30,8 @@ class Effect{
     void setPixel(int led, const CRGB &color);
     void setAll(byte red, byte green, byte blue);
     void setAll(const CRGB &color);
-    CRGB selectRandomColor() const;
+    
+    void setRandomColor();
 
     //Proceeding related
     void nextProceedIn(int delta);
@@ -34,8 +42,12 @@ class Effect{
   int   _numLeds;
   CRGB *_leds;
 
+  //Color for some effects or static
+  CRGB  _color;
+
   //Next check point
   unsigned long _millis;
+  int           _speedDelay;
 };
 
 #endif //__EFFECT_H
