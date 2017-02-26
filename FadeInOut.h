@@ -15,22 +15,25 @@ class EffectFadeInOut: public Effect{
     void reset();
 
   protected:
-    int  _fade; //-1 - fade in, 1, fade out
+    int  _fade; //negative - fade in, positive fade out
     int  _step; //cycle
 };
 
 
+#define FADE_SPEED
+
 inline EffectFadeInOut::EffectFadeInOut(){
-  _fade  = -1;
-  _step  = 0xFF;
-  _color = 0x00000; 
+  _fade       = -1;
+  _step       = 0xFF;
+  _color      = 0x00000;
+  _speedDelay = 50; 
 }
 
 inline EffectFadeInOut::~EffectFadeInOut(){
 }
 
 inline void EffectFadeInOut::reset(){ 
-  _fade  = -1;
+  _fade  = -5;
   _step  = 0xFF;
   setRandomColor();
 }

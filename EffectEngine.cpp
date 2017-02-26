@@ -2,6 +2,7 @@
 #include "Effect.h"
 #include "EffectEngine.h"
 #include "EffectEngineCtx.h"
+#include "pins.h"
 
 EffectEngine::EffectEngine(){
   _curEffect  = NULL;
@@ -26,14 +27,23 @@ void EffectEngine::addEffect(Effect *effect){
   _numEffects ++;
 }
 
-void EffectEngine::init(){
+void EffectEngine::init(struct EffectEngineCtx &ctx) {
+  //Init context
+  ctx.maxEffects = _numEffects;
+  ctx.effectNum  = 0;
+  ctx.speedDelay = SPEED_DELAY_MAX;
+
+  
   //init LEDs
-  FastLED.addLeds<WS2801, LED_PIN, LED_CLOCK, RGB>(_leds, MAX_LEDS).setCorrection( TypicalLEDStrip );
+  FastLED.addLeds<NEOPIXEL, LED_PIN>(_leds, MAX_LEDS).setCorrection( TypicalLEDStrip );
+  //FastLED.addLeds<WS2801, LED_PIN, LED_CLOCK, RGB>(_leds, MAX_LEDS).setCorrection( TypicalLEDStrip );
+  
   showStrip();
 }
 
 void EffectEngine::showStrip() {
   FastLED.show();
+  //delay(1);
 }
 
 void EffectEngine::onEffectChange(struct EffectEngineCtx &ctx){
@@ -91,6 +101,8 @@ void EffectEngine::loop(struct EffectEngineCtx &ctx){
   }
 
   //process with current effect
+  bool updateLeds = ctx.cf != EEMC_NONE;
+  
   if(_curEffect != NULL){
     
     //Check if we just changed the effect
@@ -109,12 +121,18 @@ void EffectEngine::loop(struct EffectEngineCtx &ctx){
     }
 
     //Check if color has changed
-    if(ctx.cf && EEMC_COLOR){
+    if(ctx.cf & EEMC_COLOR){
       _curEffect->setColor(ctx.color);
     }
 
     _curEffect->loop();
+
+    updateLeds |= _curEffect->proceeded();
   }
-  
-   showStrip();
+
+  //Stupid optimization as a workaroud for IR Remote conflicting with ws2811, ws2812 and ws2812b
+  if(updateLeds){
+    showStrip();    
+  }
+   
 }

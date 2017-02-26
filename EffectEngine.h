@@ -8,17 +8,12 @@ class Effect;
 
 #define MAX_EFFECTS 20
 
-#define LED_PIN     11
-#define LED_CLOCK   13
-
-
-
 class EffectEngine{
   public:
     EffectEngine();
     ~EffectEngine();
 
-    void init();
+    void init(struct EffectEngineCtx &ctx);
     void addEffect(Effect *);
 
     void loop(struct EffectEngineCtx &ctx);
@@ -33,7 +28,7 @@ protected:
   protected:
     Effect*       _effects[MAX_EFFECTS];
     int           _numEffects;
-    Effect*      _curEffect;
+    Effect*       _curEffect;
 
     EffectStatic _eStatic;
 

@@ -11,7 +11,8 @@ class Effect{
 
     //Two functions to proceed: init and proceed
     void init(CRGB *leds, int numLeds);
-    void loop();
+    void loop();    
+    bool proceeded() const;
 
     //Color
     CRGB getColor() const;
@@ -32,10 +33,10 @@ class Effect{
     void setAll(const CRGB &color);
     
     void setRandomColor();
+    bool timeToProceed() const;
 
     //Proceeding related
     void nextProceedIn(int delta);
-    bool timeToProceed() const;
     
  protected:
   //Data
@@ -48,6 +49,7 @@ class Effect{
   //Next check point
   unsigned long _millis;
   int           _speedDelay;
+  bool          _proceeded;
 };
 
 #endif //__EFFECT_H

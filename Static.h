@@ -13,6 +13,7 @@ class EffectStatic: public Effect{
 
 inline EffectStatic::EffectStatic(){
   setColor(0xFF0000);
+  _speedDelay = 100;
 }
 
 inline EffectStatic::~EffectStatic(){

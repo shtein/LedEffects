@@ -6,16 +6,20 @@ Effect::Effect(){
   _leds       = NULL;
   _millis     = 0;
   _speedDelay = 10;
+  _proceeded  = false;
 }
 
 Effect::~Effect(){
 }
 
 void Effect::init(CRGB *leds, int numLeds){
-  _leds    = leds;
-  _numLeds = numLeds;
+  _leds      = leds;
+  _numLeds   = numLeds;
+  _proceeded = false;
 
   setAll(CRGB::Black);
+
+  
   nextProceedIn(0);
 
   reset();
@@ -23,15 +27,26 @@ void Effect::init(CRGB *leds, int numLeds){
 
 
 void Effect::loop(){
+  //Reset processing flag 
+  _proceeded = false;
+  
   //Check timer
   if(!timeToProceed())
     return;
-    
+
+  //proceed
   proceed(_speedDelay);
+  
+  //set processing flag
+  _proceeded = true;
 
   //if next time to proceed is not set then set it by default
   if(timeToProceed())
     nextProceedIn(_speedDelay);
+}
+
+bool Effect::proceeded() const{
+  return _proceeded;
 }
 
 CRGB Effect::getColor() const{
@@ -79,6 +94,10 @@ void Effect::setRandomColor(){
 
 void Effect::setSpeedDelay(int speedDelay){
   _speedDelay = speedDelay;
+
+  Serial.print("New speed delay ");
+  Serial.print(_speedDelay);
+  Serial.print("\n");
 }
 
 int Effect::getSpeedDelay() const{

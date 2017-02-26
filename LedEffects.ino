@@ -14,10 +14,13 @@ void setup()
   EffectColorWipe           eColorWipe;
   EffectTheaterChaseRainbow eTheaterChaseRainbow;
 
+  //Effect engine context
+  //Define only number of leds 
+  EffectEngineCtx ctx; 
+  ctx.numLeds    = 210;
 
   //Effect Engine
   EffectEngine ee;
-
 
   //Add effects
   ee.addEffect(&eTheaterChaseRainbow);
@@ -27,16 +30,9 @@ void setup()
   ee.addEffect(&eRunningLights);
 
   //Init
-  ee.init();
+  ee.init(ctx);
 
   //Effect Control
-  
-  EffectEngineCtx ctx;
-  ctx.speedDelay = 100;
-  ctx.numLeds    = 50;
-  ctx.effectNum  = 2;
-  ctx.maxEffects = 5;
-
   EffectControls ec;
   ec.init(ctx);
   

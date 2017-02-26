@@ -56,7 +56,7 @@ bool PushButton::pushed() const{
 
 //////////////////////////
 // IRRemoteRecv
-#define REMOTE_TIMEOUT 250
+#define REMOTE_TIMEOUT 50
 
 IRRemoteRecv::IRRemoteRecv(int pin): _recv(pin){
   _recv.enableIRIn(); 
@@ -78,15 +78,27 @@ void IRRemoteRecv::read(){
 
   //Check if we are waiting for receiver or for resuming receiver
   if (_millis == 0) { 
+
+
+    //Stupid workaround for ws2811, ws2812 and ws2812b where internal clock conflicts with interrups required for IR receiver
+    //See https://github.com/FastLED/FastLED/issues/198
+    while (!_recv.isIdle());
     
+    //Now go and get IR signals
     if (_recv.decode(&_results)) {
       // Remember time when reset IR
       _millis = millis() + REMOTE_TIMEOUT;   
 
       //Remember value
       _pushed = true;
-      _value  = _results.value;
-      _repeat = 0;
+      
+      if(_results.value == RKEY_REPEAT){
+        _repeat ++;
+      }
+      else{
+        _value  = _results.value;
+        _repeat = 1;
+      }
 
       //Debug output
       translate(); 
@@ -94,16 +106,20 @@ void IRRemoteRecv::read(){
   }
   else {
     if (_millis <= millis()){
-      // Receiving  next value   
+      // Receiving  next value        
       _recv.resume(); 
       // Reset timer
-      _millis = 0;
+      _millis = 0;      
     }
   }
 }
 
-bool IRRemoteRecv::pushed(unsigned long key) const{
-  return _pushed == true && _value == key;
+int IRRemoteRecv::pushed(unsigned long key) const{
+  if(_pushed == true && _value == key){
+    return _repeat;
+  }
+
+  return 0;
 }
 
 void IRRemoteRecv::translate() {
@@ -128,7 +144,10 @@ void IRRemoteRecv::translate() {
     case 0xFF52AD: Serial.println(" #");    break;
     case 0xFFFFFFFF: Serial.println(" REPEAT");break;  
   
-    default: Serial.println(" other button   "); break;
+    default: 
+      Serial.println(" other button   "); 
+      Serial.println(_results.value, HEX); 
+    break;
 
   }
 

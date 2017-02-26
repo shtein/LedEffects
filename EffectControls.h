@@ -4,7 +4,6 @@
 #include "EffectEngineCtx.h"
 #include "AnalogInput.h"
 
-
 class EffectControls{
   public:
     EffectControls();
@@ -23,14 +22,17 @@ class EffectControls{
     void setSpeedDelay(int speedDelay);
 
     CRGB getColor() const;
-    void setColor(const CRGB color);
+    void setColor(const CRGB &color);
 
     int getNumLeds() const;
     void setNumLeds(int numLeds);
 
     int getMode() const;
 
-
+    int getRemotePushedDec(int value, int limit, unsigned long key, int repeatLimit) const;
+    int getRemotePushedInc(int value, int limit, unsigned long key, int repeatLimit) const;
+    int getRemotePushedValue(int value, int limitDec, int limitInc, unsigned long keyDec, unsigned long keyInc, int repeatLimit) const;
+    
     void readControls();
 
   protected:
@@ -51,9 +53,6 @@ class EffectControls{
     int _numLeds;
     
     //Test
-    Potentiometer _testPot;
-    PushButton    _testBut;
-    PushButton    _testBut2;
     IRRemoteRecv  _remote;
 };
 

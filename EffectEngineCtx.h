@@ -4,6 +4,10 @@
 //Leds
 #define MAX_LEDS    300
 
+//Speed delay
+#define SPEED_DELAY_MIN 0
+#define SPEED_DELAY_MAX 1000
+
 //Change flags
 #define EEMC_NONE    0x0000   //Nothing changed
 #define EEMC_MODE    0x0001   //Mode changed

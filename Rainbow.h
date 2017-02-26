@@ -21,6 +21,7 @@ class EffectRainbow: public Effect{
 
 inline EffectRainbow::EffectRainbow(){
   _step = 0;
+  _speedDelay = 100;
 }
 
 inline EffectRainbow::~EffectRainbow(){
@@ -78,7 +79,7 @@ class EffectTheaterChaseRainbow: public EffectRainbow{
 };
 
 inline EffectTheaterChaseRainbow::EffectTheaterChaseRainbow(){
-  setSpeedDelay(50);
+  _speedDelay = 130;
 }
 
 inline void EffectTheaterChaseRainbow::proceed(int speedDelay){

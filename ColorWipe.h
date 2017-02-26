@@ -22,6 +22,7 @@ class EffectColorWipe: public Effect{
 
 inline EffectColorWipe::EffectColorWipe(){
   _step = 0;
+  _speedDelay = 25;
 }
 
 
