@@ -12,8 +12,8 @@ class EffectStatic: public Effect{
 };
 
 inline EffectStatic::EffectStatic(){
-  setColor(0xFF0000);
-  _speedDelay = 100;
+  setHSV(CHSV(HUE_RED, 0xFF, 0xFF));
+  setSpeedDelay(100);
 }
 
 inline EffectStatic::~EffectStatic(){
@@ -23,7 +23,7 @@ inline void EffectStatic::reset(){
 }
 
 inline void EffectStatic::proceed(int speedDelay){
-  setAll(_color);
+  setAll(getColor());
 }
 
 #endif //__STATIC_H

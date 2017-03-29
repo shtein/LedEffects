@@ -5,7 +5,7 @@
 #define MAX_LEDS    300
 
 //Speed delay
-#define SPEED_DELAY_MIN 0
+#define SPEED_DELAY_MIN 1
 #define SPEED_DELAY_MAX 1000
 
 //Change flags
@@ -39,7 +39,7 @@ struct EffectEngineCtx {
   int   maxEffects;
   int   effectNum;
   int   numLeds;
-  CRGB  color;
+  CHSV  hsv;
 };
 
 #endif //__EFFECTENGINECTX_H

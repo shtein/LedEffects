@@ -112,7 +112,7 @@ void EffectEngine::loop(struct EffectEngineCtx &ctx){
       //Save speed
       ctx.speedDelay = _curEffect->getSpeedDelay();
       //Save color
-      ctx.color      = _curEffect->getColor();
+      ctx.hsv      = _curEffect->getHSV();
     }
     
     //Check if speed has changed
@@ -122,7 +122,7 @@ void EffectEngine::loop(struct EffectEngineCtx &ctx){
 
     //Check if color has changed
     if(ctx.cf & EEMC_COLOR){
-      _curEffect->setColor(ctx.color);
+      _curEffect->setHSV(ctx.hsv);
     }
 
     _curEffect->loop();

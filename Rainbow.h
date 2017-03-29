@@ -21,7 +21,7 @@ class EffectRainbow: public Effect{
 
 inline EffectRainbow::EffectRainbow(){
   _step = 0;
-  _speedDelay = 100;
+  setSpeedDelay(100);
 }
 
 inline EffectRainbow::~EffectRainbow(){
@@ -35,8 +35,8 @@ inline void EffectRainbow::reset(){
 inline void EffectRainbow::proceed(int speedDelay){
   byte *c;
 
-  for(int i = 0; i< _numLeds; i++) {
-    c = wheel(((i * 256 / _numLeds) + _step) & 255);
+  for(int i = 0; i< getNumLeds(); i++) {
+    c = wheel(((i * 256 / getNumLeds()) + _step) & 255);
     setPixel(i, *c, *(c + 1), *(c + 2));
   }
  
@@ -79,7 +79,7 @@ class EffectTheaterChaseRainbow: public EffectRainbow{
 };
 
 inline EffectTheaterChaseRainbow::EffectTheaterChaseRainbow(){
-  _speedDelay = 130;
+  setSpeedDelay(130);
 }
 
 inline void EffectTheaterChaseRainbow::proceed(int speedDelay){
@@ -87,8 +87,8 @@ inline void EffectTheaterChaseRainbow::proceed(int speedDelay){
   
   
   //Turn every third pixell off
-  for(int i = 0; i < _numLeds; i = i + 3){
-      setPixel((i + counters[1]) % _numLeds, 0, 0, 0);    
+  for(int i = 0; i < getNumLeds(); i = i + 3){
+      setPixel((i + counters[1]) % getNumLeds(), 0, 0, 0);    
   }
 
   //Move forward
@@ -98,9 +98,9 @@ inline void EffectTheaterChaseRainbow::proceed(int speedDelay){
   }
 
   //Turn every third pixell on
-  for(int i = 0; i < _numLeds; i = i + 3){
+  for(int i = 0; i < getNumLeds(); i = i + 3){
     byte *c = wheel((counters[0] + i) % 255);
-    setPixel((i + counters[1] ) % _numLeds, *c, *(c+1), *(c+2));    
+    setPixel((i + counters[1] ) % getNumLeds(), *c, *(c+1), *(c+2));    
   }
 }
 

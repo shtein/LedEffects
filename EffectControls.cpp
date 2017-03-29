@@ -16,7 +16,7 @@ EffectControls::~EffectControls(){
 void EffectControls::init(struct EffectEngineCtx &ctx){    
 
   ctx.cf      = EEMC_MODE | EEMC_NUMLEDS;
-  ctx.mode    = EEM_STATIC;
+  ctx.mode    = EEM_EFFECT;
 
    //This is where to read from EEPROM
   _maxEffects = ctx.maxEffects;
@@ -37,7 +37,7 @@ void EffectControls::loop(struct EffectEngineCtx &ctx){
      //Effect was changed, remember current speed and color 
      if(ctx.cf & (EEMC_EFFECT | EEMC_MODE)){
         setSpeedDelay(ctx.speedDelay);
-        setColor(ctx.color);
+        setHSV(ctx.hsv);
      }
 
      //Reset flag
@@ -50,7 +50,7 @@ void EffectControls::loop(struct EffectEngineCtx &ctx){
     ctx.mode = _mode;
   }
   
-  
+ 
   //Current effect
   _effectNum = getCurrentEffect();
   if(_effectNum != ctx.effectNum){
@@ -66,10 +66,10 @@ void EffectControls::loop(struct EffectEngineCtx &ctx){
   }
 
   //Color
-  _color = getColor();
-  if(_color != ctx.color){
+  _hsv = getHSV();
+  if(_hsv != ctx.hsv){
     ctx.cf    |= EEMC_COLOR;
-    ctx.color  = _color; 
+    ctx.hsv  = _hsv; 
   }
 
   //Number of leds
@@ -78,6 +78,7 @@ void EffectControls::loop(struct EffectEngineCtx &ctx){
     ctx.cf      |= EEMC_NUMLEDS;
     ctx.numLeds = _numLeds;
   }
+  
 }
 
 
@@ -189,28 +190,35 @@ void EffectControls::setCurrentEffect(int curEffect){
 
 #define COLOR_STEP_MAX 5
 
-CRGB EffectControls::getColor() const{
+CHSV EffectControls::getHSV() const{
   //Check mode
   if(_mode == EEM_OFF || _mode == EEM_SETUP){
-      return _effectNum; 
+      return _hsv; 
    }
   
-  CRGB color =  _color;
+  CHSV hsv(_hsv);
 
-  //Keys 1 and 4 - red
-  //Keys 2 and 5 - gree
-  //Keys 3 and 6 - blue
+  //Keys 1 and 4 - hue
+  //Keys 2 and 5 - suturation
+  //Keys 3 and 6 - valuee
   unsigned long controls[3][2] = { {RKEY_4, RKEY_1}, {RKEY_5, RKEY_2}, {RKEY_6, RKEY_3} };
 
+/*
+  Somehow code below does work with CHSV, it works with CRGB
   for(int i = 0; i < 3; i++){
-    color.raw[i] = (uint8_t)getRemotePushedValue(_color.raw[i], 0, 255, controls[i][0], controls[i][1], COLOR_STEP_MAX);
+     hsv.raw[i] = (uint8_t)getRemotePushedValue((int)hsv.raw[i], 0, 255, controls[i][0], controls[i][1], COLOR_STEP_MAX);
   }
+*/
 
-  return color;
+   hsv.h = (uint8_t)getRemotePushedValue(hsv.h, 0, 255, controls[0][0], controls[0][1], COLOR_STEP_MAX);
+   hsv.s = (uint8_t)getRemotePushedValue(hsv.s, 0, 255, controls[1][0], controls[1][1], COLOR_STEP_MAX);
+   hsv.v = (uint8_t)getRemotePushedValue(hsv.v, 0, 255, controls[2][0], controls[2][1], COLOR_STEP_MAX);
+
+  return hsv;
 }
 
-void EffectControls::setColor(const CRGB &color){
-  _color = color;
+void EffectControls::setHSV(const CHSV &hsv){
+  _hsv = hsv;
 }
 
 

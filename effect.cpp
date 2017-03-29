@@ -53,8 +53,17 @@ CRGB Effect::getColor() const{
   return _color;
 }
 
-void Effect::setColor(const CRGB &color){
-  _color = color;
+CHSV Effect::getHSV() const{
+  return _hsv;
+}
+
+void Effect::setHSV(const CHSV &hsv){
+  _color = hsv;
+  _hsv   = hsv;
+}
+
+int Effect::getNumLeds() const{
+  return _numLeds;
 }
 
 void Effect::nextProceedIn(int delta){
@@ -86,10 +95,8 @@ void Effect::setAll(const CRGB &color) {
 
 
 void Effect::setRandomColor(){
-  CRGB color(0xFF00FF);
-  color.setHue(random(256));
-   
-  _color = color;
+  CHSV hsv(random(256), 0xFF, 0xFF);
+  setHSV(hsv);
 }
 
 void Effect::setSpeedDelay(int speedDelay){

@@ -21,7 +21,7 @@ class EffectRunningLights: public Effect{
 
 inline EffectRunningLights::EffectRunningLights(){
   _step = 0;
-  setColor( 0xFFFF00 );
+  setHSV(CHSV(HUE_RED, 0xFF, 0xFF));
   setSpeedDelay(20);
 }
 
@@ -34,13 +34,14 @@ inline void EffectRunningLights::reset(){
 
 inline void EffectRunningLights::proceed(int speedDelay){
         
-  for(int i = 0; i< _numLeds; i++) {
+  for(int i = 0; i< getNumLeds(); i++) {
     float f = (sin((i + _step) ) * 127 + 128) / 255; 
-    
-    setPixel(i,f * _color.r, f * _color.g, f * _color.b);
+
+    CRGB color = getColor();
+    setPixel(i, f * color.r, f * color.g, f * color.b);
   }  
   
-  _step = (_step + 1) % (_numLeds * 2);
+  _step = (_step + 1) % (getNumLeds() * 2);
 }
 
 #endif //_RUNNING_LIGHS

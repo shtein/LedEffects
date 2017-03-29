@@ -22,7 +22,7 @@ class EffectColorWipe: public Effect{
 
 inline EffectColorWipe::EffectColorWipe(){
   _step = 0;
-  _speedDelay = 25;
+  setSpeedDelay(25);
 }
 
 
@@ -35,14 +35,14 @@ void EffectColorWipe::reset(){
 }
  
 inline void EffectColorWipe::proceed(int speedDelay){
-  setPixel(_step % _numLeds, _color);
+  setPixel(_step % getNumLeds(), getColor());
 
   _step++;
   
-  if(_step == _numLeds) { //wipe colors
-    _color = 0x000000;
+  if(_step == getNumLeds()) { //wipe colors
+    setHSV(CHSV(0, 0, 0));
   }
-  else if (_step == 2 * _numLeds) { //set color
+  else if (_step == 2 * getNumLeds()) { //set color
     _step = 0;
     setRandomColor();
   }

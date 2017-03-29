@@ -25,8 +25,7 @@ class EffectFadeInOut: public Effect{
 inline EffectFadeInOut::EffectFadeInOut(){
   _fade       = -1;
   _step       = 0xFF;
-  _color      = 0x00000;
-  _speedDelay = 50; 
+  setSpeedDelay(50); 
 }
 
 inline EffectFadeInOut::~EffectFadeInOut(){
@@ -48,7 +47,7 @@ inline void EffectFadeInOut::proceed(int speedDelay){
     setRandomColor();
 
   //get current color
-  CRGB color = _color;
+  CRGB color = getColor();
   color.fadeLightBy(_step);
   
   //change color

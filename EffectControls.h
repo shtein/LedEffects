@@ -21,8 +21,8 @@ class EffectControls{
     int getSpeedDelay() const;
     void setSpeedDelay(int speedDelay);
 
-    CRGB getColor() const;
-    void setColor(const CRGB &color);
+    CHSV getHSV() const;
+    void setHSV(const CHSV &hsv);
 
     int getNumLeds() const;
     void setNumLeds(int numLeds);
@@ -47,7 +47,7 @@ class EffectControls{
     int _speedDelay;
 
     //Color
-    CRGB _color;
+    CHSV _hsv;
 
     //Num leds
     int _numLeds;

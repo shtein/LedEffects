@@ -16,11 +16,14 @@ class Effect{
 
     //Color
     CRGB getColor() const;
-    void setColor(const CRGB &color);
+    CHSV getHSV() const;
+    void setHSV(const CHSV &color);
 
     //Speed delay
     void setSpeedDelay(int speedDelay);
     int  getSpeedDelay() const;
+
+    int getNumLeds() const;
 
   protected:
     virtual void reset() = 0;
@@ -38,13 +41,14 @@ class Effect{
     //Proceeding related
     void nextProceedIn(int delta);
     
- protected:
+ private:
   //Data
   int   _numLeds;
   CRGB *_leds;
 
   //Color for some effects or static
   CRGB  _color;
+  CHSV  _hsv;
 
   //Next check point
   unsigned long _millis;

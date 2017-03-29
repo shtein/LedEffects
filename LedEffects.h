@@ -11,6 +11,7 @@
 #include "FadeInOut.h"
 #include "RunningLights.h"
 #include "ColorWipe.h"
+#include "MoodBlobs.h"
 #include "Static.h"
 #include "EffectEngineCtx.h"
 #include "EffectEngine.h"
