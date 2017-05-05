@@ -4,24 +4,33 @@
 #include "IRremote.h"
 
 ////////////////////////////
-// Simple potentiometer
-// Define pin and scale in constructor
-#define POT_MIN 0
-#define POT_MAX 1023
-
-
-class Potentiometer{
+// Base AnalogInput
+class AnalogInput {
   public:
-    Potentiometer(int pin, float min, float max);
+    AnalogInput();
+    ~AnalogInput();
+
+    virtual void read() = 0;
+};
+
+////////////////////////////
+// Simple potentiometer
+// Define pin
+#define POT_MIN             0
+#define POT_MAX             1023
+#define POT_NOISE_THRESHOLD 2
+
+
+class Potentiometer: public AnalogInput {
+  public:
+    Potentiometer(int pin);
     ~Potentiometer();
 
     void read();
-    float value() const;
+    int value() const;
 
   protected:
     int   _pin;  
-    float _min;
-    float _max;
     int   _value;
 };
 
@@ -30,7 +39,7 @@ class Potentiometer{
 // Simple push button
 // Define pin
  
-class PushButton{
+class PushButton: public AnalogInput{
   public:
     PushButton(int pin);
     ~PushButton();
@@ -43,7 +52,6 @@ class PushButton{
     int  _value;
     int  _valueIdle;
     bool _pushed;
-    
 };
 
 
@@ -70,7 +78,7 @@ class PushButton{
 #define RKEY_STAR   0xFF42BD
 #define RKEY_HASH   0xFF52AD
 
-class IRRemoteRecv {
+class IRRemoteRecv: public AnalogInput {
   public:
     IRRemoteRecv(int pin);
     ~IRRemoteRecv();

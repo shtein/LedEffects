@@ -2,12 +2,20 @@
 #include "AnalogInput.h"
 
 ///////////////////
+//AnalogInput
+
+AnalogInput::AnalogInput(){
+}
+
+AnalogInput::~AnalogInput(){
+}
+
+///////////////////
 // Potentiometer
 
-Potentiometer::Potentiometer(int pin, float min, float max){
+Potentiometer::Potentiometer(int pin){
   _pin = pin;
-  _min = min;
-  _max = max;
+ 
   read();
 }
 
@@ -18,9 +26,8 @@ void Potentiometer::read(){
   _value = analogRead(_pin);
 }
 
-float Potentiometer::value() const{
-
-  return _min + (_value - POT_MIN) * (_max - _min) / (POT_MAX - POT_MIN);
+int Potentiometer::value() const {
+  return _value;
 }
 
 
@@ -150,8 +157,6 @@ void IRRemoteRecv::translate() {
     break;
 
   }
-
-
 }
 
 

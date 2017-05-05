@@ -3,6 +3,174 @@
 #include "EffectEngineCtx.h"
 #include "pins.h"
 
+////////////////////////////
+// EffectControl
+EffectControl::EffectControl(int cmd, AnalogInput *input) {
+   _input = input;
+   _cmd   = cmd;
+}
+
+EffectControl::~EffectControl(){
+}
+
+AnalogInput *EffectControl::getInput() const{
+  return _input;
+}
+
+void EffectControl::loop(CtrlQueueItem &itm){
+  //Check if triggered
+  if(triggered()){
+    //Prepare command
+    itm.cmd = _cmd;
+    //Retrieve data
+    getData(itm.data);
+  }
+}
+
+
+////////////////////////////
+// EffectControlPb
+EffectControlPb::EffectControlPb(int cmd, PushButton *btn, uint8_t flag):
+  EffectControl(cmd, btn){
+  _flag = flag;
+}
+
+EffectControlPb::~EffectControlPb(){
+}
+
+bool EffectControlPb::triggered() const{
+  return ((PushButton *)getInput())->pushed();
+}
+
+void EffectControlPb::getData(CtrlQueueData &data){
+  data.flag  = _flag;
+  data.value = 0;
+  data.min   = 0;
+  data.max   = 0;
+}
+
+
+////////////////////////////
+//EffectControlPtmtr
+
+EffectControlPtmtr::EffectControlPtmtr(int cmd, Potentiometer *ptn, int noiseThreshold):
+  EffectControl(cmd, ptn) {
+  _value          = -10; //just to make sure it is different from what we read
+  _noiseThreshold = noiseThreshold; 
+}
+
+EffectControlPtmtr::~EffectControlPtmtr(){
+}
+
+bool EffectControlPtmtr::triggered() const{
+  int value = ((Potentiometer *)getInput())->value();
+
+  return (abs(value - _value) > _noiseThreshold);
+}
+
+void EffectControlPtmtr::getData(CtrlQueueData &data){
+  _value     = ((Potentiometer *)getInput())->value();
+  
+  data.flag  = CTF_VAL_ABS;
+  data.value = _value;
+  data.min   = POT_MIN;
+  data.max   = POT_MAX;
+}
+
+
+////////////////////////////
+// EffectControlIRPb
+EffectControlIRPb::EffectControlIRPb(int cmd, IRRemoteRecv *ir, int btn, uint8_t flag):
+  EffectControl(cmd, ir) {
+  _btn  = btn;
+  _flag = flag;
+}
+
+EffectControlIRPb::~EffectControlIRPb(){
+}
+
+bool EffectControlIRPb::triggered() const{
+  //Single push only
+  return ((IRRemoteRecv *)getInput())->pushed(_btn) == 1? true : false;
+}
+
+void EffectControlIRPb::getData(CtrlQueueData &data){
+  data.flag  = _flag;
+  data.value = 0;
+  data.min   = 0;
+  data.max   = 0;
+}
+
+
+////////////////////////////
+// EffectControlPanel
+EffectControlPanel::EffectControlPanel(){
+  _numControls = 0;
+  _controlNum  = 0;
+  _numInputs   = 0;
+}
+
+EffectControlPanel::~EffectControlPanel(){
+}
+
+void EffectControlPanel::addControl(EffectControl *ctrl){
+  if(!ctrl)
+    return;
+
+  if(_numControls == sizeof(_controls)/sizeof(_controls[0]) - 1)
+    return;
+
+  //Add control
+  _controls[_numControls] = ctrl;
+  _numControls ++;
+
+  //Add analog input - should be only of instance to avoid reading it twice
+  AnalogInput *input = ctrl->getInput();
+  if(!input)
+    return;
+
+  //Find if input is already there
+  bool found = false;
+  for(int i = 0; i < _numInputs; i++){
+    if(input == _inputs[i]){
+      found = true;
+      break;
+    }
+  }
+
+  //Save if not found
+  if(!found){
+    _inputs[_numInputs] = input;
+    _numInputs ++;
+  }
+  
+}
+
+void EffectControlPanel::loop(CtrlQueueItem &itm){
+  //Reset cmd
+  itm.cmd       = EEMC_NONE;
+  itm.data.flag = CTF_NONE;
+  
+  if(_controlNum >= _numControls){
+     _controlNum = 0;
+    
+    //Read inputs
+    for(int i = 0; i < _numInputs; i++){
+      _inputs[i]->read();
+    }
+     
+    //Send idle command once in a while
+    return;
+  }
+
+  //process current control
+  _controls[_controlNum]->loop(itm);
+
+  //Go with next control next time
+  _controlNum ++;
+}
+
+/*
 EffectControls::EffectControls():  _remote(REMOTE_PIN) {
   _maxEffects = 0;
   _effectNum  = 0;
@@ -16,7 +184,7 @@ EffectControls::~EffectControls(){
 void EffectControls::init(struct EffectEngineCtx &ctx){    
 
   ctx.cf      = EEMC_MODE | EEMC_NUMLEDS;
-  ctx.mode    = EEM_EFFECT;
+  ctx.mode    = EEM_STATIC;
 
    //This is where to read from EEPROM
   _maxEffects = ctx.maxEffects;
@@ -68,7 +236,7 @@ void EffectControls::loop(struct EffectEngineCtx &ctx){
   //Color
   _hsv = getHSV();
   if(_hsv != ctx.hsv){
-    ctx.cf    |= EEMC_COLOR;
+    ctx.cf    |= EEMC_COLOR_HUE;
     ctx.hsv  = _hsv; 
   }
 
@@ -203,12 +371,11 @@ CHSV EffectControls::getHSV() const{
   //Keys 3 and 6 - valuee
   unsigned long controls[3][2] = { {RKEY_4, RKEY_1}, {RKEY_5, RKEY_2}, {RKEY_6, RKEY_3} };
 
-/*
-  Somehow code below does work with CHSV, it works with CRGB
-  for(int i = 0; i < 3; i++){
-     hsv.raw[i] = (uint8_t)getRemotePushedValue((int)hsv.raw[i], 0, 255, controls[i][0], controls[i][1], COLOR_STEP_MAX);
-  }
-*/
+
+//  Somehow code below does work with CHSV, it works with CRGB
+//  for(int i = 0; i < 3; i++){
+//     hsv.raw[i] = (uint8_t)getRemotePushedValue((int)hsv.raw[i], 0, 255, controls[i][0], controls[i][1], COLOR_STEP_MAX);
+//  }
 
    hsv.h = (uint8_t)getRemotePushedValue(hsv.h, 0, 255, controls[0][0], controls[0][1], COLOR_STEP_MAX);
    hsv.s = (uint8_t)getRemotePushedValue(hsv.s, 0, 255, controls[1][0], controls[1][1], COLOR_STEP_MAX);
@@ -238,4 +405,6 @@ int EffectControls::getMode() const{
 void EffectControls::readControls(){
   _remote.read();
 }
+
+*/
 

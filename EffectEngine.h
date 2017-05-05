@@ -13,27 +13,35 @@ class EffectEngine{
     EffectEngine();
     ~EffectEngine();
 
-    void init(struct EffectEngineCtx &ctx);
-    void addEffect(Effect *);
-
-    void loop(struct EffectEngineCtx &ctx);
+    void init(int numLeds = MAX_LEDS, int mode = EEM_OFF);
+    void addEffect(Effect *effect);
     
-protected:
-    void showStrip();
-
-    void onEffectChange(struct EffectEngineCtx &ctx); 
-    void onNumLedsChange(struct EffectEngineCtx &ctx);
-    void onModeChange(struct EffectEngineCtx &ctx);
+    void loop(const struct CtrlQueueItem &itm);
     
   protected:
-    Effect*       _effects[MAX_EFFECTS];
-    int           _numEffects;
-    Effect*       _curEffect;
+    void showStrip();
+
+    //Command handling
+    void onModeChange(const struct CtrlQueueData &data);
+    void onNumLedsChange(const struct CtrlQueueData &data);
+    void onEffectChange(const struct CtrlQueueData &data); 
+    void onColorChange(int index, const struct CtrlQueueData &data);
+    void onSpeedChange(const struct CtrlQueueData &data); 
+
+    void setMode();
+    
+  protected:
+    Effect*       _effects[MAX_EFFECTS];  //Effects
+    int           _numEffects;            //Total number of effects
+    Effect*       _curEffect;             //Pointer to current effect including special like static
+    int           _effectNum;             //Index of the current or last effect from _effects
 
     EffectStatic _eStatic;
 
-    CRGB         _leds[MAX_LEDS];
-    int          _numLeds;
+    CRGB         _leds[MAX_LEDS];       //LEDs
+    int          _numLeds;              //Current number of leds
+    
+    int          _mode;                 //Current mode
 };
 
 #endif //__EFFECTENGINE_H
