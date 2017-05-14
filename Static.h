@@ -7,7 +7,7 @@ class EffectStatic: public Effect{
     ~EffectStatic();
 
   protected:
-    void proceed(int speedDelay); 
+    void proceed(CRGB *leds, int numLeds); 
     void reset();
 };
 
@@ -22,8 +22,8 @@ inline EffectStatic::~EffectStatic(){
 inline void EffectStatic::reset(){
 }
 
-inline void EffectStatic::proceed(int speedDelay){
-  setAll(getColor());
+inline void EffectStatic::proceed(CRGB *leds, int numLeds){
+  setAll(leds, numLeds, getColor());
 }
 
 #endif //__STATIC_H

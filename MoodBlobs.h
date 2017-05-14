@@ -11,7 +11,7 @@ class EffectMoodBlobs: public Effect{
 
 protected:
     void reset();
-    void proceed(int speedDelay); 
+    void proceed(CRGB *leds, int numLeds); 
 
 protected:
   uint8_t _blobPhase;
@@ -35,15 +35,15 @@ void EffectMoodBlobs::reset(){
   _blobPhase   = 0;
 }
 
-void EffectMoodBlobs::proceed(int speedDelay){
+void EffectMoodBlobs::proceed(CRGB *leds, int numLeds){
 
   //Blob led increment
   float valueInc = 255. / BLOB_SIZE;
 
   //Color increment
-  float colorInc = 255. / getNumLeds() ;
+  float colorInc = 255. / numLeds;
 
-  for(int i = 0; i < getNumLeds(); i++){
+  for(int i = 0; i < numLeds; i++){
     //Get base color
     CHSV hsv = getHSV();      
 
@@ -53,19 +53,19 @@ void EffectMoodBlobs::proceed(int speedDelay){
     hsv.value = val < 0 ? 0 : val * 2; 
 
     //Calculate hue
-    int index = (i + _step / 2) % getNumLeds();
+    int index = (i + _step / 2) % numLeds;
     int hue   = ((int)sin8( index * colorInc) - 128 ) / 4;   
     hsv.hue += hue; 
    
     //Set color
-    setPixel(i , hsv);
+    setPixel(leds[i] , hsv);
   }
 
   //Increment blob phase
   _blobPhase += 2;
 
   //Increment color rotation step
-  _step = (_step + 1) % ( getNumLeds() * 2);
+  _step = (_step + 1) % ( numLeds * 2);
 
 }
 

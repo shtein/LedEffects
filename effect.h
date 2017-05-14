@@ -9,10 +9,11 @@ class Effect{
     Effect();
     virtual ~Effect();
 
-    //Two functions to proceed: init and proceed
+    //Init
     void init(CRGB *leds, int numLeds);
-    void loop();    
-    bool proceeded() const;
+    
+    //Process
+    void loop(CRGB *leds, int numLeds); 
 
     //Color
     CRGB getColor() const;
@@ -23,37 +24,45 @@ class Effect{
     void setSpeedDelay(int speedDelay);
     int  getSpeedDelay() const;
 
-    int getNumLeds() const;
-
   protected:
     virtual void reset() = 0;
-    virtual void proceed(int speedDelay) = 0;
+    virtual void proceed(CRGB *leds, int numLeds) = 0;
   
-    //Utility functions
-    void setPixel(int led, byte red, byte green, byte blue);
-    void setPixel(int led, const CRGB &color);
-    void setAll(byte red, byte green, byte blue);
-    void setAll(const CRGB &color);
-    
+    //Work with leds
+    static void setPixel(CRGB &led, byte red, byte green, byte blue);
+    static void setPixel(CRGB &led, const CRGB &color);
+    static void setAll(CRGB *leds, int numLeds, byte red, byte green, byte blue);
+    static void setAll(CRGB *leds, int numLeds, const CRGB &color);
+
+    //Private color management
     void setRandomColor();
-    bool timeToProceed() const;
-
-    //Proceeding related
-    void nextProceedIn(int delta);
-    
+   
  private:
-  //Data
-  int   _numLeds;
-  CRGB *_leds;
-
   //Color for some effects or static
-  CRGB  _color;
   CHSV  _hsv;
-
-  //Next check point
-  unsigned long _millis;
-  int           _speedDelay;
-  bool          _proceeded;
+  
+  //Speed
+  int                 _speedDelay;
 };
+
+
+inline void Effect::setPixel(CRGB &led,  byte red, byte green, byte blue) {
+   led.r = red;
+   led.g = green;
+   led.b = blue;
+}
+
+inline void Effect::setPixel(CRGB &led, const CRGB &color) {
+   led = color;
+}
+
+inline void Effect::setAll(CRGB *leds, int numLeds, const CRGB &color) {
+  fill_solid(leds, numLeds, color);
+}
+
+inline void Effect::setAll(CRGB *leds, int numLeds, byte red, byte green, byte blue) {  
+  fill_solid(leds, numLeds, CRGB (red, green, blue));
+}
+
 
 #endif //__EFFECT_H

@@ -11,7 +11,7 @@ class EffectRunningLights: public Effect{
     ~EffectRunningLights();
 
   protected:
-    void proceed(int speedDelay); 
+    void proceed(CRGB *leds, int numLeds); 
     void reset();
 
   protected:
@@ -32,16 +32,16 @@ inline void EffectRunningLights::reset(){
   _step = 0;
 }
 
-inline void EffectRunningLights::proceed(int speedDelay){
+inline void EffectRunningLights::proceed(CRGB *leds, int numLeds){
         
-  for(int i = 0; i< getNumLeds(); i++) {
+  for(int i = 0; i< numLeds; i++) {
     float f = (sin((i + _step) ) * 127 + 128) / 255; 
 
     CRGB color = getColor();
-    setPixel(i, f * color.r, f * color.g, f * color.b);
+    setPixel(leds[i], f * color.r, f * color.g, f * color.b);
   }  
   
-  _step = (_step + 1) % (getNumLeds() * 2);
+  _step = (_step + 1) % (numLeds * 2);
 }
 
 #endif //_RUNNING_LIGHS

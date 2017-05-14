@@ -13,7 +13,7 @@ class EffectRainbow: public Effect{
     byte *wheel(byte wheelPos) const;
   
     void reset();
-    void proceed(int speedDelay); 
+    void proceed(CRGB *leds, int numLeds); 
     
   protected:
     int _step; //current step
@@ -32,12 +32,12 @@ inline void EffectRainbow::reset(){
 }
 
 
-inline void EffectRainbow::proceed(int speedDelay){
+inline void EffectRainbow::proceed(CRGB *leds, int numLeds){
   byte *c;
 
-  for(int i = 0; i< getNumLeds(); i++) {
-    c = wheel(((i * 256 / getNumLeds()) + _step) & 255);
-    setPixel(i, *c, *(c + 1), *(c + 2));
+  for(int i = 0; i< numLeds; i++) {
+    c = wheel(((i * 256 / numLeds) + _step) & 255);
+    setPixel(leds[i], *c, *(c + 1), *(c + 2));
   }
  
   _step ++;
@@ -73,8 +73,9 @@ inline byte * EffectRainbow::wheel(byte wheelPos) const{
 class EffectTheaterChaseRainbow: public EffectRainbow{
   public:
     EffectTheaterChaseRainbow();
+    
   protected:
-    void proceed(int speedDelay);  
+    void proceed(CRGB *leds, int numLeds);  
 
 };
 
@@ -82,13 +83,13 @@ inline EffectTheaterChaseRainbow::EffectTheaterChaseRainbow(){
   setSpeedDelay(130);
 }
 
-inline void EffectTheaterChaseRainbow::proceed(int speedDelay){
+inline void EffectTheaterChaseRainbow::proceed(CRGB *leds, int numLeds){
   byte *counters = (byte *)&_step; //counter[0] - color for colorwheel, counter[1] - pixel (from 0 to 2)
   
   
   //Turn every third pixell off
-  for(int i = 0; i < getNumLeds(); i = i + 3){
-      setPixel((i + counters[1]) % getNumLeds(), 0, 0, 0);    
+  for(int i = 0; i < numLeds; i = i + 3){
+      setPixel(leds[i + counters[1] % numLeds], 0, 0, 0);    
   }
 
   //Move forward
@@ -98,9 +99,9 @@ inline void EffectTheaterChaseRainbow::proceed(int speedDelay){
   }
 
   //Turn every third pixell on
-  for(int i = 0; i < getNumLeds(); i = i + 3){
+  for(int i = 0; i < numLeds; i = i + 3){
     byte *c = wheel((counters[0] + i) % 255);
-    setPixel((i + counters[1] ) % getNumLeds(), *c, *(c+1), *(c+2));    
+    setPixel(leds[(i + counters[1] ) % numLeds], *c, *(c+1), *(c+2));    
   }
 }
 

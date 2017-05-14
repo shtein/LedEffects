@@ -23,15 +23,15 @@ class AnalogInput {
 
 class Potentiometer: public AnalogInput {
   public:
-    Potentiometer(int pin);
+    Potentiometer(uint8_t pin);
     ~Potentiometer();
 
     void read();
     int value() const;
 
   protected:
-    int   _pin;  
-    int   _value;
+    uint16_t  _pin:5;  
+    uint16_t  _value:11;
 };
 
 
@@ -41,17 +41,17 @@ class Potentiometer: public AnalogInput {
  
 class PushButton: public AnalogInput{
   public:
-    PushButton(int pin);
+    PushButton(uint8_t pin);
     ~PushButton();
 
     void read();
-    bool pushed() const;
+    bool clicked() const;
 
   protected:
-    int  _pin;
-    int  _value;
-    int  _valueIdle;
-    bool _pushed;
+    uint8_t  _pin:5;
+    uint8_t  _value:1;
+    uint8_t  _valueIdle:1;
+    uint8_t  _pushed:1;
 };
 
 
@@ -80,22 +80,18 @@ class PushButton: public AnalogInput{
 
 class IRRemoteRecv: public AnalogInput {
   public:
-    IRRemoteRecv(int pin);
+    IRRemoteRecv(uint8_t pin);
     ~IRRemoteRecv();
 
     void read();
     int pushed(unsigned long key) const;
 
   protected:
-    void translate();
-
-  protected:
     IRrecv         _recv;          
-    decode_results _results;
     unsigned long  _millis;
     unsigned long  _value;
-    int            _repeat;
-    bool           _pushed;
+    uint8_t        _repeat:7;
+    uint8_t        _pushed;
 };
 
 #endif //__ANALOGINPUT_H

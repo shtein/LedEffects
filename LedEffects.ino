@@ -2,10 +2,8 @@
 #include "LedEffects.h"
 #include "EffectEngine.h"
 
-
-void setup()
-{
-  Serial.begin(57600);  
+void setup() {
+  Serial.begin(9600);  
 
   //Effects
   EffectMoodBlobs           eMoodBlobs;
@@ -14,11 +12,10 @@ void setup()
   EffectRunningLights       eRunningLights;
   EffectColorWipe           eColorWipe;
   EffectTheaterChaseRainbow eTheaterChaseRainbow;
-
-
+  
   //Effect Engine
   EffectEngine ee;
-
+  
   //Add effects
   ee.addEffect(&eMoodBlobs);
   ee.addEffect(&eTheaterChaseRainbow);
@@ -30,35 +27,28 @@ void setup()
   //Init
   ee.init(50, EEM_STATIC); //88 for Igor
 
-  //Analog inputs
-  PushButton btnMode(2);        //Mode
-  PushButton btnEffect(3);      //Effect
-  Potentiometer ptmHue(0);  //Hue
-  //Potentiometer ptmSpeed(0);  //Speed
-  //Potentiometer ptmLeds(0);     //Number of LEDs
-  
-
-  //Controls
-  EffectControlPb ecMode(EEMC_MODE, &btnMode);
-  EffectControlPb ecEffect(EEMC_EFFECT, &btnEffect);
-  EffectControlPtmtr ecHue(EEMC_COLOR_VAL, &ptmHue);
-  //EffectControlPtmtr ecSpeed(EEMC_SPEED, &ptmSpeed);
-  //EffectControlPtmtr ecLeds(EEMC_NUMLEDS, &ptmLeds);
-
   //Control panel
   EffectControlPanel cp;
-  cp.addControl(&ecMode);
-  cp.addControl(&ecEffect);
-  cp.addControl(&ecHue);
-  //cp.addControl(&ecSpeed);
-  //cp.addControl(&ecLeds);
-  
+  BEGIN_CONTROL_MAP(cp)
+    PUSH_BUTTON_TO_CMD(Mode, EEMC_MODE, 2)  
+    PUSH_BUTTON_TO_CMD(Effect, EEMC_EFFECT, 3)  
+    POT_TO_CMD(Leds, EEMC_NUMLEDS, 2)
+    BEGIN_REMOTE(Remote, 8)
+      RMT_BUTTON_TO_CMD(Mode, EEMC_MODE, RKEY_OK)
+      RMT_BUTTON_PAIR_TO_CMD(Effect, EEMC_EFFECT, RKEY_UP, RKEY_DOWN, 0) 
+      RMT_BUTTON_PAIR_TO_CMD(Speed, EEMC_SPEED, RKEY_LEFT, RKEY_RIGHT, 5) 
+      RMT_BUTTON_PAIR_TO_CMD(ColorHue, EEMC_COLOR_HUE, RKEY_1, RKEY_4, 5) 
+      RMT_BUTTON_PAIR_TO_CMD(ColorSat, EEMC_COLOR_SAT, RKEY_2, RKEY_5, 5) 
+      RMT_BUTTON_PAIR_TO_CMD(ColorVal, EEMC_COLOR_VAL, RKEY_3, RKEY_6, 5) 
+    END_REMOTE()
+  END_CONTROL_MAP()
 
+  //Main loop
   CtrlQueueItem itm;
-  
+
   for( ;; ){      
      cp.loop(itm);
-     ee.loop(itm); 
+     ee.loop(itm);   
   }
 }
 

@@ -13,8 +13,9 @@ AnalogInput::~AnalogInput(){
 ///////////////////
 // Potentiometer
 
-Potentiometer::Potentiometer(int pin){
-  _pin = pin;
+Potentiometer::Potentiometer(uint8_t pin){
+  _pin   = pin;
+  _value = POT_MIN;
  
   read();
 }
@@ -26,18 +27,18 @@ void Potentiometer::read(){
   _value = analogRead(_pin);
 }
 
-int Potentiometer::value() const {
+int Potentiometer::value() const{
   return _value;
 }
 
 
 //////////////////
 // PushButton
-PushButton::PushButton(int pin){
+PushButton::PushButton(uint8_t pin){
+   _pin        = pin;
    pinMode(_pin, INPUT);
-  _pin        = pin;
-  _pushed     = false;
-  _value      = digitalRead(_pin);
+  _pushed     = 0;
+  _value      = digitalRead(_pin) == HIGH ? 1 : 0;
   _valueIdle  = _value;
 }
 
@@ -45,27 +46,28 @@ PushButton::~PushButton(){
 }
 
 void PushButton::read(){
-  if( pushed() ){
-    _pushed = false;
+  if( clicked() ){
+    _pushed = 0;
   }
   
-  _value = digitalRead(_pin);
+  _value = digitalRead(_pin) == HIGH ? 1 : 0;
 
   if (_value != _valueIdle){
-    _pushed = true;
+    _pushed = 1;
   }
 }
 
 
-bool PushButton::pushed() const{
-  return _value == _valueIdle && _pushed == true;
+bool PushButton::clicked() const{
+  return _value == _valueIdle && _pushed == 1;
 }
 
 //////////////////////////
 // IRRemoteRecv
-#define REMOTE_TIMEOUT 50
+#define REMOTE_TIMEOUT      10
+#define REMOTE_REPEAT_LIMIT 127
 
-IRRemoteRecv::IRRemoteRecv(int pin): _recv(pin){
+IRRemoteRecv::IRRemoteRecv(uint8_t pin): _recv(pin){
   _recv.enableIRIn(); 
   _millis = 0;
   _value  = 0;
@@ -76,12 +78,15 @@ IRRemoteRecv::IRRemoteRecv(int pin): _recv(pin){
 IRRemoteRecv::~IRRemoteRecv(){
 }
 
+
+
 void IRRemoteRecv::read(){
   
    //Reset if necessary
    if(pushed(_value)){
     _pushed = false;
    }
+
 
   //Check if we are waiting for receiver or for resuming receiver
   if (_millis == 0) { 
@@ -90,26 +95,30 @@ void IRRemoteRecv::read(){
     //Stupid workaround for ws2811, ws2812 and ws2812b where internal clock conflicts with interrups required for IR receiver
     //See https://github.com/FastLED/FastLED/issues/198
     while (!_recv.isIdle());
-    
+ 
     //Now go and get IR signals
-    if (_recv.decode(&_results)) {
+    decode_results results;
+    if (_recv.decode(&results)) {
+    
       // Remember time when reset IR
       _millis = millis() + REMOTE_TIMEOUT;   
 
       //Remember value
       _pushed = true;
       
-      if(_results.value == RKEY_REPEAT){
+      if(results.value == RKEY_REPEAT && _repeat < REMOTE_REPEAT_LIMIT){
         _repeat ++;
       }
       else{
-        _value  = _results.value;
+        _value  = results.value;
         _repeat = 1;
       }
 
-      //Debug output
-      translate(); 
+      Serial.print("Remote button ");
+      Serial.print(results.value, HEX);
+      Serial.print("\n");
     }
+    
   }
   else {
     if (_millis <= millis()){
@@ -118,7 +127,10 @@ void IRRemoteRecv::read(){
       // Reset timer
       _millis = 0;      
     }
+    
   }
+
+  
 }
 
 int IRRemoteRecv::pushed(unsigned long key) const{
@@ -129,34 +141,7 @@ int IRRemoteRecv::pushed(unsigned long key) const{
   return 0;
 }
 
-void IRRemoteRecv::translate() {
 
-  switch(_results.value) {
-    case 0xFF629D: Serial.println(" FORWARD"); break;
-    case 0xFF22DD: Serial.println(" LEFT");    break;
-    case 0xFF02FD: Serial.println(" -OK-");    break;
-    case 0xFFC23D: Serial.println(" RIGHT");   break;
-    case 0xFFA857: Serial.println(" REVERSE"); break;
-    case 0xFF6897: Serial.println(" 1");    break;
-    case 0xFF9867: Serial.println(" 2");    break;
-    case 0xFFB04F: Serial.println(" 3");    break;
-    case 0xFF30CF: Serial.println(" 4");    break;
-    case 0xFF18E7: Serial.println(" 5");    break;
-    case 0xFF7A85: Serial.println(" 6");    break;
-    case 0xFF10EF: Serial.println(" 7");    break;
-    case 0xFF38C7: Serial.println(" 8");    break;
-    case 0xFF5AA5: Serial.println(" 9");    break;
-    case 0xFF42BD: Serial.println(" *");    break;
-    case 0xFF4AB5: Serial.println(" 0");    break;
-    case 0xFF52AD: Serial.println(" #");    break;
-    case 0xFFFFFFFF: Serial.println(" REPEAT");break;  
-  
-    default: 
-      Serial.println(" other button   "); 
-      Serial.println(_results.value, HEX); 
-    break;
 
-  }
-}
 
 

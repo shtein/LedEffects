@@ -4,6 +4,7 @@
 #include "EffectEngineCtx.h"
 #include "pins.h"
 
+
 EffectEngine::EffectEngine(){
   _curEffect  = NULL;
   _numEffects = 0;
@@ -30,17 +31,17 @@ void EffectEngine::addEffect(Effect *effect){
   _numEffects ++;
 }
 
-void EffectEngine::init(int numLeds, int mode) {  
+void EffectEngine::init(int numLeds, uint8_t mode) {  
   //Init LEDs
   //FastLED.addLeds<NEOPIXEL, LED_PIN>(_leds, MAX_LEDS).setCorrection( TypicalLEDStrip );
   FastLED.addLeds<WS2801, LED_PIN, LED_CLOCK, RGB>(_leds, MAX_LEDS).setCorrection( TypicalLEDStrip );
 
   //Save initial values
   _numLeds = numLeds;
-  _mode    = mode;
+  _mode    = 0xFF; 
 
   //Set mode
-  setMode();
+  setMode(mode);
 
   //Light LEDs
   showStrip();
@@ -54,18 +55,19 @@ void EffectEngine::showStrip() {
 
 void EffectEngine::onModeChange(const struct CtrlQueueData &data){ 
   //Get new mode value  
-  int mode = data.translate(_mode, EEM_OFF, EEM_MODEMAX);
-
+  uint8_t mode = (uint8_t)data.translate(_mode, EEM_OFF, EEM_MODEMAX);
+  
   //Do nothing if did not change
   if(_mode == mode)
     return;
 
   //Change mode
-  _mode = mode;
-  setMode();        
+  setMode(mode);        
 }
 
-void EffectEngine::setMode(){
+void EffectEngine::setMode(uint8_t mode){
+  _mode = mode;
+  
   switch(_mode){
     case EEM_OFF: //Off
       _curEffect = NULL;
@@ -84,13 +86,25 @@ void EffectEngine::setMode(){
   //Black the lights
   fill_solid(_leds, MAX_LEDS, CRGB::Black);
 
-  //Init effect
-  if(_curEffect != NULL)
+  //Refresh effect
+  setEffect(_curEffect);
+ 
+}
+
+void EffectEngine::setEffect(Effect *effect){  
+  _curEffect = effect;
+  
+  if(_curEffect != NULL){
+    //Init effect
     _curEffect->init(_leds, _numLeds);
+
+    //Process right away
+    _millis = 0;
+  }
 }
 
 void EffectEngine::onNumLedsChange(const struct CtrlQueueData &data){
-
+  
   //Get new mode value
   int numLeds = data.translate(_numLeds, 0, MAX_LEDS);
 
@@ -100,13 +114,13 @@ void EffectEngine::onNumLedsChange(const struct CtrlQueueData &data){
 
   //Save new value
   _numLeds = numLeds;
+  
 
  //Black the lights
   fill_solid(_leds, MAX_LEDS, CRGB::Black);
 
-  //Init effect
-  if(_curEffect != NULL)
-    _curEffect->init(_leds, _numLeds);        
+  //Refresh effect
+  setEffect(_curEffect);
 }
 
 void EffectEngine::onEffectChange(const struct CtrlQueueData &data){
@@ -116,25 +130,20 @@ void EffectEngine::onEffectChange(const struct CtrlQueueData &data){
     return; 
 
   //Get new mode value
-  _effectNum = data.translate(_effectNum, 0, _numEffects - 1);
+  _effectNum = (uint8_t)data.translate(_effectNum, 0, _numEffects - 1);
 
   
   //Black the leds
   fill_solid(_leds, MAX_LEDS, CRGB::Black);
 
   //Change effect
-  _curEffect =  _effects[_effectNum];
-  _curEffect->init(_leds, _numLeds);        
+  setEffect(_effects[_effectNum]);
 }
 
 void EffectEngine::onColorChange(int index, const struct CtrlQueueData &data){
   //Check if effect is there
   if(!_curEffect)
     return;
-
-  Serial.print("onColorChange ");
-  Serial.print(index);
-  Serial.print("\n");
 
   //Get effect color
   CHSV hsv = _curEffect->getHSV();
@@ -148,6 +157,10 @@ void EffectEngine::onColorChange(int index, const struct CtrlQueueData &data){
 
 
 void EffectEngine::onSpeedChange(const struct CtrlQueueData &data){
+  //React inly in effect mode
+  if(_mode != EEM_EFFECT)
+    return;
+  
   //Check if effect is there
    if(!_curEffect)
     return;
@@ -183,8 +196,18 @@ void EffectEngine::loop(const struct CtrlQueueItem &itm){
   bool updateLeds = itm.cmd != EEMC_NONE;
 
   if(_curEffect != NULL){    
-    _curEffect->loop();
-    updateLeds |= _curEffect->proceeded();
+    //Is it time to process ?
+     if(_millis <= millis()){
+
+        //Proceed
+        _curEffect->loop(_leds, _numLeds);
+        
+        //Remember when proceed next time
+        _millis = millis() + _curEffect->getSpeedDelay();
+        
+        updateLeds = true;
+     }
+      
   }
   
   //Stupid optimization as a workaroud for IR Remote conflicting with ws2811, ws2812 and ws2812b

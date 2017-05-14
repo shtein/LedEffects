@@ -11,7 +11,7 @@ class EffectFadeInOut: public Effect{
     ~EffectFadeInOut();
 
   protected:
-    void proceed(int speedDelay); 
+    void proceed(CRGB *leds, int numLeds); 
     void reset();
 
   protected:
@@ -37,7 +37,7 @@ inline void EffectFadeInOut::reset(){
   setRandomColor();
 }
 
-inline void EffectFadeInOut::proceed(int speedDelay){
+inline void EffectFadeInOut::proceed(CRGB *leds, int numLeds){
 
   _step = _step + _fade;
   if(_step == 0 || _step == 0xFF)
@@ -51,7 +51,7 @@ inline void EffectFadeInOut::proceed(int speedDelay){
   color.fadeLightBy(_step);
   
   //change color
-  setAll( color );
+  setAll(leds, numLeds, color );
 }
 
 

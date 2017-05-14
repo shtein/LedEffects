@@ -12,7 +12,7 @@ class EffectColorWipe: public Effect{
     ~EffectColorWipe();
 
   protected:
-    void proceed(int speedDelay); 
+    void proceed(CRGB *leds, int numLeds); 
     void reset();
    
   protected:
@@ -34,15 +34,15 @@ void EffectColorWipe::reset(){
   setRandomColor();
 }
  
-inline void EffectColorWipe::proceed(int speedDelay){
-  setPixel(_step % getNumLeds(), getColor());
+inline void EffectColorWipe::proceed(CRGB *leds, int numLeds){
+  setPixel(leds[_step % numLeds], getColor());
 
   _step++;
   
-  if(_step == getNumLeds()) { //wipe colors
+  if(_step == numLeds) { //wipe colors
     setHSV(CHSV(0, 0, 0));
   }
-  else if (_step == 2 * getNumLeds()) { //set color
+  else if (_step == 2 * numLeds) { //set color
     _step = 0;
     setRandomColor();
   }
