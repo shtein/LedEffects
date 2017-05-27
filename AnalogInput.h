@@ -18,7 +18,7 @@ class AnalogInput {
 // Define pin
 #define POT_MIN             0
 #define POT_MAX             1023
-#define POT_NOISE_THRESHOLD 2
+#define POT_NOISE_THRESHOLD 4
 
 
 class Potentiometer: public AnalogInput {
@@ -48,10 +48,10 @@ class PushButton: public AnalogInput{
     bool clicked() const;
 
   protected:
-    uint8_t  _pin:5;
-    uint8_t  _value:1;
-    uint8_t  _valueIdle:1;
-    uint8_t  _pushed:1;
+    uint8_t         _pin:5;
+    uint8_t        _value:1;
+    uint8_t        _valueIdle:1;
+    uint8_t        _pushed:1;    
 };
 
 
@@ -91,7 +91,28 @@ class IRRemoteRecv: public AnalogInput {
     unsigned long  _millis;
     unsigned long  _value;
     uint8_t        _repeat:7;
-    uint8_t        _pushed;
+    uint8_t        _pushed:1;
 };
+
+
+////////////////////////////
+//RotaryEncoder
+
+class RotaryEncoder: public AnalogInput {
+  public:
+    RotaryEncoder(uint8_t pinData, uint8_t pinClock);
+    ~RotaryEncoder();
+
+    void read();
+    int value() const;
+
+  protected:
+    uint8_t  _pinData:5;  
+    uint8_t  _pinClock:5;  
+    uint8_t  _value:5;
+    uint8_t  _valClock:1;
+};
+
+
 
 #endif //__ANALOGINPUT_H

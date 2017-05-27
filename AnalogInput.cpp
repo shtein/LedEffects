@@ -23,7 +23,7 @@ Potentiometer::Potentiometer(uint8_t pin){
 Potentiometer::~Potentiometer(){
 }
 
-void Potentiometer::read(){
+void Potentiometer::read(){ 
   _value = analogRead(_pin);
 }
 
@@ -37,8 +37,9 @@ int Potentiometer::value() const{
 PushButton::PushButton(uint8_t pin){
    _pin        = pin;
    pinMode(_pin, INPUT);
+   digitalWrite(_pin, HIGH);
   _pushed     = 0;
-  _value      = digitalRead(_pin) == HIGH ? 1 : 0;
+  _value      = digitalRead(_pin);
   _valueIdle  = _value;
 }
 
@@ -50,7 +51,7 @@ void PushButton::read(){
     _pushed = 0;
   }
   
-  _value = digitalRead(_pin) == HIGH ? 1 : 0;
+  _value = digitalRead(_pin);
 
   if (_value != _valueIdle){
     _pushed = 1;
@@ -141,6 +142,45 @@ int IRRemoteRecv::pushed(unsigned long key) const{
   return 0;
 }
 
+//////////////////////////////////////
+// RotaryEncodder
+RotaryEncoder::RotaryEncoder(uint8_t pinData, uint8_t pinClock){
+  _pinData      = pinData;
+  _pinClock     = pinClock;
+  _value        = 0;
+  _valClock    = HIGH;
+  
+  pinMode (_pinData, INPUT);
+  pinMode (_pinClock, INPUT); 
+}
+
+
+RotaryEncoder::~RotaryEncoder(){
+}
+
+// _value can be one of the following: 0 (1 up), 1 (no change), 2 (1 down)
+
+void RotaryEncoder::read(){    
+  
+ //See where the clock is
+ int valClock = digitalRead(_pinClock);
+
+ //Read pin only when clock is changing from LOW to HIGH
+ if((_valClock == LOW) && (valClock == HIGH)) {
+      //Now we can read data
+     _value = digitalRead(_pinData) == LOW ? 2 : 0 ;     
+  } 
+  else {
+    _value = 1;
+  }
+
+ //Remember clock
+ _valClock = valClock;
+}
+
+int RotaryEncoder::value() const{  
+  return (int)1 - (int)_value;
+}
 
 
 

@@ -33,8 +33,10 @@ void EffectEngine::addEffect(Effect *effect){
 
 void EffectEngine::init(int numLeds, uint8_t mode) {  
   //Init LEDs
-  //FastLED.addLeds<NEOPIXEL, LED_PIN>(_leds, MAX_LEDS).setCorrection( TypicalLEDStrip );
-  FastLED.addLeds<WS2801, LED_PIN, LED_CLOCK, RGB>(_leds, MAX_LEDS).setCorrection( TypicalLEDStrip );
+  FastLED.addLeds<WS2812B, LED_PIN>(_leds, MAX_LEDS).setCorrection( TypicalLEDStrip );
+  //FastLED.addLeds<NEOPIXEL, LED_PIN>(_leds, MAX_LEDS).setCorrection( TypicalLEDStrip );  
+  //FastLED.addLeds<WS2801, LED_PIN, LED_CLOCK, RGB>(_leds, MAX_LEDS).setCorrection( TypicalLEDStrip );
+  
 
   //Save initial values
   _numLeds = numLeds;
@@ -117,10 +119,12 @@ void EffectEngine::onNumLedsChange(const struct CtrlQueueData &data){
   
 
  //Black the lights
-  fill_solid(_leds, MAX_LEDS, CRGB::Black);
+  fill_solid(_leds + _numLeds, MAX_LEDS - _numLeds, CRGB::Black);
 
   //Refresh effect
-  setEffect(_curEffect);
+  //setEffect(_curEffect);
+
+  Serial.println("EffectEngine::onNumLedsChange");
 }
 
 void EffectEngine::onEffectChange(const struct CtrlQueueData &data){

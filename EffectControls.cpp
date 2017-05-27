@@ -131,6 +131,29 @@ void EffectControlIRBtn::getData(CtrlQueueData &data){
 
 
 ////////////////////////////
+// EffectControlRotEnc
+EffectControlRotEnc::EffectControlRotEnc(uint8_t cmd, RotaryEncoder *re, uint8_t inc): 
+  EffectControl(cmd, re) {
+  _inc = inc;
+}
+
+EffectControlRotEnc::~EffectControlRotEnc(){
+}
+
+bool EffectControlRotEnc::triggered() const{ 
+  return ((RotaryEncoder *)getInput())->value() != 0;
+}
+
+void EffectControlRotEnc::getData(CtrlQueueData &data){ 
+  data.flag  = CTF_VAL_DELTA;
+  data.value = ((RotaryEncoder *)getInput())->value() * _inc;  
+  data.min   = 0;
+  data.max   = 0;
+
+}
+
+
+////////////////////////////
 // EffectControlPanel
 EffectControlPanel::EffectControlPanel(){
   _numControls = 0;

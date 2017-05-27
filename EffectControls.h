@@ -75,7 +75,23 @@ class EffectControlIRBtn: public EffectControl{
     uint8_t       _repeat:7;
 };
 
+////////////////////////////////////////
+// Rotary encoder control
+// Always returns incremental/decremental value
+#define ROTECT_DEFAULT_INC 10 //Default incremement value
 
+class EffectControlRotEnc: public EffectControl{
+  public:
+    EffectControlRotEnc(uint8_t cmd, RotaryEncoder *re, uint8_t inc = ROTECT_DEFAULT_INC);
+    ~EffectControlRotEnc();
+
+  protected:
+    bool triggered() const;
+    void getData(CtrlQueueData &data);  
+
+  protected: 
+    uint8_t  _inc;
+};
 
 ////////////////////////////////////////
 // EffectControlPanel
@@ -111,13 +127,18 @@ class EffectControlPanel{
 
 #define PUSH_BUTTON_TO_CMD(name, cmd, pin) \ 
   PushButton btn##name(pin); \
-  EffectControlPb ec##name(cmd, &btn##name); \
-  ecc->addControl(&ec##name);
+  EffectControlPb ecpb##name(cmd, &btn##name); \
+  ecc->addControl(&ecpb##name);
 
 #define POT_TO_CMD(name, cmd, pin) \ 
   Potentiometer pot##name(pin); \
-  EffectControlPtmtr ec##name(cmd, &pot##name); \
-  ecc->addControl(&ec##name);
+  EffectControlPtmtr ecptm##name(cmd, &pot##name); \
+  ecc->addControl(&ecptm##name);
+
+#define ROTENC_TO_CMD(name, cmd, pinData, pinClock, ...) \
+  RotaryEncoder re##name(pinData, pinClock); \
+  EffectControlRotEnc ecre##name(cmd, &re##name); \
+  ecc->addControl(&ecre##name);
 
 #define BEGIN_REMOTE(name, pin) \ 
   IRRemoteRecv rmt##Name(pin); \
