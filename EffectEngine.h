@@ -47,4 +47,14 @@ class EffectEngine{
     unsigned long _millis;              //Processing
 };
 
+#define BEGIN_EFFECTS(p) \
+  EffectEngine *e = &p;
+
+#define END_EFFECTS()
+
+#define ADD_EFFECT(ClassEffect) \
+  ClassEffect e##ClassEffect; \
+  e->addEffect(&e##ClassEffect);
+
+
 #endif //__EFFECTENGINE_H

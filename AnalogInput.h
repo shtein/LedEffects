@@ -32,6 +32,8 @@ class Potentiometer: public AnalogInput {
   protected:
     uint16_t  _pin:5;  
     uint16_t  _value:11;
+    uint16_t  _avgCnt:5;  
+    uint16_t  _valueAvg:11;
 };
 
 

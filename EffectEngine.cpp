@@ -29,14 +29,17 @@ void EffectEngine::addEffect(Effect *effect){
 
   _effects[_numEffects] = effect;
   _numEffects ++;
-}
+}  
 
 void EffectEngine::init(int numLeds, uint8_t mode) {  
+  
   //Init LEDs
-  FastLED.addLeds<WS2812B, LED_PIN>(_leds, MAX_LEDS).setCorrection( TypicalLEDStrip );
+  FastLED.addLeds<WS2811, LED_PIN, RGB>(_leds, MAX_LEDS).setCorrection( TypicalLEDStrip );
   //FastLED.addLeds<NEOPIXEL, LED_PIN>(_leds, MAX_LEDS).setCorrection( TypicalLEDStrip );  
   //FastLED.addLeds<WS2801, LED_PIN, LED_CLOCK, RGB>(_leds, MAX_LEDS).setCorrection( TypicalLEDStrip );
-  
+
+  //Don't uncomment it if you don;t know what it is 
+  //FastLED.setMaxPowerInVoltsAndMilliamps(5,1000);
 
   //Save initial values
   _numLeds = numLeds;
@@ -73,15 +76,15 @@ void EffectEngine::setMode(uint8_t mode){
   switch(_mode){
     case EEM_OFF: //Off
       _curEffect = NULL;
-      Serial.print("mode off\n");
+      DBG_OUTLN("mode off");
     break;
     case EEM_STATIC: //Static light
       _curEffect = &_eStatic;
-      Serial.print("mode static\n");
+      DBG_OUTLN("mode static");
      break;
      case EEM_EFFECT:
       _curEffect =  _effects[_effectNum];
-      Serial.print("mode effect\n");
+      DBG_OUTLN("mode effect");
      break;
   }  
 
@@ -123,8 +126,6 @@ void EffectEngine::onNumLedsChange(const struct CtrlQueueData &data){
 
   //Refresh effect
   //setEffect(_curEffect);
-
-  Serial.println("EffectEngine::onNumLedsChange");
 }
 
 void EffectEngine::onEffectChange(const struct CtrlQueueData &data){

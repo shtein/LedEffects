@@ -3,7 +3,7 @@
 
 
 Effect::Effect(){
-  _speedDelay = 10;
+  _speedDelay = 25;
 }
 
 Effect::~Effect(){

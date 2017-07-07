@@ -7,7 +7,15 @@
 //PIN of IR remote receiver
 #define REMOTE_PIN  7
 
-//LED PINS
+//Push button for mode
+#define MODE_PIN    10
+
+//Rotary encoder pins
+#define SPEED_CLOCK_PIN 3
+#define SPEED_PIN       4
+#define EFFECT_PIN      5
+
+//LED Pins
 #define LED_PIN     12
 #define LED_CLOCK   13
 

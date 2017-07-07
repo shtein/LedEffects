@@ -1,8 +1,6 @@
 #ifndef __COLORWIPE_H
 #define __COLORWIPE_H
 
-#endif //__COLORWIPE_H
-
 //////////////////////////////
 // Color Wipe Effect
 
@@ -47,4 +45,6 @@ inline void EffectColorWipe::proceed(CRGB *leds, int numLeds){
     setRandomColor();
   }
 }
+
+#endif //__COLORWIPE_H
     

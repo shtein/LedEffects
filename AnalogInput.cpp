@@ -14,17 +14,18 @@ AnalogInput::~AnalogInput(){
 // Potentiometer
 
 Potentiometer::Potentiometer(uint8_t pin){
-  _pin   = pin;
-  _value = POT_MIN;
- 
-  read();
+  _pin        = pin;
+  _value      = analogRead(_pin);
 }
 
 Potentiometer::~Potentiometer(){
 }
 
+#define alfa 0.5
 void Potentiometer::read(){ 
-  _value = analogRead(_pin);
+  //Running average, sort of
+  _value = _value * alfa + (1 - alfa) * analogRead(_pin) + 0.5;
+
 }
 
 int Potentiometer::value() const{
@@ -115,9 +116,9 @@ void IRRemoteRecv::read(){
         _repeat = 1;
       }
 
-      Serial.print("Remote button ");
-      Serial.print(results.value, HEX);
-      Serial.print("\n");
+      DBG_OUT("Remote button ");
+      DBG_OUT(results.value, HEX);
+      DBG_OUTLN("\n");
     }
     
   }

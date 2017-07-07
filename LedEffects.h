@@ -13,9 +13,12 @@
 #include "ColorWipe.h"
 #include "MoodBlobs.h"
 #include "Static.h"
+#include "Noise.h"
 #include "EffectEngineCtx.h"
 #include "EffectEngine.h"
 #include "EffectControls.h"
+
+
 
 
 #endif //__LEDEFFECTS_H

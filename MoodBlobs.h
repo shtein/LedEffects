@@ -14,8 +14,8 @@ protected:
     void proceed(CRGB *leds, int numLeds); 
 
 protected:
-  uint8_t _blobPhase;
-  int     _step;
+  byte _blobPhase;
+  int _step;
 };
 
 

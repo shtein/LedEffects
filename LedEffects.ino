@@ -4,37 +4,29 @@
 #include "pins.h"
 
 void setup() {
-  Serial.begin(9600);  
+  DBG_INIT();
 
-  //Effects
-  EffectMoodBlobs           eMoodBlobs;
-  EffectRainbow             eRainbow;
-  EffectFadeInOut           eFadeInOut;
-  EffectRunningLights       eRunningLights;
-  EffectColorWipe           eColorWipe;
-  EffectTheaterChaseRainbow eTheaterChaseRainbow;
-  
   //Effect Engine
   EffectEngine ee;
+  BEGIN_EFFECTS(ee)
+    ADD_EFFECT(EffectNoise)
+    ADD_EFFECT(EffectMoodBlobs)
+    ADD_EFFECT(EffectRainbow)
+    ADD_EFFECT(EffectFadeInOut)
+    ADD_EFFECT(EffectRunningLights)
+    ADD_EFFECT(EffectColorWipe)
+  END_EFFECTS()
   
-  //Add effects
-  ee.addEffect(&eMoodBlobs);
-  ee.addEffect(&eTheaterChaseRainbow);
-  ee.addEffect(&eFadeInOut);
-  ee.addEffect(&eRainbow);
-  ee.addEffect(&eColorWipe);
-  ee.addEffect(&eRunningLights);
-
   //Init
   ee.init(50, EEM_STATIC); //88 for Igor
 
   //Control panel
   EffectControlPanel cp;
   BEGIN_CONTROL_MAP(cp)
-    //PUSH_BUTTON_TO_CMD(Mode, EEMC_MODE, 2)  
-    //PUSH_BUTTON_TO_CMD(Effect, EEMC_EFFECT, 10)  
+    PUSH_BUTTON_TO_CMD(Mode, EEMC_MODE, MODE_PIN)  
+    PUSH_BUTTON_TO_CMD(Effect, EEMC_EFFECT, EFFECT_PIN)  
     POT_TO_CMD(Leds, EEMC_NUMLEDS, NUMLEDS_PIN)
-   // ROTENC_TO_CMD(Speed, EEMC_SPEED, 7, 5)
+    ROTENC_TO_CMD(Speed, EEMC_SPEED, SPEED_PIN, SPEED_CLOCK_PIN)
     
     BEGIN_REMOTE(Remote, REMOTE_PIN)
       RMT_BUTTON_TO_CMD(Mode, EEMC_MODE, RKEY_OK)
@@ -44,6 +36,7 @@ void setup() {
       RMT_BUTTON_PAIR_TO_CMD(ColorSat, EEMC_COLOR_SAT, RKEY_2, RKEY_5, 5) 
       RMT_BUTTON_PAIR_TO_CMD(ColorVal, EEMC_COLOR_VAL, RKEY_3, RKEY_6, 5) 
     END_REMOTE()    
+    
   END_CONTROL_MAP()
 
   //Main loop

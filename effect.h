@@ -39,10 +39,10 @@ class Effect{
    
  private:
   //Color for some effects or static
-  CHSV  _hsv;
+  CHSV   _hsv;
   
   //Speed
-  int                 _speedDelay;
+  int   _speedDelay;
 };
 
 

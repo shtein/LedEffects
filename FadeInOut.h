@@ -15,15 +15,15 @@ class EffectFadeInOut: public Effect{
     void reset();
 
   protected:
-    int  _fade; //negative - fade in, positive fade out
-    int  _step; //cycle
+    int  _fade:5;  //negative - fade in, positive fade out
+    int  _step:11; //cycle
 };
 
 
 #define FADE_SPEED
 
 inline EffectFadeInOut::EffectFadeInOut(){
-  _fade       = -1;
+  _fade       = -5;
   _step       = 0xFF;
   setSpeedDelay(50); 
 }
