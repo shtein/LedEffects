@@ -35,34 +35,110 @@ int Potentiometer::value() const{
 
 //////////////////
 // PushButton
+#define PUSH_LONG_INTERVAL  3000
+
+#define BUTTON_STATE_OFF            0x00
+#define BUTTON_STATE_PUSHED_SHORT   0x01
+#define BUTTON_STATE_PUSHED_LONG    0x02
+#define BUTTON_STATE_PUSHED_WAIT    0x03
+
+
 PushButton::PushButton(uint8_t pin){
    _pin        = pin;
    pinMode(_pin, INPUT);
-   digitalWrite(_pin, HIGH);
-  _pushed     = 0;
+   digitalWrite(_pin, HIGH);  
   _value      = digitalRead(_pin);
-  _valueIdle  = _value;
+  _state      = BUTTON_STATE_OFF; 
+  _millis     = 0;
 }
 
 PushButton::~PushButton(){
 }
 
-void PushButton::read(){
-  if( clicked() ){
-    _pushed = 0;
+//Pushed state - long push, repeats every three second
+//Clicked state - push and release, within less than three second
+
+void PushButton::read(){  
+
+  //Analys last saved buttone value
+  if(_value == HIGH){
+    //Reset everything
+      _millis = 0;
+      _state  = BUTTON_STATE_OFF;  
+  }
+
+  //Analyse current state
+  switch(_state){
+    case BUTTON_STATE_OFF: //off      
+    
+      //Check if just pressed
+      if(_value == LOW){
+        //Be ready for short push
+        _state = BUTTON_STATE_PUSHED_SHORT;
+        //Set timer
+        _millis = millis() + PUSH_LONG_INTERVAL; 
+        DBG_OUTLN("pushed");
+      }
+    break;
+    case BUTTON_STATE_PUSHED_SHORT: //Short push
+    case BUTTON_STATE_PUSHED_WAIT:  //Wait for next interval
+
+       //Check timer
+      if(_millis < millis()){
+        _state = BUTTON_STATE_PUSHED_LONG;
+        //Reset the timer so next long push event happens
+        _millis = millis() + PUSH_LONG_INTERVAL;
+         DBG_OUTLN("long pushed");
+      }
+    break;
+    case BUTTON_STATE_PUSHED_LONG:
+    
+      //Reset long push
+      _state = BUTTON_STATE_PUSHED_WAIT;
+       DBG_OUTLN("wait");
+    break;
   }
   
+    
+  //Read button state
   _value = digitalRead(_pin);
+}
 
-  if (_value != _valueIdle){
-    _pushed = 1;
-  }
+bool PushButton::pushedLong() const{
+  //Pushed for long time
+  return _state == BUTTON_STATE_PUSHED_LONG ? true : false;
+}
+
+bool PushButton::clickedShort() const{
+  //Was pushed for short period of time and than released
+  return _value == HIGH && _state == BUTTON_STATE_PUSHED_SHORT? true : false;
 }
 
 
-bool PushButton::clicked() const{
-  return _value == _valueIdle && _pushed == 1;
+bool PushButton::clickedLong() const{
+  //Was pushed for long period of time and than released
+  return _value == HIGH && (_state == BUTTON_STATE_PUSHED_WAIT || _state == BUTTON_STATE_PUSHED_LONG) ? true : false;
 }
+
+bool PushButton::value(uint8_t ctrl) const{
+  switch(ctrl){
+    case PB_CONTROL_CLICK_SHORT:
+      return clickedShort();
+    break; 
+    case PB_CONTROL_CLICK_LONG:
+      return clickedLong();
+    break;
+    case PB_CONTROL_CLICK:
+      return clickedShort() || clickedLong();
+    break;
+    case PB_CONTROL_PUSH_LONG:
+      return pushedLong();
+    break;
+  };
+  
+ return false;
+}
+
 
 //////////////////////////
 // IRRemoteRecv
@@ -95,7 +171,7 @@ void IRRemoteRecv::read(){
 
 
     //Stupid workaround for ws2811, ws2812 and ws2812b where internal clock conflicts with interrups required for IR receiver
-    //See https://github.com/FastLED/FastLED/issues/198
+    //See https://github.com/Fa9876rdstLED/FastLED/issues/198
     while (!_recv.isIdle());
  
     //Now go and get IR signals
@@ -117,10 +193,11 @@ void IRRemoteRecv::read(){
       }
 
       DBG_OUT("Remote button ");
-      DBG_OUT(results.value, HEX);
-      DBG_OUTLN("\n");
+      DBG_OUTLN(results.value, HEX);
     }
     
+    // Receiving  next value   
+    _recv.resume(); 
   }
   else {
     if (_millis <= millis()){

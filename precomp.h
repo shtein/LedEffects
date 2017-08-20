@@ -17,4 +17,13 @@
 #endif
 
 
+//#define CHECK_MEM
+
+#ifdef CHECK_MEM 
+  #define _CM static
+#else
+  #define _CM
+#endif
+  
+
 #endif //__PRECOMP_H

@@ -1,7 +1,6 @@
 #include "precomp.h"
 #include "EffectControls.h"
 #include "EffectEngineCtx.h"
-#include "pins.h"
 
 
 int powInt(int x, int y, int limit){
@@ -45,16 +44,17 @@ void EffectControl::loop(CtrlQueueItem &itm){
 
 ////////////////////////////
 // EffectControlPb
-EffectControlPb::EffectControlPb(uint8_t cmd, PushButton *btn, uint8_t flag):
+EffectControlPb::EffectControlPb(uint8_t cmd, PushButton *btn, uint8_t ctrl, uint8_t flag):
   EffectControl(cmd, btn){
   _flag = flag;
+  _ctrl = ctrl;  
 }
 
 EffectControlPb::~EffectControlPb(){
 }
 
 bool EffectControlPb::triggered() const{
-  return ((PushButton *)getInput())->clicked();
+  return ((PushButton *)getInput())->value(_ctrl);
 }
 
 void EffectControlPb::getData(CtrlQueueData &data){
@@ -70,7 +70,7 @@ void EffectControlPb::getData(CtrlQueueData &data){
 
 EffectControlPtmtr::EffectControlPtmtr(uint8_t cmd, Potentiometer *ptn, int noiseThreshold):
   EffectControl(cmd, ptn) {
-  _value          = -10; //just to make sure it is different from what we read
+  _value          = POT_MAX + 1; //just to make sure it is different from what we read
   _noiseThreshold = noiseThreshold; 
 }
 
@@ -95,9 +95,13 @@ void EffectControlPtmtr::getData(CtrlQueueData &data){
 
 ////////////////////////////
 // EffectControlIRBtn
+
+#define BTN_TO_KEY(btn) ((unsigned long)btn | 0xFF0000)
+#define KEY_TO_BTN(key) (uint16_t)(btn & 0x0000FFFF)
+
 EffectControlIRBtn::EffectControlIRBtn(uint8_t cmd, IRRemoteRecv *ir, unsigned long btn, bool dir, uint8_t repeat):
   EffectControl(cmd, ir) {
-  _btn    = btn;
+  _btn    = KEY_TO_BTN(btn);
   _dir    = dir;
   _repeat = repeat;
 }
@@ -106,7 +110,7 @@ EffectControlIRBtn::~EffectControlIRBtn(){
 }
 
 bool EffectControlIRBtn::triggered() const{
-  int n = ((IRRemoteRecv *)getInput())->pushed(_btn);
+  int n = ((IRRemoteRecv *)getInput())->pushed(BTN_TO_KEY(_btn));
 
   //Not pushed
   if(n == 0) {
@@ -124,7 +128,7 @@ bool EffectControlIRBtn::triggered() const{
 
 void EffectControlIRBtn::getData(CtrlQueueData &data){
   data.flag  = _repeat > 0 ? CTF_VAL_DELTA : (_dir ? CTF_VAL_NEXT: CTF_VAL_PREV ); 
-  data.value = (_dir ? 1 : -1) * powInt(2, ((IRRemoteRecv *)getInput())->pushed(_btn) - 1, _repeat);
+  data.value = (_dir ? 1 : -1) * powInt(2, ((IRRemoteRecv *)getInput())->pushed(BTN_TO_KEY(_btn)) - 1, _repeat);
   data.min   = 0;
   data.max   = 0;
 }

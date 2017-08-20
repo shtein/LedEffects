@@ -15,7 +15,7 @@ protected:
 
 protected:
   byte _blobPhase;
-  int _step;
+  int  _step;
 };
 
 
@@ -31,12 +31,11 @@ inline EffectMoodBlobs::~EffectMoodBlobs(){
 
 
 void EffectMoodBlobs::reset(){
-  _step       = 0;
-  _blobPhase   = 0;
+  _step      = 0;
+  _blobPhase = 0;
 }
 
 void EffectMoodBlobs::proceed(CRGB *leds, int numLeds){
-
   //Blob led increment
   float valueInc = 255. / BLOB_SIZE;
 

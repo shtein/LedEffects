@@ -1,6 +1,6 @@
 #include "precomp.h"
 #include "effect.h"
-
+#include "effectenginectx.h"
 
 Effect::Effect(){
   _speedDelay = 25;
@@ -43,10 +43,12 @@ void Effect::setRandomColor(){
   setHSV(CHSV(random(256), 0xFF, 0xFF));
 }
 
-void Effect::setSpeedDelay(int speedDelay){
-  _speedDelay = speedDelay;
+void Effect::setSpeedDelay(uint16_t speedDelay){
+  //Scale down
+  _speedDelay = (uint8_t)map(speedDelay, SPEED_DELAY_MIN, SPEED_DELAY_MAX, 0, 255);
 }
 
-int Effect::getSpeedDelay() const{
-  return _speedDelay;
+uint16_t Effect::getSpeedDelay() const{
+  //Scale Up
+  return (uint16_t)map(_speedDelay, 0, 255, SPEED_DELAY_MIN, SPEED_DELAY_MAX);
 }

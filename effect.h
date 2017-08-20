@@ -4,6 +4,8 @@
 ///////////////////
 // Basic effect
 
+class CRGB;
+
 class Effect{
   public:
     Effect();
@@ -21,8 +23,8 @@ class Effect{
     void setHSV(const CHSV &color);
 
     //Speed delay
-    void setSpeedDelay(int speedDelay);
-    int  getSpeedDelay() const;
+    void setSpeedDelay(uint16_t speedDelay);
+    uint16_t  getSpeedDelay() const;
 
   protected:
     virtual void reset() = 0;
@@ -39,10 +41,10 @@ class Effect{
    
  private:
   //Color for some effects or static
-  CHSV   _hsv;
+  CHSV     _hsv;
   
   //Speed
-  int   _speedDelay;
+  uint8_t  _speedDelay; //byte, i.e. range is 0 - 255, that maps to range from SPEED_DELAY_MIN tp SPEED_DELAY_MAX by setSpeedDelay and getSpeedDelay
 };
 
 

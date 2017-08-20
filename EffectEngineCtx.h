@@ -1,11 +1,8 @@
 #ifndef __EFFECTENGINECTX_H
 #define __EFFECTENGINECTX_H
 
-//Leds
-#define MAX_LEDS    300
-
 //Speed delay
-#define SPEED_DELAY_MIN 1
+#define SPEED_DELAY_MIN 10
 #define SPEED_DELAY_MAX 1000
 
 //Change commands

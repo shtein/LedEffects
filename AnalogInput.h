@@ -40,6 +40,11 @@ class Potentiometer: public AnalogInput {
 ///////////////////////
 // Simple push button
 // Define pin
+
+#define PB_CONTROL_CLICK_SHORT 0x01
+#define PB_CONTROL_CLICK_LONG  0x02
+#define PB_CONTROL_CLICK       0x03
+#define PB_CONTROL_PUSH_LONG   0x04
  
 class PushButton: public AnalogInput{
   public:
@@ -47,13 +52,18 @@ class PushButton: public AnalogInput{
     ~PushButton();
 
     void read();
-    bool clicked() const;
+        
+    bool clickedShort() const;
+    bool pushedLong() const;
+    bool clickedLong() const;
+
+    bool value(uint8_t ctrl) const;
 
   protected:
-    uint8_t         _pin:5;
-    uint8_t        _value:1;
-    uint8_t        _valueIdle:1;
-    uint8_t        _pushed:1;    
+    uint8_t        _pin:5;
+    uint8_t        _value:1; 
+    uint8_t        _state:2;
+    unsigned long  _millis;    
 };
 
 
@@ -91,9 +101,9 @@ class IRRemoteRecv: public AnalogInput {
   protected:
     IRrecv         _recv;          
     unsigned long  _millis;
-    unsigned long  _value;
-    uint8_t        _repeat:7;
-    uint8_t        _pushed:1;
+    unsigned long  _value; 
+    uint16_t       _repeat:7;
+    uint16_t       _pushed:1;
 };
 
 
@@ -109,10 +119,10 @@ class RotaryEncoder: public AnalogInput {
     int value() const;
 
   protected:
-    uint8_t  _pinData:5;  
-    uint8_t  _pinClock:5;  
-    uint8_t  _value:5;
-    uint8_t  _valClock:1;
+    uint16_t  _pinData:5;  
+    uint16_t  _pinClock:5;  
+    uint16_t  _value:5;
+    uint16_t  _valClock:1;
 };
 
 

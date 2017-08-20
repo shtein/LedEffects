@@ -25,10 +25,10 @@ class EffectControl{
 };
 
 ////////////////////////////////
-// Push button control, reacts on click
+// Push button control, reacts on either short click, long click or long push
 class EffectControlPb: public EffectControl{
   public:
-    EffectControlPb(uint8_t cmd, PushButton *input, uint8_t flag = CTF_VAL_NEXT);
+    EffectControlPb(uint8_t cmd, PushButton *input, uint8_t ctrl = PB_CONTROL_CLICK, uint8_t flag = CTF_VAL_NEXT);
    ~EffectControlPb();
 
   protected:
@@ -36,7 +36,8 @@ class EffectControlPb: public EffectControl{
     void getData(CtrlQueueData &data);
 
   protected:
-    uint8_t _flag;
+    uint8_t _flag:4;
+    uint8_t _ctrl:4;
 };
 
 ////////////////////////////////
@@ -70,9 +71,9 @@ class EffectControlIRBtn: public EffectControl{
     void getData(CtrlQueueData &data);
 
   protected:
-    unsigned long _btn;
-    uint8_t       _dir:1;
-    uint8_t       _repeat:7;
+    uint16_t _btn; //Making it 16 bit instead of 32 to save some memory for uno and nano. For the purpose of the remote key recognition first leading FFs are stripped
+    uint8_t  _dir:1;
+    uint8_t  _repeat:7;
 };
 
 ////////////////////////////////////////
@@ -119,42 +120,80 @@ class EffectControlPanel{
 
 
 ///////////////////////////////////////
+//Macros for temp variable names
+#define TOKEN_CONCAT(x, y) x ## y
+#define TOKEN_CONCAT2(x, y) TOKEN_CONCAT(x, y)
+#define VAR_NAME(prefix) TOKEN_CONCAT2(prefix, __LINE__)
+
+#define BTN VAR_NAME(btn) //Temp button variable
+#define BTN_CTRL VAR_NAME(ecbtn)
+
+#define IR_NAME VAR_NAME(rmt)
+#define IR_CTRL VAR_NAME(ectbtn)
+#define IR_CTRL_UP VAR_NAME(ecbtnUp)
+#define IR_CTRL_DOWN VAR_NAME(ecbtnDown)
+
+#define POT_NAME VAR_NAME(pot)
+#define POT_CTRL VAR_NAME(ecpot)
+
+#define ROT_NAME VAR_NAME(rot)
+#define ROT_CTRL VAR_NAME(ecrot)
+
+
+///////////////////////////////////////
 //Control map
-#define BEGIN_CONTROL_MAP(p) \ 
-  EffectControlPanel *ecc = &p;
+#define BEGIN_CONTROL_MAP() \
+  _CM EffectControlPanel cp; \
+  IRRemoteRecv *r = NULL; \
+  PushButton *pb  = NULL; 
 
 #define END_CONTROL_MAP()
 
-#define PUSH_BUTTON_TO_CMD(name, cmd, pin) \ 
-  PushButton btn##name(pin); \
-  EffectControlPb ecpb##name(cmd, &btn##name); \
-  ecc->addControl(&ecpb##name);
+#define BEGIN_PUSH_BUTTON(pin) \
+  _CM PushButton BTN(pin); \
+  pb = &BTN;  
 
-#define POT_TO_CMD(name, cmd, pin) \ 
-  Potentiometer pot##name(pin); \
-  EffectControlPtmtr ecptm##name(cmd, &pot##name); \
-  ecc->addControl(&ecptm##name);
+#define END_PUSH_BUTTON() \
+  pb = NULL;  
 
-#define ROTENC_TO_CMD(name, cmd, pinData, pinClock, ...) \
-  RotaryEncoder re##name(pinData, pinClock); \
-  EffectControlRotEnc ecre##name(cmd, &re##name); \
-  ecc->addControl(&ecre##name);
-
-#define BEGIN_REMOTE(name, pin) \ 
-  IRRemoteRecv rmt##Name(pin); \
-  IRRemoteRecv *r = &rmt##Name;
-#define END_REMOTE()
+#define PUSH_BUTTON_TO_CMD(cmd, ...) \
+  _CM EffectControlPb BTN_CTRL(cmd, pb, __VA_ARGS__); \
+  cp.addControl(&BTN_CTRL);
 
 
-#define RMT_BUTTON_TO_CMD(name, cmd, code) \ 
-  EffectControlIRBtn rmb##name(cmd, r, code); \
-  ecc->addControl(&rmb##name);
+#define PUSH_BUTTON_SA_TO_CMD(cmd, pin) \
+  BEGIN_PUSH_BUTTON(pin); \
+  PUSH_BUTTON_TO_CMD(cmd, PB_CONTROL_CLICK); \
+  END_PUSH_BUTTON()
 
-#define RMT_BUTTON_PAIR_TO_CMD(name, cmd, code1, code2, repeat) \ 
-  EffectControlIRBtn rmb##name##Up(cmd, r, code1, true, repeat); \ 
-  ecc->addControl(&rmb##name##Up); \
-  EffectControlIRBtn rmb##name##Down(cmd, r, code2, false, repeat); \
-  ecc->addControl(&rmb##name##Down);
+
+#define POT_TO_CMD(cmd, pin) \
+  _CM Potentiometer POT_NAME(pin); \
+  _CM EffectControlPtmtr POT_CTRL(cmd, &POT_NAME); \
+  cp.addControl(&POT_CTRL);
+
+#define ROTENC_TO_CMD(cmd, pinData, pinClock) \
+  _CM RotaryEncoder ROT_NAME(pinData, pinClock); \
+  _CM EffectControlRotEnc ROT_CTRL(cmd, &ROT_NAME); \
+  cp.addControl(&ROT_CTRL);
+
+#define BEGIN_REMOTE(pin) \
+  _CM IRRemoteRecv IR_NAME(pin); \
+  r = &IR_NAME;
+  
+#define END_REMOTE() \
+  r = NULL;
+
+
+#define RMT_BUTTON_TO_CMD(cmd, code) \
+  _CM EffectControlIRBtn IR_CTRL(cmd, r, code); \
+  cp.addControl(&IR_CTRL);
+
+#define RMT_BUTTON_PAIR_TO_CMD(cmd, code1, code2, repeat) \
+  _CM EffectControlIRBtn IR_CTRL_UP(cmd, r, code1, true, repeat); \
+  cp.addControl(&IR_CTRL_UP); \
+  _CM EffectControlIRBtn IR_CTRL_DOWN(cmd, r, code2, false, repeat); \
+  cp.addControl(&IR_CTRL_DOWN);
 
 
 #endif //__EFFECTCONTROLS_H

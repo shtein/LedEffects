@@ -2,7 +2,6 @@
 #include "Effect.h"
 #include "EffectEngine.h"
 #include "EffectEngineCtx.h"
-#include "pins.h"
 
 
 EffectEngine::EffectEngine(){
@@ -11,8 +10,9 @@ EffectEngine::EffectEngine(){
   _effectNum  = 0;
   ::memset(_effects, 0, sizeof(_effects));
 
-  _numLeds = MAX_LEDS;
-  fill_solid(_leds, MAX_LEDS, CRGB::Black);
+  _numLeds = 0;
+  _maxLeds = 0;
+  _leds    = 0;
 
   _mode = EEM_OFF;
 }
@@ -31,18 +31,16 @@ void EffectEngine::addEffect(Effect *effect){
   _numEffects ++;
 }  
 
-void EffectEngine::init(int numLeds, uint8_t mode) {  
-  
-  //Init LEDs
-  FastLED.addLeds<WS2811, LED_PIN, RGB>(_leds, MAX_LEDS).setCorrection( TypicalLEDStrip );
-  //FastLED.addLeds<NEOPIXEL, LED_PIN>(_leds, MAX_LEDS).setCorrection( TypicalLEDStrip );  
-  //FastLED.addLeds<WS2801, LED_PIN, LED_CLOCK, RGB>(_leds, MAX_LEDS).setCorrection( TypicalLEDStrip );
-
+void EffectEngine::init(CRGB *leds, int maxLeds, uint8_t mode) {  
+ 
   //Don't uncomment it if you don;t know what it is 
   //FastLED.setMaxPowerInVoltsAndMilliamps(5,1000);
 
-  //Save initial values
-  _numLeds = numLeds;
+  _leds    = leds;
+  _numLeds = maxLeds;
+  _maxLeds = maxLeds;
+  fill_solid(_leds, _maxLeds, CRGB::Black);
+    
   _mode    = 0xFF; 
 
   //Set mode
@@ -54,7 +52,6 @@ void EffectEngine::init(int numLeds, uint8_t mode) {
 
 void EffectEngine::showStrip() {
   FastLED.show();
-  //delay(1);
 }
 
 
@@ -89,7 +86,7 @@ void EffectEngine::setMode(uint8_t mode){
   }  
 
   //Black the lights
-  fill_solid(_leds, MAX_LEDS, CRGB::Black);
+  fill_solid(_leds, _maxLeds, CRGB::Black);
 
   //Refresh effect
   setEffect(_curEffect);
@@ -111,7 +108,7 @@ void EffectEngine::setEffect(Effect *effect){
 void EffectEngine::onNumLedsChange(const struct CtrlQueueData &data){
   
   //Get new mode value
-  int numLeds = data.translate(_numLeds, 0, MAX_LEDS);
+  int numLeds = data.translate(_numLeds, 0, _maxLeds);
 
   //Do nothing if did not change
   if(_numLeds == numLeds)
@@ -119,10 +116,13 @@ void EffectEngine::onNumLedsChange(const struct CtrlQueueData &data){
 
   //Save new value
   _numLeds = numLeds;
+
+  DBG_OUT("new number of leds: ");
+  DBG_OUTLN(_numLeds);
   
 
  //Black the lights
-  fill_solid(_leds + _numLeds, MAX_LEDS - _numLeds, CRGB::Black);
+  fill_solid(_leds + _numLeds, _maxLeds - _numLeds, CRGB::Black);
 
   //Refresh effect
   //setEffect(_curEffect);
@@ -139,7 +139,7 @@ void EffectEngine::onEffectChange(const struct CtrlQueueData &data){
 
   
   //Black the leds
-  fill_solid(_leds, MAX_LEDS, CRGB::Black);
+  fill_solid(_leds, _maxLeds, CRGB::Black);
 
   //Change effect
   setEffect(_effects[_effectNum]);

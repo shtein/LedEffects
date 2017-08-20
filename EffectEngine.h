@@ -6,17 +6,17 @@
 
 class Effect;
 
-#define MAX_EFFECTS 20
+#define MAX_EFFECTS 15
 
 class EffectEngine{
   public:
     EffectEngine();
     ~EffectEngine();
 
-    void init(int numLeds = MAX_LEDS, uint8_t mode = EEM_OFF);
+    void init(CRGB *leds, int maxLeds, uint8_t mode = EEM_OFF);
     void addEffect(Effect *effect);
     
-    void loop(const struct CtrlQueueItem &itm);
+    void loop(const struct CtrlQueueItem &itm);    
     
   protected:
     void showStrip();
@@ -39,22 +39,41 @@ class EffectEngine{
 
     EffectStatic _eStatic;
 
-    CRGB         _leds[MAX_LEDS];       //LEDs
-    int          _numLeds;              //Current number of leds
-    
-    uint8_t      _mode;                 //Current mode
+    CRGB        *_leds;                //Leds
+    uint32_t    _maxLeds:12;           //Current number of leds    
+    uint32_t    _numLeds:12;           //Current number of leds    
+    uint32_t    _mode:8;               //Current mode
 
     unsigned long _millis;              //Processing
 };
 
-#define BEGIN_EFFECTS(p) \
-  EffectEngine *e = &p;
+#define BEGIN_EFFECT_ENGINE() \
+  _CM EffectEngine ee;
+
+#define END_EFFECT_ENGINE()  \
+  _CM CtrlQueueItem itm; \
+  for( ;; ){\
+     cp.loop(itm); \
+     ee.loop(itm); \
+  }
+
+#define BEGIN_EFFECTS()
 
 #define END_EFFECTS()
 
 #define ADD_EFFECT(ClassEffect) \
-  ClassEffect e##ClassEffect; \
-  e->addEffect(&e##ClassEffect);
+  _CM ClassEffect e##ClassEffect; \
+  ee.addEffect(&e##ClassEffect);
 
+
+#define BEGIN_LEDS(xmaxleds, xmode) \
+   _CM CRGB leds[xmaxleds]; \
+    uint8_t mode = xmode;
+    
+#define ADD_STRIP(Type, ...) \
+  FastLED.addLeds<Type, __VA_ARGS__ >(leds, sizeof(leds) / sizeof(leds[0])).setCorrection( TypicalLEDStrip );  
+
+#define END_LEDS() \
+    ee.init(leds, sizeof(leds) / sizeof(leds[0]), mode);
 
 #endif //__EFFECTENGINE_H

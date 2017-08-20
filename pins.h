@@ -19,4 +19,6 @@
 #define LED_PIN     12
 #define LED_CLOCK   13
 
+#define LED_PIN2    8
+
 #endif //__PINS_H
