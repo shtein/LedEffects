@@ -47,33 +47,4 @@ class EffectEngine{
     unsigned long _millis;              //Processing
 };
 
-#define BEGIN_EFFECT_ENGINE() \
-  _CM EffectEngine ee;
-
-#define END_EFFECT_ENGINE()  \
-  _CM CtrlQueueItem itm; \
-  for( ;; ){\
-     cp.loop(itm); \
-     ee.loop(itm); \
-  }
-
-#define BEGIN_EFFECTS()
-
-#define END_EFFECTS()
-
-#define ADD_EFFECT(ClassEffect) \
-  _CM ClassEffect e##ClassEffect; \
-  ee.addEffect(&e##ClassEffect);
-
-
-#define BEGIN_LEDS(xmaxleds, xmode) \
-   _CM CRGB leds[xmaxleds]; \
-    uint8_t mode = xmode;
-    
-#define ADD_STRIP(Type, ...) \
-  FastLED.addLeds<Type, __VA_ARGS__ >(leds, sizeof(leds) / sizeof(leds[0])).setCorrection( TypicalLEDStrip );  
-
-#define END_LEDS() \
-    ee.init(leds, sizeof(leds) / sizeof(leds[0]), mode);
-
 #endif //__EFFECTENGINE_H

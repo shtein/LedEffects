@@ -4,7 +4,7 @@
 #include "Arduino.h"
 #include "FastLED.h"
 
-//#define LEDBG
+#define LEDBG
 
 #ifdef LEDBG
   #define DBG_INIT()      Serial.begin(57600)  

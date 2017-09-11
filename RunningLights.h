@@ -22,7 +22,7 @@ class EffectRunningLights: public Effect{
 inline EffectRunningLights::EffectRunningLights(){
   _step = 0;
   setHSV(CHSV(HUE_RED, 0xFF, 0xFF));
-  setSpeedDelay(20);
+  setSpeedDelay(50);
 }
 
 inline EffectRunningLights::~EffectRunningLights(){

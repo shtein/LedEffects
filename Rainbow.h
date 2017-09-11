@@ -89,7 +89,7 @@ inline void EffectTheaterChaseRainbow::proceed(CRGB *leds, int numLeds){
   
   //Turn every third pixell off
   for(int i = 0; i < numLeds; i = i + 3){
-      setPixel(leds[i + counters[1] % numLeds], 0, 0, 0);    
+      setPixel(leds[(i + counters[1]) % numLeds], 0, 0, 0);          
   }
 
   //Move forward

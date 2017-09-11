@@ -15,6 +15,8 @@ EffectEngine::EffectEngine(){
   _leds    = 0;
 
   _mode = EEM_OFF;
+
+  _millis     = 0;
 }
 
 EffectEngine::~EffectEngine(){
@@ -69,10 +71,15 @@ void EffectEngine::onModeChange(const struct CtrlQueueData &data){
 
 void EffectEngine::setMode(uint8_t mode){
   _mode = mode;
+
+  //Black the lights
+  fill_solid(_leds, _maxLeds, CRGB::Black);
+
   
   switch(_mode){
     case EEM_OFF: //Off
       _curEffect = NULL;
+      showStrip(); //Turn off
       DBG_OUTLN("mode off");
     break;
     case EEM_STATIC: //Static light
@@ -84,13 +91,9 @@ void EffectEngine::setMode(uint8_t mode){
       DBG_OUTLN("mode effect");
      break;
   }  
-
-  //Black the lights
-  fill_solid(_leds, _maxLeds, CRGB::Black);
-
+  
   //Refresh effect
   setEffect(_curEffect);
- 
 }
 
 void EffectEngine::setEffect(Effect *effect){  
@@ -136,7 +139,6 @@ void EffectEngine::onEffectChange(const struct CtrlQueueData &data){
 
   //Get new mode value
   _effectNum = (uint8_t)data.translate(_effectNum, 0, _numEffects - 1);
-
   
   //Black the leds
   fill_solid(_leds, _maxLeds, CRGB::Black);
@@ -173,6 +175,7 @@ void EffectEngine::onSpeedChange(const struct CtrlQueueData &data){
   //Set new speed delay
   _curEffect->setSpeedDelay(data.translate(_curEffect->getSpeedDelay(), SPEED_DELAY_MIN, SPEED_DELAY_MAX));
 }
+
 
 void EffectEngine::loop(const struct CtrlQueueItem &itm){
 
@@ -215,9 +218,9 @@ void EffectEngine::loop(const struct CtrlQueueItem &itm){
       
   }
   
-  //Stupid optimization as a workaroud for IR Remote conflicting with ws2811, ws2812 and ws2812b
-  if(updateLeds){
-     showStrip();    
+  //Optimization to avoid calling update leds too often
+  if(updateLeds ){
+     showStrip();      
   }
 }
 
