@@ -106,4 +106,36 @@ inline void EffectTheaterChaseRainbow::proceed(CRGB *leds, int numLeds){
 }
 
 
+/////////////////////////
+// EffectRainbowMove
+
+class EffectRainbowMove: public Effect{
+  public:
+    EffectRainbowMove();
+    ~EffectRainbowMove();
+
+  protected:
+    void proceed(CRGB *leds, int numLeds); 
+    void reset();
+};
+
+
+inline EffectRainbowMove::EffectRainbowMove(){
+  setSpeedDelay(50);
+}
+
+inline EffectRainbowMove::~EffectRainbowMove(){
+}
+
+void EffectRainbowMove::proceed(CRGB *leds, int numLeds){
+  uint8_t beatA = beatsin8(17, 0, 255);                        
+  uint8_t beatB = beatsin8(13, 0, 255);
+  
+  fill_rainbow(leds, numLeds, (beatA+beatB)/2, 8);
+}
+
+inline void EffectRainbowMove::reset(){
+}
+
+
 #endif //__RAINBOW_H

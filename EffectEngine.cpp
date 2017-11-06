@@ -2,6 +2,7 @@
 #include "Effect.h"
 #include "EffectEngine.h"
 #include "EffectEngineCtx.h"
+#include <EEPROM.h>
 
 
 EffectEngine::EffectEngine(){
@@ -16,7 +17,8 @@ EffectEngine::EffectEngine(){
 
   _mode = EEM_OFF;
 
-  _millis     = 0;
+  _millis          = 0;
+  _millisToSaveCfg = 0;
 }
 
 EffectEngine::~EffectEngine(){
@@ -41,9 +43,11 @@ void EffectEngine::init(CRGB *leds, int maxLeds, uint8_t mode) {
   _leds    = leds;
   _numLeds = maxLeds;
   _maxLeds = maxLeds;
+  _mode    = mode;
   fill_solid(_leds, _maxLeds, CRGB::Black);
-    
-  _mode    = 0xFF; 
+  
+  //Try to read from EEPROM
+  readConfig();
 
   //Set mode
   setMode(mode);
@@ -66,7 +70,10 @@ void EffectEngine::onModeChange(const struct CtrlQueueData &data){
     return;
 
   //Change mode
-  setMode(mode);        
+  setMode(mode);  
+
+  //Safe config
+  preSafeConfig();     
 }
 
 void EffectEngine::setMode(uint8_t mode){
@@ -145,6 +152,9 @@ void EffectEngine::onEffectChange(const struct CtrlQueueData &data){
 
   //Change effect
   setEffect(_effects[_effectNum]);
+
+  //Safe config
+  preSafeConfig();     
 }
 
 void EffectEngine::onColorChange(int index, const struct CtrlQueueData &data){
@@ -215,12 +225,63 @@ void EffectEngine::loop(const struct CtrlQueueItem &itm){
         
         updateLeds = true;
      }
-      
+   
   }
   
   //Optimization to avoid calling update leds too often
   if(updateLeds ){
      showStrip();      
   }
+
+  //See if we need to safe config
+  if(_millisToSaveCfg != 0 && _millisToSaveCfg < millis()){
+    //Reset
+    _millisToSaveCfg = 0;
+    
+    //Safe config
+    writeConfig();
+    DBG_OUTLN("Config saved");    
+  }
+  
+}
+
+////////////////////////
+// Read/Write configuration
+
+struct EffectEngineConfig{
+  uint8_t ver;        //config version
+  uint8_t mode;       //mode
+  uint8_t effect;     //selected effect
+};
+
+#define EE_VERSION 0x01
+
+void EffectEngine::readConfig(){
+  struct EffectEngineConfig ec = {0x00, 0xFF, 0x00}; 
+
+  EEPROM.get(0x0000, ec); 
+
+  //Check if version is correct
+  if(ec.ver == EE_VERSION){
+
+    //Check mode
+    if(ec.mode <= EEM_MODEMAX) {
+      _mode = ec.mode;
+    }
+
+    //Check number of effects
+    if(ec.effect < _numEffects)
+      _effectNum = ec.effect;      
+  }
+}
+
+void EffectEngine::writeConfig(){
+  struct EffectEngineConfig ec = {EE_VERSION, _mode, _effectNum}; 
+
+  EEPROM.put(0x0000, ec);  
+}
+
+void EffectEngine::preSafeConfig(){
+  _millisToSaveCfg = millis() + SAVE_CONFIG_TIMEOUT;
 }
 

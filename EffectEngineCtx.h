@@ -23,6 +23,9 @@
 #define EEM_SETUP    0x0004    //Setup
 #define EEM_MODEMAX  EEM_EFFECT
 
+//Timeout to save config
+#define SAVE_CONFIG_TIMEOUT 30000
+
 
 ///////////////////////////////////
 // Control flags

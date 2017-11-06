@@ -28,8 +28,14 @@ class EffectEngine{
     void onColorChange(int index, const struct CtrlQueueData &data);
     void onSpeedChange(const struct CtrlQueueData &data); 
 
+    //Internal routines
     void setMode(uint8_t mode);
     void setEffect(Effect *effect);
+
+    //Reading/writing config from/to EEPROM
+    void readConfig();
+    void writeConfig(); 
+    void preSafeConfig();
     
   protected:
     Effect*       _effects[MAX_EFFECTS];  //Effects
@@ -39,12 +45,13 @@ class EffectEngine{
 
     EffectStatic _eStatic;
 
-    CRGB        *_leds;                //Leds
-    uint32_t    _maxLeds:12;           //Current number of leds    
-    uint32_t    _numLeds:12;           //Current number of leds    
+    CRGB       *_leds;                 //Leds
+    uint32_t    _maxLeds:12;           //Max number of leds    
+    uint32_t    _numLeds:12;           //Actual number of leds    
     uint32_t    _mode:8;               //Current mode
 
     unsigned long _millis;              //Processing
+    unsigned long _millisToSaveCfg;     //When to safe config
 };
 
 #endif //__EFFECTENGINE_H
