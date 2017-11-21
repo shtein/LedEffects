@@ -96,14 +96,14 @@ class EffectBeatWave: public Effect{
 };
 
 
-EffectBeatWave::EffectBeatWave(){
+inline EffectBeatWave::EffectBeatWave(){
   setSpeedDelay(100);
 }
 
-EffectBeatWave::~EffectBeatWave(){
+inline EffectBeatWave::~EffectBeatWave(){
 }
 
-void EffectBeatWave::reset(){
+inline void EffectBeatWave::reset(){
   _step = 0;  
 }
 
@@ -148,19 +148,19 @@ class EffectBlur: public Effect{
     void reset();
 
   protected:
-    int           _step;
+    int _step;
     
 };
 
 
-EffectBlur::EffectBlur(){
+inline EffectBlur::EffectBlur(){
   setSpeedDelay(25);
 }
 
-EffectBlur::~EffectBlur(){
+inline EffectBlur::~EffectBlur(){
 }
 
-void EffectBlur::reset(){
+inline void EffectBlur::reset(){
 }
 
 inline void EffectBlur::proceed(CRGB *leds, int numLeds){
@@ -168,16 +168,16 @@ inline void EffectBlur::proceed(CRGB *leds, int numLeds){
   uint8_t blurAmount = dim8_raw( beatsin8(3, 64, 192) );       
   blur1d( leds, numLeds, blurAmount);                        
   
-  uint8_t  i = beatsin8(9, 0, numLeds);
-  uint8_t  j = beatsin8(7, 0, numLeds);
-  uint8_t  k = beatsin8(5, 0, numLeds);
+  uint16_t  i = beatsin16(9, 0, numLeds);
+  uint16_t  j = beatsin16(7, 0, numLeds);
+  uint16_t  k = beatsin16(5, 0, numLeds);
   
   // The color of each point shifts over time, each at a different speed.
   uint16_t ms = millis();  
-  leds[(i + j) / 2]    = CHSV(ms / 29, 200, 255);
-  leds[(j + k) / 2]    = CHSV(ms / 41, 200, 255);
-  leds[(k + i) / 2]    = CHSV(ms / 73, 200, 255);
-  leds[(k + i+ j) / 3] = CHSV(ms / 53, 200, 255);
+  leds[(i + j) / 2]     = CHSV(ms / 29, 200, 255);
+  leds[(j + k) / 2]     = CHSV(ms / 41, 200, 255);
+  leds[(k + i) / 2]     = CHSV(ms / 73, 200, 255);
+  leds[(k + i + j) / 3] = CHSV(ms / 53, 200, 255);
 }
 
 

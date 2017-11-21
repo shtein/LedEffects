@@ -51,13 +51,13 @@ void setup() {
 
       
       //BEGIN_REMOTE(REMOTE_PIN)  //Remote
-      // RMT_BUTTON_TO_CMD(EEMC_MODE, RKEY_OK)                         //Mode
+      //  RMT_BUTTON_TO_CMD(EEMC_MODE, RKEY_OK)                         //Mode
       //  RMT_BUTTON_PAIR_TO_CMD(EEMC_EFFECT, RKEY_UP, RKEY_DOWN, 0)    //Effect
       //  RMT_BUTTON_PAIR_TO_CMD(EEMC_SPEED, RKEY_LEFT, RKEY_RIGHT, 5)  //Speed
       //  RMT_BUTTON_PAIR_TO_CMD(EEMC_COLOR_HUE, RKEY_1, RKEY_4, 5)     //Color Hue
       //  RMT_BUTTON_PAIR_TO_CMD(EEMC_COLOR_SAT, RKEY_2, RKEY_5, 5)     //Color Saturation
       //  RMT_BUTTON_PAIR_TO_CMD(EEMC_COLOR_VAL, RKEY_3, RKEY_6, 5)     //Color Value
-      END_REMOTE()    
+      //END_REMOTE()    
       
     END_CONTROL_MAP()
        
