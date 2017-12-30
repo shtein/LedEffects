@@ -44,7 +44,7 @@ int Potentiometer::value() const{
 
 
 PushButton::PushButton(uint8_t pin){
-   _pin        = pin;
+  _pin        = pin;
    pinMode(_pin, INPUT);
    digitalWrite(_pin, HIGH);  
   _value      = digitalRead(_pin);
@@ -60,11 +60,15 @@ PushButton::~PushButton(){
 
 void PushButton::read(){  
 
-  //Analys last saved buttone value
+  //Check last saved buttone value
   if(_value == HIGH){
-    //Reset everything
-      _millis = 0;
-      _state  = BUTTON_STATE_OFF;  
+
+    if(_state != BUTTON_STATE_OFF){ 
+      //Reset everything
+       _millis = 0;
+       _state  = BUTTON_STATE_OFF;  
+       DBG_OUTLN("off");
+    }
   }
 
   //Analyse current state
@@ -92,7 +96,7 @@ void PushButton::read(){
       }
     break;
     case BUTTON_STATE_PUSHED_LONG:
-    
+        
       //Reset long push
       _state = BUTTON_STATE_PUSHED_WAIT;
        DBG_OUTLN("wait");

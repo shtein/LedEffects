@@ -1,7 +1,135 @@
 #ifndef __NOISE_H
 #define __NOISE_H
 
-class EffectNoise: public Effect{
+#define MAX_PAL_CHANGES 24
+#define CHANGE_PAL_STEP 500
+
+/////////////////////////////////////////
+// Effect Palette Transform - basic palette transformation
+class EffectPaletteTransform: public Effect{
+  public: 
+    EffectPaletteTransform();
+   ~EffectPaletteTransform();
+
+   virtual void proceed(CRGB *leds, int numLeds); 
+   virtual void reset();
+
+  protected:
+    virtual int getPalClrIndex(int ledIndex, int numLeds) const;
+    virtual CRGBPalette16 getNewPal() const;
+    virtual bool isReadyToBlendPal() const;
+    virtual bool isReadyToChangePal() const;
+    virtual uint8_t getMaxPaxPalChanges() const;
+
+  protected:
+    CRGBPalette16 _palCurrent;
+    CRGBPalette16 _palTarget;
+    
+    int           _step;
+};
+
+inline EffectPaletteTransform::EffectPaletteTransform(){
+  setSpeedDelay(25);
+}
+
+inline EffectPaletteTransform::~EffectPaletteTransform(){
+  
+}
+
+inline void EffectPaletteTransform::reset(){
+  _palCurrent = getNewPal();//CRGBPalette16(CRGB::Black);
+  _palTarget  = getNewPal();
+  
+  _step       = 0;
+}
+
+
+inline int EffectPaletteTransform::getPalClrIndex(int ledIndex, int numLeds) const{
+  //First index by default - need to experiment with this
+  return 0;
+}
+
+inline bool EffectPaletteTransform::isReadyToBlendPal() const{
+  return true;
+}
+
+bool EffectPaletteTransform::isReadyToChangePal() const{
+  return _step == CHANGE_PAL_STEP ? true : false;
+}
+
+inline CRGBPalette16 EffectPaletteTransform::getNewPal() const{
+  //Random palette
+  return CRGBPalette16(CHSV(random8(), 255, random8(128,255)), 
+                       CHSV(random8(), 255, random8(128,255)), 
+                       CHSV(random8(), 192, random8(128,255)), 
+                       CHSV(random8(), 255, random8(128,255))
+                      );
+}
+
+uint8_t EffectPaletteTransform::getMaxPaxPalChanges() const{
+  return MAX_PAL_CHANGES;
+}
+
+inline void EffectPaletteTransform::proceed(CRGB *leds, int numLeds){
+  
+  //Check if it is to update target palette
+  if(isReadyToChangePal()){
+
+    //Reset step
+    _step = 0;
+    
+    //Change target palette
+    _palTarget = getNewPal();
+  }
+  
+  
+  //Proceed with palette transtion
+  if(isReadyToBlendPal()){
+    nblendPaletteTowardPalette(_palCurrent, _palTarget, getMaxPaxPalChanges()); 
+  }
+
+
+  //Set colors
+  for(int i = 0; i < numLeds; i++){                                    
+    leds[i] = ColorFromPalette(_palCurrent, getPalClrIndex(i, numLeds), 255, LINEARBLEND);
+  }
+
+  //Prepare for the next move                                        
+  _step++;
+}
+
+////////////////////////////
+// Effect EffectPaletteTransformFast - simple transition between paletees
+class EffectPaletteTransformFast: public EffectPaletteTransform{
+  public:
+    EffectPaletteTransformFast();
+    ~EffectPaletteTransformFast();
+
+  protected:
+    int getPalClrIndex(int ledIndex, int numLeds) const;
+    bool isReadyToChangePal() const;
+    
+};
+
+inline EffectPaletteTransformFast::EffectPaletteTransformFast(){
+}
+
+inline EffectPaletteTransformFast::~EffectPaletteTransformFast(){
+}
+
+inline int EffectPaletteTransformFast::getPalClrIndex(int ledIndex, int numLeds) const{
+  //Full range
+  return map(ledIndex, 0, numLeds - 1, 0, 65535);
+}
+
+inline bool EffectPaletteTransformFast::isReadyToChangePal() const{
+  return _step > MAX_PAL_CHANGES * 3 ? true : false;
+}
+
+
+////////////////////////////
+//EffectNoise
+class EffectNoise: public EffectPaletteTransform{
   public:
      EffectNoise(); 
     ~EffectNoise();
@@ -9,177 +137,69 @@ class EffectNoise: public Effect{
     void proceed(CRGB *leds, int numLeds); 
     void reset();
 
+protected:
+    int getPalClrIndex(int ledIndex, int numLeds) const;
+
   protected:
-    CRGBPalette16 _palCurrent;
-    CRGBPalette16 _palTarget;
-    int           _step;
     int           _dist;
 };
 
 inline EffectNoise::EffectNoise(){
-  setSpeedDelay(25);
 }
 
 inline EffectNoise::~EffectNoise(){ 
 }
 
 inline void EffectNoise::reset(){
-  _palCurrent = CRGBPalette16(CRGB::Black);
-  _palTarget  = CRGBPalette16( CHSV(random8(), 255, random8(128,255)), 
-                               CHSV(random8(), 255, random8(128,255)), 
-                               CHSV(random8(), 192, random8(128,255)), 
-                               CHSV(random8(), 255, random8(128,255))
-                             );
+  //Do default actions
+  EffectPaletteTransform::reset();
   
-  _dist       = random16(millis());
-  _step       = 0;
+  //Reset dist
+  _dist = random16(millis());
 }
 
-#define MAX_PAL_CHANGES 24
+inline void EffectNoise::proceed(CRGB *leds, int numLeds){
+  //Do default actions
+  EffectPaletteTransform::proceed(leds, numLeds);
+  
+  //Prepare for the next move
+  _dist += beatsin8(10, 1, 4);                                               
+}
 
 #define XSCALE          30
 #define YSCALE          30
 
-#define CHANGE_PAL_STEP 500
-
-
-inline void EffectNoise::proceed(CRGB *leds, int numLeds){
-  //Check if it is to update target palette
-  if(_step == CHANGE_PAL_STEP){
-
-    //Reset step
-    _step = 0;
-    
-    //Change target palette
-    _palTarget = CRGBPalette16(CHSV(random8(), 255, random8(128,255)), 
-                               CHSV(random8(), 255, random8(128,255)), 
-                               CHSV(random8(), 192, random8(128,255)), 
-                               CHSV(random8(), 255, random8(128,255))
-                              );
-
-
-  }
-  
-  
-
-  //Proceed with palette transtion
-  nblendPaletteTowardPalette(_palCurrent, _palTarget, MAX_PAL_CHANGES); 
-
-
-  //Set colors
-  for(int i = 0; i < numLeds; i++) {                                    
-    uint8_t index = inoise8(i  * XSCALE, _dist + i * YSCALE) % 255;             
-    leds[i] = ColorFromPalette(_palCurrent, index, 255, LINEARBLEND);
-  }
-
-  //Prepare for the next move
-  _dist += beatsin8(10, 1, 4);                                               
-  _step++;
+inline int EffectNoise::getPalClrIndex(int ledIndex, int /*numLeds*/) const{
+  return inoise8(ledIndex  * XSCALE, _dist + ledIndex * YSCALE) % 255;             
 }
 
 
 /////////////////////////////////////
 // class EffectBeatWave
-class EffectBeatWave: public Effect{
+class EffectBeatWave: public EffectPaletteTransform{
   public:
      EffectBeatWave(); 
     ~EffectBeatWave();
 
-    void proceed(CRGB *leds, int numLeds); 
-    void reset();
-
   protected:
-    CRGBPalette16 _palCurrent;
-    CRGBPalette16 _palTarget;
-    int           _step;
-    
+    int getPalClrIndex(int ledIndex, int numLeds) const;
+    bool isReadyToBlendPal() const;
 };
 
 
 inline EffectBeatWave::EffectBeatWave(){
-  setSpeedDelay(100);
 }
 
 inline EffectBeatWave::~EffectBeatWave(){
 }
 
-inline void EffectBeatWave::reset(){
-  _step = 0;  
+inline int EffectBeatWave::getPalClrIndex(int ledIndex, int /*numLeds*/) const{
+  return ledIndex + beatsin8(9, 0, 255) + beatsin8(8, 0, 255) + beatsin8(7, 0, 255) + beatsin8(6, 0, 255);
 }
 
-inline void EffectBeatWave::proceed(CRGB *leds, int numLeds){
-
-    //Proceed with palette transtion
-  nblendPaletteTowardPalette(_palCurrent, _palTarget, MAX_PAL_CHANGES); 
-
-  //Set colors
-  for(int i = 0; i < numLeds; i++) {                                   
-    leds[i] = ColorFromPalette( _palCurrent, i+ beatsin8(9, 0, 255) + beatsin8(8, 0, 255) + beatsin8(7, 0, 255) + beatsin8(6, 0, 255), 255, LINEARBLEND); 
-  }
-
-  _step++;
-
-  
-  //Check if it is to update target palette
-  if(_step == CHANGE_PAL_STEP){
-
-    //Reset step
-    _step = 0;
-    
-    
-    _palTarget = CRGBPalette16(CHSV(random8(), 255, random8(128,255)), 
-                               CHSV(random8(), 255, random8(128,255)), 
-                               CHSV(random8(), 192, random8(128,255)), 
-                               CHSV(random8(), 255, random8(128,255))
-                              );    
-
-  }
+inline bool EffectBeatWave::isReadyToBlendPal() const{
+  return _step % 50 == 0 ? true : false; 
 }
-
-
-/////////////////////////////////////
-// class EffectBlur
-class EffectBlur: public Effect{
-  public:
-     EffectBlur(); 
-    ~EffectBlur();
-
-    void proceed(CRGB *leds, int numLeds); 
-    void reset();
-
-  protected:
-    int _step;
-    
-};
-
-
-inline EffectBlur::EffectBlur(){
-  setSpeedDelay(25);
-}
-
-inline EffectBlur::~EffectBlur(){
-}
-
-inline void EffectBlur::reset(){
-}
-
-inline void EffectBlur::proceed(CRGB *leds, int numLeds){
-  
-  uint8_t blurAmount = dim8_raw( beatsin8(3, 64, 192) );       
-  blur1d( leds, numLeds, blurAmount);                        
-  
-  uint16_t  i = beatsin16(9, 0, numLeds);
-  uint16_t  j = beatsin16(7, 0, numLeds);
-  uint16_t  k = beatsin16(5, 0, numLeds);
-  
-  // The color of each point shifts over time, each at a different speed.
-  uint16_t ms = millis();  
-  leds[(i + j) / 2]     = CHSV(ms / 29, 200, 255);
-  leds[(j + k) / 2]     = CHSV(ms / 41, 200, 255);
-  leds[(k + i) / 2]     = CHSV(ms / 73, 200, 255);
-  leds[(k + i + j) / 3] = CHSV(ms / 53, 200, 255);
-}
-
 
 
 

@@ -64,7 +64,7 @@ void EffectMoodBlobs::proceed(CRGB *leds, int numLeds){
   _blobPhase += 2;
 
   //Increment color rotation step
-  _step = (_step + 1) % ( numLeds * 2);
+  _step = (_step + 1) % ( numLeds * 2 );
 
 }
 

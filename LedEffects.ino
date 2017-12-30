@@ -15,6 +15,8 @@ void setup() {
   BEGIN_EFFECT_ENGINE() 
     //Effects   
     BEGIN_EFFECTS()
+      ADD_EFFECT(EffectMatrix)
+      ADD_EFFECT(EffectPaletteTransformFast)
       ADD_EFFECT(EffectBlur)
       ADD_EFFECT(EffectBeatWave)
       ADD_EFFECT(EffectRainbowMove)
@@ -28,11 +30,11 @@ void setup() {
     END_EFFECTS()
 
     //Leds
-    BEGIN_LEDS(50, EEM_EFFECT) //50 for test, 267 for deck, 88 for Igor, 212 for Sasha, 300, for Christmass Tree
+    BEGIN_LEDS(100, EEM_EFFECT) //50 for test, 267 for deck, 88 for Igor, 212 for Sasha, 300 for Christmass Tree, 100 for old 2801 leds
       //ADD_STRIP(NEOPIXEL, LED_PIN)
       //ADD_STRIP(NEOPIXEL, LED_PIN2) //Second strip for deck
       //ADD_STRIP(WS2811, LED_PIN, RGB) //Christmas Tree
-      ADD_STRIP(WS2801, LED_PIN, LED_CLOCK, RGB)
+      ADD_STRIP(WS2801, LED_PIN, LED_CLOCK, RGB) //Old 2801 strip
     END_LEDS()
 
   //Control    
@@ -42,7 +44,7 @@ void setup() {
       BEGIN_PUSH_BUTTON(MODE_PIN)    
         PUSH_BUTTON_TO_CMD(EEMC_MODE, PB_CONTROL_PUSH_LONG)
         PUSH_BUTTON_TO_CMD(EEMC_EFFECT, PB_CONTROL_CLICK_SHORT)      
-       END_PUSH_BUTTON()
+      END_PUSH_BUTTON()
     
       //PUSH_BUTTON_SA_TO_CMD(EEMC_MODE, MODE_PIN)            //Mode
       //PUSH_BUTTON_SA_TO_CMD(EEMC_EFFECT, EFFECT_PIN)        //Effect

@@ -57,7 +57,7 @@
 ///////////////////////////////////////
 //Control map
 #define BEGIN_CONTROL_MAP() \
-  AnalogInput *ai = NULL;
+  _CM AnalogInput *ai = NULL;
 
 #define END_CONTROL_MAP() \
   ai = NULL;
@@ -96,7 +96,6 @@
   
 #define END_REMOTE() \
   ai = NULL;
-
 
 #define RMT_BUTTON_TO_CMD(cmd, code) \
   _CM EffectControlIRBtn IR_CTRL(cmd, (IRRemoteRecv *)ai, code); \

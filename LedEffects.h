@@ -10,5 +10,6 @@
 #include "MoodBlobs.h"
 #include "Static.h"
 #include "Noise.h"
+#include "Blur.h"
 
 #endif //__LEDEFFECTS_H

@@ -131,7 +131,7 @@ void EffectRainbowMove::proceed(CRGB *leds, int numLeds){
   uint8_t beatA = beatsin8(17, 0, 255);                        
   uint8_t beatB = beatsin8(13, 0, 255);
   
-  fill_rainbow(leds, numLeds, (beatA+beatB)/2, 8);
+  fill_rainbow(leds, numLeds, (beatA + beatB) / 2, 8);
 }
 
 inline void EffectRainbowMove::reset(){
