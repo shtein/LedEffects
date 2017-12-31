@@ -15,12 +15,15 @@ class EffectPaletteTransform: public Effect{
    virtual void reset();
 
   protected:
+    virtual void updateColors();
+    virtual void updateLeds(CRGB *leds, int numLeds);
+
     virtual int getPalClrIndex(int ledIndex, int numLeds) const;
     virtual CRGBPalette16 getNewPal() const;
     virtual bool isReadyToBlendPal() const;
     virtual bool isReadyToChangePal() const;
     virtual uint8_t getMaxPaxPalChanges() const;
-
+    
   protected:
     CRGBPalette16 _palCurrent;
     CRGBPalette16 _palTarget;
@@ -37,7 +40,7 @@ inline EffectPaletteTransform::~EffectPaletteTransform(){
 }
 
 inline void EffectPaletteTransform::reset(){
-  _palCurrent = getNewPal();//CRGBPalette16(CRGB::Black);
+  _palCurrent = getNewPal();
   _palTarget  = getNewPal();
   
   _step       = 0;
@@ -70,16 +73,27 @@ uint8_t EffectPaletteTransform::getMaxPaxPalChanges() const{
   return MAX_PAL_CHANGES;
 }
 
+inline void EffectPaletteTransform::updateColors(){
+  //Change target palette
+  _palTarget = getNewPal();
+}
+
+inline void EffectPaletteTransform::updateLeds(CRGB *leds, int numLeds){  
+  for(int i = 0; i < numLeds; i++){                                    
+    leds[i] = ColorFromPalette(_palCurrent, getPalClrIndex(i, numLeds), 255, LINEARBLEND);
+  }
+}
+
 inline void EffectPaletteTransform::proceed(CRGB *leds, int numLeds){
   
   //Check if it is to update target palette
   if(isReadyToChangePal()){
 
     //Reset step
-    _step = 0;
-    
-    //Change target palette
-    _palTarget = getNewPal();
+    _step = 0;       
+
+    //Update palette
+    updateColors();
   }
   
   
@@ -90,9 +104,7 @@ inline void EffectPaletteTransform::proceed(CRGB *leds, int numLeds){
 
 
   //Set colors
-  for(int i = 0; i < numLeds; i++){                                    
-    leds[i] = ColorFromPalette(_palCurrent, getPalClrIndex(i, numLeds), 255, LINEARBLEND);
-  }
+  updateLeds(leds, numLeds);
 
   //Prepare for the next move                                        
   _step++;
@@ -175,7 +187,7 @@ inline int EffectNoise::getPalClrIndex(int ledIndex, int /*numLeds*/) const{
 
 
 /////////////////////////////////////
-// class EffectBeatWave
+// Effect Beat Wave
 class EffectBeatWave: public EffectPaletteTransform{
   public:
      EffectBeatWave(); 
@@ -200,6 +212,85 @@ inline int EffectBeatWave::getPalClrIndex(int ledIndex, int /*numLeds*/) const{
 inline bool EffectBeatWave::isReadyToBlendPal() const{
   return _step % 50 == 0 ? true : false; 
 }
+
+
+//////////////////////////////
+// Effect Confetti
+class EffectConfetti: public EffectPaletteTransform{
+  public:
+    EffectConfetti();
+    ~EffectConfetti();
+
+  protected:
+    void updateLeds(CRGB *leds, int numLeds);
+    void updateColors(); 
+
+    bool isReadyToChangePal() const;
+
+  protected:
+    uint16_t _hue;
+    uint8_t  _hueDiff;
+    uint8_t  _hueInc:4;
+    uint8_t  _fade:4;
+    
+};
+
+inline EffectConfetti::EffectConfetti(){  
+  _hue     = 50;
+  _hueDiff = 255;
+  _hueInc  = 1;
+  _fade    = 8;
+
+  setSpeedDelay(20);
+}
+
+inline EffectConfetti::~EffectConfetti(){  
+}
+
+
+inline bool EffectConfetti::isReadyToChangePal() const{
+  return _step == 100 ? true : false;
+}
+
+void EffectConfetti::updateLeds(CRGB *leds, int numLeds){
+  
+  fadeToBlackBy(leds, numLeds, _fade);                     
+  leds[random16(numLeds)] = ColorFromPalette(_palCurrent, _hue + random16(_hueDiff) / 4 , 255, LINEARBLEND);
+  
+  _hue += _hueInc;
+}
+
+#define CONFETI_MODE_MIN 0 
+#define CONFETI_MODE_MAX 2 
+
+void EffectConfetti::updateColors(){
+  uint8_t mode = random8(MODE_MIN, MODE_MAX + 1);
+
+  switch(mode){
+    case 0:
+      _palTarget = OceanColors_p; 
+      _hueInc    = 1; 
+      _hue       = 192; 
+      _fade      = 16; 
+      _hueDiff   = 255;
+     break;
+     case 1:
+       _palTarget = LavaColors_p; 
+       _hueInc    = 2; 
+       _hue       = 128; 
+       _fade      = 8; 
+       _hueDiff   = 64;
+     break;
+     case 2:
+       _palTarget = ForestColors_p; 
+       _hueInc    = 1; 
+       _hue       = random16(255); 
+       _fade      = 4; 
+       _hueDiff   = 16;
+     break;
+  }
+}
+
 
 
 

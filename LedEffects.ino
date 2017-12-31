@@ -15,6 +15,7 @@ void setup() {
   BEGIN_EFFECT_ENGINE() 
     //Effects   
     BEGIN_EFFECTS()
+      ADD_EFFECT(EffectConfetti)
       ADD_EFFECT(EffectMatrix)
       ADD_EFFECT(EffectPaletteTransformFast)
       ADD_EFFECT(EffectBlur)

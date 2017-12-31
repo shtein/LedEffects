@@ -35,7 +35,8 @@ int Potentiometer::value() const{
 
 //////////////////
 // PushButton
-#define PUSH_LONG_INTERVAL  3000
+#define BUTTON_DEBOUNCE_TIME  25
+#define PUSH_LONG_INTERVAL    3000
 
 #define BUTTON_STATE_OFF            0x00
 #define BUTTON_STATE_PUSHED_SHORT   0x01
@@ -44,12 +45,13 @@ int Potentiometer::value() const{
 
 
 PushButton::PushButton(uint8_t pin){
-  _pin        = pin;
+  _pin            = pin;
    pinMode(_pin, INPUT);
    digitalWrite(_pin, HIGH);  
-  _value      = digitalRead(_pin);
-  _state      = BUTTON_STATE_OFF; 
-  _millis     = 0;
+  _value          = digitalRead(_pin);
+  _state          = BUTTON_STATE_OFF; 
+  _millis         = 0;
+  _millisDebounce = 0;
 }
 
 PushButton::~PushButton(){
@@ -105,7 +107,27 @@ void PushButton::read(){
   
     
   //Read button state
-  _value = digitalRead(_pin);
+  uint8_t value = digitalRead(_pin);
+  
+  //Debouncing
+  if(_value != value){
+
+    if(_millisDebounce == 0){
+      //Wait for some time
+      _millisDebounce = millis();
+    }
+    else{    
+       //Change if the value is the same  
+      if(millis() - _millisDebounce > BUTTON_DEBOUNCE_TIME){
+        _value = value;
+      }
+    }
+  }
+  else{
+    //Reset
+    _millisDebounce = 0;
+  }
+  
 }
 
 bool PushButton::pushedLong() const{

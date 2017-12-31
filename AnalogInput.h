@@ -63,7 +63,8 @@ class PushButton: public AnalogInput{
     uint8_t        _pin:5;
     uint8_t        _value:1; 
     uint8_t        _state:2;
-    unsigned long  _millis;    
+    unsigned long  _millis;  
+    unsigned long  _millisDebounce;  
 };
 
 
