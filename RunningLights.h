@@ -15,7 +15,7 @@ class EffectRunningLights: public Effect{
     void reset();
 
   protected:
-    int  _step;
+    uint8_t  _step;
 };
 
 
@@ -32,26 +32,26 @@ inline void EffectRunningLights::reset(){
   _step = 0;
 }
 
-inline void EffectRunningLights::proceed(CRGB *leds, int numLeds){
-        
-  for(int i = 0; i< numLeds; i++) {
-    float f = (sin((i + _step) ) * 127 + 128) / 255; 
 
-    CRGB color = getColor();
-    setPixel(leds[i], f * color.r, f * color.g, f * color.b);
+#define RL_SIZE 6
+inline void EffectRunningLights::proceed(CRGB *leds, int numLeds){
+  
+  for(int i = 0; i< numLeds; i++) {   
+    
+    CHSV hsv = getHSV();
+    hsv.v  = sin8( ((i + _step) % RL_SIZE) * 255 / (RL_SIZE - 1) );
+    setPixel(leds[i], hsv);
   }  
   
-  _step = (_step + 1) % (numLeds * 2);
+  _step = (_step + 1) % RL_SIZE;
 }
 
 ///////////////////////////
 // Effect Matrix, I have no idea why it is called matrix, it is its name in original code
 
-#define MATRIX_STEP_MIN 300
-#define MATRIX_STEP_MAX 150
+#define MATRIX_STEP_MIN 200
+#define MATRIX_STEP_MAX 100
 
-#define MODE_MAX        5
-#define MODE_MIN        1
 
 class EffectMatrix: public Effect{
   public:
@@ -71,19 +71,22 @@ class EffectMatrix: public Effect{
   protected:
     uint16_t  _step:9;        //current step    
     uint16_t  _dir:1;         //direction
-    uint16_t  _hueInc:1;      //change hue over
+    uint16_t  _hueInc:1;      //change hue
     uint16_t  _updateRate:5;  //steps between each update
     uint8_t   _indexPal;      //palette index
 
-    CRGBPalette16 _palCurrent;
-    CRGBPalette16 _palTarget;
+    CRGBPalette16 &_palCurrent;
+    CRGBPalette16 &_palTarget;
 
-    CRGBPalette16 _palBgCurrent;
-    CRGBPalette16 _palBgTarget;
-     
+    CRGBPalette16 &_palBgCurrent;
+    CRGBPalette16 &_palBgTarget;   
 };
 
-inline EffectMatrix::EffectMatrix(){ 
+inline EffectMatrix::EffectMatrix():
+                                _palCurrent (allocPalette(0)), 
+                                _palTarget (allocPalette(1)), 
+                                _palBgCurrent (allocPalette(2)), 
+                                _palBgTarget (allocPalette(3)) {
   setSpeedDelay(25);
 
   _step       = 0;
@@ -92,7 +95,6 @@ inline EffectMatrix::EffectMatrix(){
   _updateRate = 1;
   _indexPal   = 0;
   _updateRate = 0; 
-  
 }
 
 inline EffectMatrix::~EffectMatrix(){
@@ -101,13 +103,12 @@ inline EffectMatrix::~EffectMatrix(){
 
 inline void EffectMatrix::reset(){  
   //Init with black
-  _palCurrent = CRGBPalette16(CHSV(0, 0, 0));    
-  _palTarget  = CRGBPalette16(CHSV(0, 0, 0));  
+  _palCurrent = CRGBPalette16(CHSV(80, 0, 0));    
+  _palTarget  = CRGBPalette16(CHSV(180, 0, 0));  
 
-  //Blue background
-  
-   _palBgCurrent = CRGBPalette16 (CHSV(80, 255, 255));
-   _palBgTarget  = CRGBPalette16 (CHSV(180, 255, 255) );
+  //Blue background  
+  _palBgCurrent = CRGBPalette16 (CHSV(80, 255, 255));
+  _palBgTarget  = CRGBPalette16 (CHSV(180, 255, 255) );
 
 
   //Default update rate
@@ -115,38 +116,34 @@ inline void EffectMatrix::reset(){
   _step = random(MATRIX_STEP_MIN, MATRIX_STEP_MAX);  
 }
 
-
 inline void EffectMatrix::updateColors(){
   
-  uint8_t mode = random8(MODE_MIN, MODE_MAX + 1);
+   struct MatSettings {
+    CHSV                          bg;
+    const TProgmemRGBPalette16   &pal;
+    uint8_t                       useBg:4;
+    uint8_t                       usePal:4;
+   } 
+   stgs[] = { { CHSV(140, 255, 255), OceanColors_p, true, true },
+              { CHSV(50, 255, 255), LavaColors_p, true, true },
+              { CHSV(96, 255, 255), ForestColors_p, true, true },
+              { CHSV(0, 0, 0), ForestColors_p, true, false },
+              { CHSV(0, 0, 0), PartyColors_p, false, true },
+            };
+
+  
+  uint8_t idx = random8(sizeof(stgs) / sizeof(stgs[0]) + 1);
   
 
   //Set background color, target palette and update rate
-  switch(mode){
-     case 1:
-        _palBgTarget = CRGBPalette16(CHSV(140, 255, 255) );                    
-        _palTarget   = OceanColors_p;
-        _updateRate  = 2;
-     break;
-     case 2:
-        _palBgTarget = CRGBPalette16(CHSV(50, 255, 255) );                    
-        _palTarget   = LavaColors_p;
-        _updateRate  = 2;
-     break;
-     case 3:
-        _palBgTarget = CRGBPalette16(CHSV(96, 255, 255) );                    
-        _palTarget   = ForestColors_p;
-        _updateRate  = 2;
-     break;
-     case 4: //Go to black
-        _palTarget  = CRGBPalette16(CHSV(0, 0, 0));    
-        _updateRate = 2;
-     break;
-     case 5: //Go colorful
-        _palTarget = PartyColors_p;
-        _updateRate = 2;
-     break;
+  if(stgs[idx].useBg){
+    _palBgTarget =  CRGBPalette16(stgs[idx].bg);                    
   }
+
+  if(stgs[idx].usePal){
+     _palTarget   = stgs[idx].pal;
+  }
+     
 
   //Set number of passes
   _step = random(MATRIX_STEP_MIN, MATRIX_STEP_MAX);  
@@ -208,7 +205,7 @@ inline void EffectMatrix::proceed(CRGB *leds, int numLeds){
   }
 
   if(_step % 4){ 
-    nblendPaletteTowardPalette(_palBgCurrent, _palBgTarget, 48);  
+    nblendPaletteTowardPalette(_palBgCurrent, _palBgTarget, 24);  
   }
 
 

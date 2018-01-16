@@ -6,6 +6,9 @@
 
 class CRGB;
 
+//Max number of preallocated palettes
+#define MAX_PAL 4
+
 class Effect{
   public:
     Effect();
@@ -20,7 +23,7 @@ class Effect{
     //Color
     CRGB getColor() const;
     CHSV getHSV() const;
-    void setHSV(const CHSV &color);
+    void setHSV(const CHSV &hsv);
 
     //Speed delay
     void setSpeedDelay(uint16_t speedDelay);
@@ -34,37 +37,26 @@ class Effect{
     static void setPixel(CRGB &led, byte red, byte green, byte blue);
     static void setPixel(CRGB &led, const CRGB &color);
     static void setAll(CRGB *leds, int numLeds, byte red, byte green, byte blue);
-    static void setAll(CRGB *leds, int numLeds, const CRGB &color);
+    static void setAll(CRGB *leds, int numLeds, const CRGB &color);    
+
+    //Pallette pool for memory optimization
+    static CRGBPalette16 &allocPalette(int index);
 
     //Private color management
     void setRandomColor();
    
  private:
-  //Color for some effects or static
-  CHSV     _hsv;
-  
-  //Speed
-  uint8_t  _speedDelay; //byte, i.e. range is 0 - 255, that maps to range from SPEED_DELAY_MIN tp SPEED_DELAY_MAX by setSpeedDelay and getSpeedDelay
+   //Color for some effects or static
+   CHSV _hsv;
+   
+   //Speed
+   uint8_t  _speedDelay; //byte, i.e. range is 0 - 255, that maps to range from SPEED_DELAY_MIN to SPEED_DELAY_MAX by setSpeedDelay and getSpeedDelay
+
+   //Preallocated palettes
+   static CRGBPalette16 _pals[MAX_PAL];
+
 };
 
-
-inline void Effect::setPixel(CRGB &led,  byte red, byte green, byte blue) {
-   led.r = red;
-   led.g = green;
-   led.b = blue;
-}
-
-inline void Effect::setPixel(CRGB &led, const CRGB &color) {
-   led = color;
-}
-
-inline void Effect::setAll(CRGB *leds, int numLeds, const CRGB &color) {
-  fill_solid(leds, numLeds, color);
-}
-
-inline void Effect::setAll(CRGB *leds, int numLeds, byte red, byte green, byte blue) {  
-  fill_solid(leds, numLeds, CRGB (red, green, blue));
-}
 
 
 #endif //__EFFECT_H

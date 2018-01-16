@@ -44,6 +44,8 @@ inline void EffectColorWipe::proceed(CRGB *leds, int numLeds){
     _step = 0;
     setRandomColor();
   }
+
+
 }
 
 #endif //__COLORWIPE_H

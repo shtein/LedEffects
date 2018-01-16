@@ -60,6 +60,9 @@ class PushButton: public AnalogInput{
     bool value(uint8_t ctrl) const;
 
   protected:
+    void readValue();
+    
+  protected:
     uint8_t        _pin:5;
     uint8_t        _value:1; 
     uint8_t        _state:2;

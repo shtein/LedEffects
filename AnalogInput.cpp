@@ -105,8 +105,14 @@ void PushButton::read(){
     break;
   }
   
-    
-  //Read button state
+
+  //Read signal
+  readValue();
+  
+}
+
+void PushButton::readValue(){
+   //Read button state
   uint8_t value = digitalRead(_pin);
   
   //Debouncing
@@ -127,7 +133,6 @@ void PushButton::read(){
     //Reset
     _millisDebounce = 0;
   }
-  
 }
 
 bool PushButton::pushedLong() const{

@@ -172,16 +172,13 @@ void EffectControlPanel::addControl(EffectControl *ctrl){
   if(!ctrl)
     return;
 
-  if(_numControls == sizeof(_controls)/sizeof(_controls[0]) - 1)
+  if(_numControls == sizeof(_controls)/sizeof(_controls[0]))
     return;
 
   //Add control
   _controls[_numControls] = ctrl;
   _numControls ++;
 
-  //Check number of inputs
-  if(_numInputs == sizeof(_inputs)/sizeof(_inputs[0]) - 1) 
-    return;
   
   //Add analog input - should be only of instance to avoid reading it twice
   AnalogInput *input = ctrl->getInput();
@@ -199,6 +196,11 @@ void EffectControlPanel::addControl(EffectControl *ctrl){
 
   //Save if not found
   if(!found){
+    
+    //Check number of inputs
+    if(_numInputs == sizeof(_inputs)/sizeof(_inputs[0])) 
+      return;
+        
     _inputs[_numInputs] = input;
     _numInputs ++;
   }

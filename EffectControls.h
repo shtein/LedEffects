@@ -4,6 +4,7 @@
 #include "EffectEngineCtx.h"
 #include "AnalogInput.h"
 
+
 //////////////////////////////////////////
 // EffectControl - base class
 class EffectControl{

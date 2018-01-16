@@ -19,6 +19,9 @@ EffectEngine::EffectEngine(){
 
   _millis          = 0;
   _millisToSaveCfg = 0;
+
+  //Random number initialization
+  randomSeed(analogRead(A0)); 
 }
 
 EffectEngine::~EffectEngine(){
@@ -28,7 +31,7 @@ void EffectEngine::addEffect(Effect *effect){
   if(!effect)
     return;
 
-  if(_numEffects == sizeof(_effects)/sizeof(_effects[0]) - 1)
+  if(_numEffects == sizeof(_effects)/sizeof(_effects[0]))
     return;
 
   _effects[_numEffects] = effect;
