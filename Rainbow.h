@@ -14,13 +14,9 @@ class EffectRainbow: public Effect{
   
     void reset();
     void proceed(CRGB *leds, int numLeds); 
-    
-  protected:
-    uint8_t _step; //current step
 };
 
 inline EffectRainbow::EffectRainbow(){
-  _step = 0;
   setSpeedDelay(75);
 }
 
@@ -28,17 +24,25 @@ inline EffectRainbow::~EffectRainbow(){
 }
 
 inline void EffectRainbow::reset(){
-  _step = 0;
+  setHSV(CHSV(0, 255, 255)); 
 }
 
 
 inline void EffectRainbow::proceed(CRGB *leds, int numLeds){
-  
-  for(int i = 0; i< numLeds; i++) {    
-    leds[i] = CHSV(((i * 255 / numLeds) + _step), 255, 255);
-  }
 
-  _step ++;
+  //Get current colors
+  CHSV hsv      = getHSV();
+  uint8_t delta = numLeds >= 255 ? 1 : 255 / numLeds;
+
+  //Move forward and save
+  hsv.hue = (hsv.hue + delta) & 0xFF;
+  setHSV(hsv);
+
+  //Set colors - same as fill_rainbow
+  for(int i = 0; i < numLeds; i++){ 
+    leds[i] = hsv;
+    hsv.hue = (hsv.hue + delta) & 0xFF;
+  }
 }
 
 
@@ -53,37 +57,48 @@ class EffectTheaterChaseRainbow: public Effect{
     void proceed(CRGB *leds, int numLeds);  
 
   protected:
-    uint8_t _step;
-    uint8_t _pos;
+  uint8_t _step;
+
 };
 
 inline EffectTheaterChaseRainbow::EffectTheaterChaseRainbow(){
-  setSpeedDelay(100);
-  _pos  = 0;
-  _step = 0;
+  setSpeedDelay(100);  
 }
 
 inline void EffectTheaterChaseRainbow::reset(){
+
   _step = 0;
-  _pos  = 0;
+  
+  setHSV(CHSV(0, 255, 255)); setHSV(CHSV(0, 255, 255)); 
 }
 
 
 inline void EffectTheaterChaseRainbow::proceed(CRGB *leds, int numLeds){  
+
+  
   //Turn every third pixell off
   for(int i = 0; i < numLeds; i = i + 3){
-      setPixel(leds[(i + _pos) % numLeds], 0, 0, 0);          
+      setPixel(leds[(i + _step) % numLeds], 0, 0, 0);          
   }
 
+  CHSV hsv      = getHSV();
+  uint8_t delta = numLeds >= 255 ? 1 : 255 / numLeds;
+  
   //Move forward
-  _pos  = (_pos + 1) % 3;
-  if (_pos  == 0){ // Next cycle    
-    _step ++;
+  _step  = (_step + 1) % 3;
+  if (_step  == 0){ // Next cycle    
+    
+    //Move to the next color
+    hsv.hue = (hsv.hue + delta) & 0xFF;
+
+    //Save it
+    setHSV(hsv);
   }
 
   //Turn every third pixell on
   for(int i = 0; i < numLeds; i = i + 3){ 
-    leds[(i + _pos ) % numLeds] = CHSV(((i * 255 / numLeds) + _step), 255 ,255);
+    leds[(i + _step ) % numLeds] = hsv;
+    hsv.hue = (hsv.hue + delta) & 0xFF;
   }
 }
 
@@ -109,15 +124,17 @@ inline EffectRainbowMove::EffectRainbowMove(){
 inline EffectRainbowMove::~EffectRainbowMove(){
 }
 
+
+inline void EffectRainbowMove::reset(){
+}
+
 void EffectRainbowMove::proceed(CRGB *leds, int numLeds){
   uint8_t beatA = beatsin8(17, 0, 255);                        
   uint8_t beatB = beatsin8(13, 0, 255);
   
-  fill_rainbow(leds, numLeds, (beatA + beatB) / 2, 16);
+  fill_rainbow(leds, numLeds, (beatA + beatB) / 2, 8);
 }
 
-inline void EffectRainbowMove::reset(){
-}
 
 
 #endif //__RAINBOW_H

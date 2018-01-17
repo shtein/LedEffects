@@ -13,45 +13,42 @@ class EffectFadeInOut: public Effect{
   protected:
     void proceed(CRGB *leds, int numLeds); 
     void reset();
-
-  protected:
-    int  _fade:5;  //negative - fade in, positive fade out
-    int  _step:11; //cycle
 };
 
 
-#define FADE_SPEED
+
 
 inline EffectFadeInOut::EffectFadeInOut(){
-  _fade       = -5;
-  _step       = 0xFF;
-  setSpeedDelay(50); 
+  setSpeedDelay(75); 
 }
 
 inline EffectFadeInOut::~EffectFadeInOut(){
 }
 
-inline void EffectFadeInOut::reset(){ 
-  _fade  = -5;
-  _step  = 0xFF;
+inline void EffectFadeInOut::reset(){   
   setRandomColor();
 }
 
+#define FIO_STEP 5
+
 inline void EffectFadeInOut::proceed(CRGB *leds, int numLeds){
+  CHSV hsv = getHSV();
 
-  _step = _step + _fade;
-  if(_step == 0 || _step == 0xFF)
-    _fade = -_fade; 
+  //See if we need to change color
+  if(hsv.value == 0 ){
+     setRandomColor();
+     hsv = getHSV();
+  }
 
-  if(_step == 0xFF )
-    setRandomColor();
+  //Change value
+  hsv.value -= FIO_STEP;
+  setHSV(hsv);
 
-  //get current color
-  CRGB color = getColor();
-  color.fadeLightBy(_step);
+  //Transalate value 
+  hsv.value = triwave8(hsv.value);
   
-  //change color
-  setAll(leds, numLeds, color );
+  //Change color
+  setAll(leds, numLeds, hsv );
 }
 
 

@@ -245,7 +245,6 @@ void EffectEngine::loop(const struct CtrlQueueItem &itm){
     writeConfig();
     DBG_OUTLN("Config saved");    
   }
-  
 }
 
 ////////////////////////
