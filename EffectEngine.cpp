@@ -121,7 +121,7 @@ void EffectEngine::setEffect(Effect *effect){
 void EffectEngine::onNumLedsChange(const struct CtrlQueueData &data){
   
   //Get new mode value
-  int numLeds = data.translate(_numLeds, 0, _maxLeds);
+  uint16_t numLeds = data.translate(_numLeds, 0, _maxLeds);
 
   //Do nothing if did not change
   if(_numLeds == numLeds)
@@ -130,9 +130,7 @@ void EffectEngine::onNumLedsChange(const struct CtrlQueueData &data){
   //Save new value
   _numLeds = numLeds;
 
-  DBG_OUT("new number of leds: ");
-  DBG_OUTLN(_numLeds);
-  
+  DBG_OUTLN("New number of leds: %d", _numLeds);  
 
  //Black the lights
   fill_solid(_leds + _numLeds, _maxLeds - _numLeds, CRGB::Black);
@@ -263,7 +261,7 @@ void EffectEngine::readConfig(){
 
   EEPROM.get(0x0000, ec); 
 
-  //Check if version is correct
+  //Check if version is correct 
   if(ec.ver == EE_VERSION){
 
     //Check mode
@@ -278,7 +276,7 @@ void EffectEngine::readConfig(){
 }
 
 void EffectEngine::writeConfig(){
-  struct EffectEngineConfig ec = {EE_VERSION, _mode, _effectNum}; 
+  struct EffectEngineConfig ec = {EE_VERSION, (uint8_t)_mode, _effectNum}; 
 
   EEPROM.put(0x0000, ec);  
 }

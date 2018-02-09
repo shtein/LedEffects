@@ -1,6 +1,8 @@
 #ifndef __EFFECTENGINECTX_H
 #define __EFFECTENGINECTX_H
 
+#include "Controls.h"
+
 //Speed delay
 #define SPEED_DELAY_MIN 10
 #define SPEED_DELAY_MAX 1000
@@ -26,67 +28,6 @@
 //Timeout to save config
 #define SAVE_CONFIG_TIMEOUT 30000
 
-
-///////////////////////////////////
-// Control flags
-#define CTF_NONE        0x00  //Nothing, value is absolute number
-#define CTF_VAL_ABS     0x00  //Absolute number
-#define CTF_VAL_DELTA   0x01  //Value is delta
-#define CTF_VAL_NEXT    0x02  //Go next - in cycles
-#define CTF_VAL_PREV    0x03  //Go previous - in cycles
-
-////////////////////////////////////
-// Control queue data
-struct CtrlQueueData{
-  uint8_t flag;   //Flag that shows how to interpret the value: absolute number, inrement, etc 
-  int     value;  //Value
-  int     min;    //Value minimum
-  int     max;    //Value maximum   
-  
-  CtrlQueueData(){
-      flag   = CTF_NONE;
-      value  = 0;
-      min    = 0;
-      max    = 0;
-  }
-
-  int translate(int base, int vmin, int vmax) const{
-    
-     switch(flag){ 
-      case CTF_VAL_ABS:  //Absolute value
-        base = map(value, min, max, vmin, vmax);
-      break;
-      case CTF_VAL_NEXT: //Go next
-        base ++;
-        if(base > vmax) base = vmin;
-      break;
-      case CTF_VAL_PREV: //Go Prev
-        base --;
-        if(base < vmin) base = vmax;
-      break;
-      case CTF_VAL_DELTA://Delta
-        base += value;
-        if(base < vmin)      base = vmin;
-        else if(base > vmax) base = vmax;
-      break;
-    }
-
-    return base;
-  }
-};
-
-
-
-////////////////////////////////////
-// Control queue element
-struct CtrlQueueItem {
-  uint8_t       cmd;    // Command
-  CtrlQueueData data;   // Data
-
-  CtrlQueueItem(){
-     cmd = EEMC_NONE;
-  }
-};
 
 
 #endif //__EFFECTENGINECTX_H

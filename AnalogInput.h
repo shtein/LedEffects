@@ -1,7 +1,7 @@
 #ifndef __ANALOGINPUT_H
 #define __ANALOGINPUT_H
 
-#include "IRremote.h"
+#include <IRremote.h>
 
 ////////////////////////////
 // Base AnalogInput

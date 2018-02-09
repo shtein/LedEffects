@@ -1,6 +1,5 @@
 #include "precomp.h"
-#include "EffectControls.h"
-#include "EffectEngineCtx.h"
+#include "Controls.h"
 
 
 int powInt(int x, int y, int limit){
@@ -18,19 +17,19 @@ int powInt(int x, int y, int limit){
 
 ////////////////////////////
 // EffectControl
-EffectControl::EffectControl(uint8_t cmd, AnalogInput *input) {
+CtrlItem::CtrlItem(uint8_t cmd, AnalogInput *input) {
    _input = input;
    _cmd   = cmd;
 }
 
-EffectControl::~EffectControl(){
+CtrlItem::~CtrlItem(){
 }
 
-AnalogInput *EffectControl::getInput() const{
+AnalogInput *CtrlItem::getInput() const{
   return _input;
 }
 
-void EffectControl::loop(CtrlQueueItem &itm){
+void CtrlItem::loop(CtrlQueueItem &itm){
   //Check if triggered
   if(triggered()){
     //Prepare command
@@ -43,21 +42,21 @@ void EffectControl::loop(CtrlQueueItem &itm){
 
 
 ////////////////////////////
-// EffectControlPb
-EffectControlPb::EffectControlPb(uint8_t cmd, PushButton *btn, uint8_t ctrl, uint8_t flag):
-  EffectControl(cmd, btn){
+// CtrlItemPb
+CtrlItemPb::CtrlItemPb(uint8_t cmd, PushButton *btn, uint8_t ctrl, uint8_t flag):
+  CtrlItem(cmd, btn){
   _flag = flag;
   _ctrl = ctrl;  
 }
 
-EffectControlPb::~EffectControlPb(){
+CtrlItemPb::~CtrlItemPb(){
 }
 
-bool EffectControlPb::triggered() const{
+bool CtrlItemPb::triggered() const{
   return ((PushButton *)getInput())->value(_ctrl);
 }
 
-void EffectControlPb::getData(CtrlQueueData &data){
+void CtrlItemPb::getData(CtrlQueueData &data){
   data.flag  = _flag;
   data.value = 0;
   data.min   = 0;
@@ -66,24 +65,24 @@ void EffectControlPb::getData(CtrlQueueData &data){
 
 
 ////////////////////////////
-//EffectControlPtmtr
+//CtrlItemPtmtr
 
-EffectControlPtmtr::EffectControlPtmtr(uint8_t cmd, Potentiometer *ptn, int noiseThreshold):
-  EffectControl(cmd, ptn) {
+CtrlItemPtmtr::CtrlItemPtmtr(uint8_t cmd, Potentiometer *ptn, int noiseThreshold):
+  CtrlItem(cmd, ptn) {
   _value          = POT_MAX + 1; //just to make sure it is different from what we read
   _noiseThreshold = noiseThreshold; 
 }
 
-EffectControlPtmtr::~EffectControlPtmtr(){
+CtrlItemPtmtr::~CtrlItemPtmtr(){
 }
 
-bool EffectControlPtmtr::triggered() const{ 
+bool CtrlItemPtmtr::triggered() const{ 
   uint16_t value = ((Potentiometer *)getInput())->value();
 
   return (abs(value - _value) > _noiseThreshold);
 }
 
-void EffectControlPtmtr::getData(CtrlQueueData &data){
+void CtrlItemPtmtr::getData(CtrlQueueData &data){
   _value     = ((Potentiometer *)getInput())->value();
   
   data.flag  = CTF_VAL_ABS;
@@ -94,22 +93,22 @@ void EffectControlPtmtr::getData(CtrlQueueData &data){
 
 
 ////////////////////////////
-// EffectControlIRBtn
+// CtrlItemIRBtn
 
 #define BTN_TO_KEY(btn) ((unsigned long)btn | 0xFF0000)
 #define KEY_TO_BTN(key) (uint16_t)(btn & 0x0000FFFF)
 
-EffectControlIRBtn::EffectControlIRBtn(uint8_t cmd, IRRemoteRecv *ir, unsigned long btn, bool dir, uint8_t repeat):
-  EffectControl(cmd, ir) {
+CtrlItemIRBtn::CtrlItemIRBtn(uint8_t cmd, IRRemoteRecv *ir, unsigned long btn, bool dir, uint8_t repeat):
+  CtrlItem(cmd, ir) {
   _btn    = KEY_TO_BTN(btn);
   _dir    = dir;
   _repeat = repeat;
 }
 
-EffectControlIRBtn::~EffectControlIRBtn(){
+CtrlItemIRBtn::~CtrlItemIRBtn(){
 }
 
-bool EffectControlIRBtn::triggered() const{
+bool CtrlItemIRBtn::triggered() const{
   int n = ((IRRemoteRecv *)getInput())->pushed(BTN_TO_KEY(_btn));
 
   //Not pushed
@@ -126,7 +125,7 @@ bool EffectControlIRBtn::triggered() const{
   return true;
 }
 
-void EffectControlIRBtn::getData(CtrlQueueData &data){
+void CtrlItemIRBtn::getData(CtrlQueueData &data){
   data.flag  = _repeat > 0 ? CTF_VAL_DELTA : (_dir ? CTF_VAL_NEXT: CTF_VAL_PREV ); 
   data.value = (_dir ? 1 : -1) * powInt(2, ((IRRemoteRecv *)getInput())->pushed(BTN_TO_KEY(_btn)) - 1, _repeat);
   data.min   = 0;
@@ -135,20 +134,20 @@ void EffectControlIRBtn::getData(CtrlQueueData &data){
 
 
 ////////////////////////////
-// EffectControlRotEnc
-EffectControlRotEnc::EffectControlRotEnc(uint8_t cmd, RotaryEncoder *re, uint8_t inc): 
-  EffectControl(cmd, re) {
+// CtrlItemRotEnc
+CtrlItemRotEnc::CtrlItemRotEnc(uint8_t cmd, RotaryEncoder *re, uint8_t inc): 
+  CtrlItem(cmd, re) {
   _inc = inc;
 }
 
-EffectControlRotEnc::~EffectControlRotEnc(){
+CtrlItemRotEnc::~CtrlItemRotEnc(){
 }
 
-bool EffectControlRotEnc::triggered() const{ 
+bool CtrlItemRotEnc::triggered() const{ 
   return ((RotaryEncoder *)getInput())->value() != 0;
 }
 
-void EffectControlRotEnc::getData(CtrlQueueData &data){ 
+void CtrlItemRotEnc::getData(CtrlQueueData &data){ 
   data.flag  = CTF_VAL_DELTA;
   data.value = ((RotaryEncoder *)getInput())->value() * _inc;  
   data.min   = 0;
@@ -158,17 +157,17 @@ void EffectControlRotEnc::getData(CtrlQueueData &data){
 
 
 ////////////////////////////
-// EffectControlPanel
-EffectControlPanel::EffectControlPanel(){
+// CtrlPanel
+CtrlPanel::CtrlPanel(){
   _numControls = 0;
   _controlNum  = 0;
   _numInputs   = 0;
 }
 
-EffectControlPanel::~EffectControlPanel(){
+CtrlPanel::~CtrlPanel(){
 }
 
-void EffectControlPanel::addControl(EffectControl *ctrl){
+void CtrlPanel::addControl(CtrlItem *ctrl){
   if(!ctrl)
     return;
 
@@ -206,7 +205,7 @@ void EffectControlPanel::addControl(EffectControl *ctrl){
   }
 }
 
-void EffectControlPanel::loop(CtrlQueueItem &itm){
+void CtrlPanel::loop(CtrlQueueItem &itm){
   //Reset cmd
   itm.cmd       = EEMC_NONE;
   itm.data.flag = CTF_NONE;

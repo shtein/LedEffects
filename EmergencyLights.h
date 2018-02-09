@@ -19,7 +19,6 @@ class EffectEmergencyLights: public Effect{
 
 inline EffectEmergencyLights::EffectEmergencyLights(){  
   setSpeedDelay(50); 
-  _step = 0;
 }
 
 inline EffectEmergencyLights::~EffectEmergencyLights(){  
@@ -27,7 +26,6 @@ inline EffectEmergencyLights::~EffectEmergencyLights(){
 
 inline void EffectEmergencyLights::reset(){
   _step = 0;
-  
 }
 
 #define EL_BLINKS         5               //Number of ons and offs

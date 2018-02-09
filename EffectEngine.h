@@ -45,10 +45,10 @@ class EffectEngine{
 
     EffectStatic _eStatic;
 
-    CRGB       *_leds;                 //Leds
-    uint32_t    _maxLeds:12;           //Max number of leds    
-    uint32_t    _numLeds:12;           //Actual number of leds    
-    uint32_t    _mode:8;               //Current mode
+    CRGB       *_leds;              //Leds
+    uint16_t   _maxLeds;            //Max number of leds    
+    uint16_t   _numLeds;            //Actual number of leds    
+    uint8_t    _mode;               //Current mode
 
     unsigned long _millis;              //Processing
     unsigned long _millisToSaveCfg;     //When to safe config

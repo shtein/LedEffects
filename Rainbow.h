@@ -74,7 +74,6 @@ inline void EffectTheaterChaseRainbow::reset(){
 
 
 inline void EffectTheaterChaseRainbow::proceed(CRGB *leds, int numLeds){  
-
   
   //Turn every third pixell off
   for(int i = 0; i < numLeds; i = i + 3){

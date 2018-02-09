@@ -12,5 +12,6 @@
 #include "Noise.h"
 #include "Blur.h"
 #include "EmergencyLights.h"
+#include "Fire.h"
 
 #endif //__LEDEFFECTS_H

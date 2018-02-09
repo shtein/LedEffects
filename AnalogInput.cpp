@@ -223,8 +223,7 @@ void IRRemoteRecv::read(){
         _repeat = 1;
       }
 
-      DBG_OUT("Remote button ");
-      DBG_OUTLN(results.value, HEX);
+      DBG_OUTLN("Remote button: %lx", results.value);
     }
     
     // Receiving  next value   
