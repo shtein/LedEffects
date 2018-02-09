@@ -25,7 +25,7 @@
 //Effect Engine
 #define BEGIN_EFFECT_ENGINE() \
   _CM EffectEngine ee; \
-  _CM EffectControlPanel cp; \
+  _CM CtrlPanel cp; \
 
 #define END_EFFECT_ENGINE()  \
   _CM CtrlQueueItem itm; \
@@ -70,7 +70,7 @@
   ai = NULL;  
 
 #define PUSH_BUTTON_TO_CMD(cmd, ...) \
-  _CM EffectControlPb BTN_CTRL(cmd, (PushButton *)ai, __VA_ARGS__); \
+  _CM CtrlItemPb BTN_CTRL(cmd, (PushButton *)ai, __VA_ARGS__); \
   cp.addControl(&BTN_CTRL);
 
 
@@ -82,12 +82,12 @@
 
 #define POT_TO_CMD(cmd, pin) \
   _CM Potentiometer POT_NAME(pin); \
-  _CM EffectControlPtmtr POT_CTRL(cmd, &POT_NAME); \
+  _CM CtrlItemPtmtr POT_CTRL(cmd, &POT_NAME); \
   cp.addControl(&POT_CTRL);
 
 #define ROTENC_TO_CMD(cmd, pinData, pinClock) \
   _CM RotaryEncoder ROT_NAME(pinData, pinClock); \
-  _CM EffectControlRotEnc ROT_CTRL(cmd, &ROT_NAME); \
+  _CM CtrlItemRotEnc ROT_CTRL(cmd, &ROT_NAME); \
   cp.addControl(&ROT_CTRL);
 
 #define BEGIN_REMOTE(pin) \
@@ -98,13 +98,13 @@
   ai = NULL;
 
 #define RMT_BUTTON_TO_CMD(cmd, code) \
-  _CM EffectControlIRBtn IR_CTRL(cmd, (IRRemoteRecv *)ai, code); \
+  _CM CtrlItemIRBtn IR_CTRL(cmd, (IRRemoteRecv *)ai, code); \
   cp.addControl(&IR_CTRL);
 
 #define RMT_BUTTON_PAIR_TO_CMD(cmd, code1, code2, repeat) \
-  _CM EffectControlIRBtn IR_CTRL_UP(cmd, (IRRemoteRecv *)ai, code1, true, repeat); \
+  _CM CtrlItemIRBtn IR_CTRL_UP(cmd, (IRRemoteRecv *)ai, code1, true, repeat); \
   cp.addControl(&IR_CTRL_UP); \
-  _CM EffectControlIRBtn IR_CTRL_DOWN(cmd, (IRRemoteRecv *)ai, code2, false, repeat); \
+  _CM CtrlItemIRBtn IR_CTRL_DOWN(cmd, (IRRemoteRecv *)ai, code2, false, repeat); \
   cp.addControl(&IR_CTRL_DOWN);
 
 

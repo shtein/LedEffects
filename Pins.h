@@ -16,10 +16,14 @@
 #define EFFECT_PIN      5
 
 //LED Pins
-#define LED_PIN     12
-#define LED_CLOCK   13
+#define LED_PIN         12
+#define LED_CLOCK_PIN   13
 
-#define LED_PIN2    8
-#define LED_CLOCK2  9
+#define LED_PIN2        8
+#define LED_CLOCK_PIN2  9
+
+#define LED_PIN3        6
+#define LED_CLOCK_PIN3  5
+
 
 #endif //__PINS_H

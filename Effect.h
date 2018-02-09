@@ -6,9 +6,6 @@
 
 class CRGB;
 
-//Max number of preallocated palettes
-#define MAX_PAL 4
-
 class Effect{
   public:
     Effect();
@@ -22,7 +19,7 @@ class Effect{
 
     //Color
     CRGB getColor() const;
-    CHSV getHSV() const;
+    const CHSV & getHSV() const;
     void setHSV(const CHSV &hsv);
 
     //Speed delay
@@ -39,9 +36,6 @@ class Effect{
     static void setAll(CRGB *leds, int numLeds, byte red, byte green, byte blue);
     static void setAll(CRGB *leds, int numLeds, const CRGB &color);    
 
-    //Pallette pool for memory optimization
-    static CRGBPalette16 &allocPalette(int index);
-
     //Private color management
     void setRandomColor();
    
@@ -51,12 +45,42 @@ class Effect{
    
    //Speed
    uint8_t  _speedDelay; //byte, i.e. range is 0 - 255, that maps to range from SPEED_DELAY_MIN to SPEED_DELAY_MAX by setSpeedDelay and getSpeedDelay
-
-   //Preallocated palettes
-   static CRGBPalette16 _pals[MAX_PAL];
-
 };
 
+/////////////////////////////////////////
+// Effect Palette Transform - basic palette transformation
+
+#define MAX_PAL_CHANGES 24
+#define CHANGE_PAL_STEP 500
+
+class EffectPaletteTransform: public Effect{
+  public: 
+    EffectPaletteTransform();
+   ~EffectPaletteTransform();
+
+   virtual void proceed(CRGB *leds, int numLeds); 
+   virtual void reset();
+
+  protected:
+    virtual void updateColors();
+    virtual void updateLeds(CRGB *leds, int numLeds);
+
+    virtual int getPalClrIndex(int ledIndex, int numLeds) const;
+    virtual CRGBPalette16 getNewPal() const;
+    
+    virtual bool isReadyToBlendPal() const;
+    virtual bool isReadyToChangePal() const;
+    virtual bool isReadyToUpdateLeds() const;
+
+    virtual uint8_t getMaxPaxPalChanges() const;
+    virtual int getMaxStep() const;
+    
+  protected:
+    static CRGBPalette16 _palCurrent;
+    static CRGBPalette16 _palTarget;
+    
+    static int           _step;
+};
 
 
 #endif //__EFFECT_H
