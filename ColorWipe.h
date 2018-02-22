@@ -3,7 +3,6 @@
 
 //////////////////////////////
 // Color Wipe Effect
-
 class EffectColorWipe: public Effect{
   public:
     EffectColorWipe();

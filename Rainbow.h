@@ -57,7 +57,7 @@ class EffectTheaterChaseRainbow: public Effect{
     void proceed(CRGB *leds, int numLeds);  
 
   protected:
-  uint8_t _step;
+    uint8_t _step;
 
 };
 

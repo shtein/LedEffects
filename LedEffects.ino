@@ -15,13 +15,13 @@ void setup() {
   BEGIN_EFFECT_ENGINE() 
     //Effects   
     BEGIN_EFFECTS()
-      ADD_EFFECT(EffectFire)
-      ADD_EFFECT(EffectEmergencyLights) //For David
+      //ADD_EFFECT(EffectFire)
+      //ADD_EFFECT(EffectEmergencyLights) //For David
       ADD_EFFECT(EffectConfetti)
       ADD_EFFECT(EffectMatrix) 
       ADD_EFFECT(EffectPaletteTransformFast) 
       ADD_EFFECT(EffectBlur)
-      ADD_EFFECT(EffectBeatWave)              //Ugly or incomplete
+      //ADD_EFFECT(EffectBeatWave)              //Ugly or incomplete
       ADD_EFFECT(EffectRainbowMove)
       ADD_EFFECT(EffectNoise)            
       ADD_EFFECT(EffectMoodBlobs) 
@@ -33,11 +33,11 @@ void setup() {
     END_EFFECTS()
 
     //Leds
-    BEGIN_LEDS(150, EEM_EFFECT) //50 for test or David, 267 for deck, 88 for Igor, 212 for Sasha, 300 for Christmass Tree, 100 for old 2801 leds
+    BEGIN_LEDS(150, EEM_EFFECT) //50 for test or David, 267 for deck, 88 for Igor, 212 for Sasha, 300 for Christmass Tree (150 for new Christmass Tree), 100 for old 2801 leds
       //ADD_STRIP(NEOPIXEL, LED_PIN)
       //ADD_STRIP(NEOPIXEL, LED_PIN2)   //Second strip for deck
       
-      ADD_STRIP(WS2811, LED_PIN, RGB) //Christmas Tree or David
+      ADD_STRIP(WS2811, LED_PIN, RGB)  //Christmas Tree or David
       ADD_STRIP(WS2811, LED_PIN2, RGB) //Second strip for Christmass Tree
       ADD_STRIP(WS2811, LED_PIN3, RGB) //Third strip for Christmass Tree
       

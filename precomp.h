@@ -9,7 +9,7 @@
 
 
 
-#define CHECK_MEM
+//#define CHECK_MEM
 #ifdef CHECK_MEM 
   #define _CM static
 #else

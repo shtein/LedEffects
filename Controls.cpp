@@ -152,7 +152,6 @@ void CtrlItemRotEnc::getData(CtrlQueueData &data){
   data.value = ((RotaryEncoder *)getInput())->value() * _inc;  
   data.min   = 0;
   data.max   = 0;
-
 }
 
 
