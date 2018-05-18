@@ -7,6 +7,10 @@
 #define TOKEN_CONCAT2(x, y) TOKEN_CONCAT(x, y)
 #define VAR_NAME(prefix) TOKEN_CONCAT2(prefix, __LINE__)
 
+#define EFFECT_ARR_NAME VAR_NAME(efcts)
+
+#define EFFECT_NAME VAR_NAME(efct)
+
 #define BTN VAR_NAME(btn) //Temp button variable
 #define BTN_CTRL VAR_NAME(ecbtn)
 
@@ -38,20 +42,34 @@
 
 #define END_EFFECTS()
 
+#define BEGIN_MODE(modeName, maxEffects) \
+  _CM Effect *modeName[maxEffects]; \
+  ee.addMode(modeName);
+
+ #define END_MODE()
+
+#define BLACK_MODE() \
+  ee.addMode(NULL);
+ 
+
 #define ADD_EFFECT(ClassEffect) \
-  _CM ClassEffect e##ClassEffect; \
-  ee.addEffect(&e##ClassEffect);
+  _CM ClassEffect EFFECT_NAME; \
+  ee.addEffect(&EFFECT_NAME);
+
+#define ADD_STATIC_COLOR(hsv) \
+  _CM EffectStatic EFFECT_NAME(hsv); \
+  ee.addEffect(&EFFECT_NAME);
 
 
-#define BEGIN_LEDS(xmaxleds, xmode) \
-   _CM CRGB leds[xmaxleds]; \
-    uint8_t mode = xmode;
+
+#define BEGIN_LEDS(xmaxleds) \
+   _CM CRGB leds[xmaxleds];
     
 #define ADD_STRIP(Type, ...) \
   FastLED.addLeds<Type, __VA_ARGS__ >(leds, sizeof(leds) / sizeof(leds[0])).setCorrection( TypicalLEDStrip );  
 
 #define END_LEDS() \
-    ee.init(leds, sizeof(leds) / sizeof(leds[0]), mode);
+    ee.init(leds, sizeof(leds) / sizeof(leds[0]));
 
 
 ///////////////////////////////////////

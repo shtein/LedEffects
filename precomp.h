@@ -4,12 +4,12 @@
 #include "Arduino.h"
 #include "FastLED.h"
 
-//#define DBG_TO_SERIAL
-#include "dbgtool.h"
+#define DBG_TO_SERIAL
+#include <DbgTool.h>
 
 
 
-//#define CHECK_MEM
+#define CHECK_MEM
 #ifdef CHECK_MEM 
   #define _CM static
 #else

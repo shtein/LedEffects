@@ -3,7 +3,7 @@
 
 class EffectStatic: public Effect{
   public:
-    EffectStatic();
+    EffectStatic(const CHSV &hsv);
     ~EffectStatic();
 
   protected:
@@ -11,8 +11,8 @@ class EffectStatic: public Effect{
     void reset();
 };
 
-inline EffectStatic::EffectStatic(){
-  setHSV(CHSV(HUE_RED, 0xFF, 0xFF));
+inline EffectStatic::EffectStatic(const CHSV &hsv = CHSV(HUE_RED, 0xFF, 0xFF)){
+  setHSV(hsv);
   setSpeedDelay(100);
 }
 

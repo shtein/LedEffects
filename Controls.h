@@ -2,7 +2,7 @@
 #define __EFFECTCONTROLS_H
 
 #include "EffectEngineCtx.h"
-#include "AnalogInput.h"
+#include <AnalogInput.h>
 
 ///////////////////////////////////
 // Control flags

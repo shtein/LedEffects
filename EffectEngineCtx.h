@@ -17,13 +17,6 @@
 #define EEMC_SPEED       0x08   //Speed changed
 #define EEMC_NUMLEDS     0x10   //Number of leds changed
 
-//Modes
-#define EEM_OFF      0x0000    //Off
-#define EEM_STATIC   0x0001    //static
-#define EEM_EFFECT   0x0002    //Effect
-#define EEM_RANDOM   0x0003    //Random effect change after random interval bettwen 2 and 5 minutes - not implemented
-#define EEM_SETUP    0x0004    //Setup
-#define EEM_MODEMAX  EEM_EFFECT
 
 //Timeout to save config
 #define SAVE_CONFIG_TIMEOUT 30000
