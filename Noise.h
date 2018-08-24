@@ -10,7 +10,7 @@ class EffectPaletteTransformFast: public EffectPaletteTransform{
     ~EffectPaletteTransformFast();
 
   protected:
-    int getPalClrIndex(int ledIndex, int numLeds) const;
+    uint8_t getPalClrIndex(int ledIndex, int numLeds) const;
     int getMaxStep() const;
 };
 
@@ -20,9 +20,9 @@ inline EffectPaletteTransformFast::EffectPaletteTransformFast(){
 inline EffectPaletteTransformFast::~EffectPaletteTransformFast(){
 }
 
-inline int EffectPaletteTransformFast::getPalClrIndex(int ledIndex, int numLeds) const{
+inline uint8_t EffectPaletteTransformFast::getPalClrIndex(int ledIndex, int numLeds) const{
   //Full range
-  return map(ledIndex, 0, numLeds - 1, 0, 65535);
+  return map(ledIndex, 0, numLeds - 1, 0, 255);
 }
 
 inline int EffectPaletteTransformFast::getMaxStep() const{
@@ -41,7 +41,7 @@ class EffectNoise: public EffectPaletteTransform{
     void reset();
 
 protected:
-    int getPalClrIndex(int ledIndex, int numLeds) const;
+    uint8_t getPalClrIndex(int ledIndex, int numLeds) const;
 
   protected:
     int _dist;
@@ -72,10 +72,58 @@ inline void EffectNoise::proceed(CRGB *leds, int numLeds){
 #define XSCALE          30
 #define YSCALE          30
 
-inline int EffectNoise::getPalClrIndex(int ledIndex, int /*numLeds*/) const{
+inline uint8_t EffectNoise::getPalClrIndex(int ledIndex, int /*numLeds*/) const{
   return inoise8(ledIndex  * XSCALE, _dist + ledIndex * YSCALE) % 255;             
 }
 
+
+class EffectPlasma: public EffectPaletteTransform{
+  public: 
+    EffectPlasma();
+    ~EffectPlasma();
+
+  protected:
+    virtual CRGBPalette16 getNewPal() const;
+    virtual void updateLeds(CRGB *leds, int numLeds);
+    virtual int getMaxStep() const;
+};
+
+inline EffectPlasma::EffectPlasma(){
+  setSpeedDelay(50);  
+}
+
+EffectPlasma::~EffectPlasma(){
+}
+
+#define qsuba(x, b)  ((x > b) ? x-b: 0) 
+
+void EffectPlasma::updateLeds(CRGB *leds, int numLeds){
+  int phase1 = beatsin8(6,-64, 64);
+  int phase2 = beatsin8(7,-64, 64);
+
+  for(int i = 0; i < numLeds; i++){
+    int clrIndex      = cubicwave8( (i * 23) + phase1) / 2 + cos8( (i * 15) + phase2) / 2;
+    int clrBrightness = qsuba(clrIndex, beatsin8(7, 0, 96));
+    
+    leds[i] = ColorFromPalette(_palCurrent, clrIndex, clrBrightness, LINEARBLEND);
+  }  
+}
+
+CRGBPalette16 EffectPlasma::getNewPal() const{
+
+  uint8_t clr = random8();
+  return CRGBPalette16(CHSV(clr + random8(32), 192, random8(128,255)), 
+                       CHSV(clr + random8(32), 255, random8(128,255)), 
+                       CHSV(clr + random8(32), 192, random8(128,255)), 
+                       CHSV(clr + random8(32), 255, random8(128,255))
+                     );
+}
+
+
+int EffectPlasma::getMaxStep() const{
+  return 100;
+}
+ 
 
 /////////////////////////////////////
 // Effect Beat Wave
@@ -85,7 +133,7 @@ class EffectBeatWave: public EffectPaletteTransform{
     ~EffectBeatWave();
 
   protected:
-    int getPalClrIndex(int ledIndex, int numLeds) const;
+    uint8_t getPalClrIndex(int ledIndex, int numLeds) const;
     bool isReadyToBlendPal() const;
 };
 
@@ -96,13 +144,15 @@ inline EffectBeatWave::EffectBeatWave(){
 inline EffectBeatWave::~EffectBeatWave(){
 }
 
-inline int EffectBeatWave::getPalClrIndex(int ledIndex, int /*numLeds*/) const{
+inline uint8_t EffectBeatWave::getPalClrIndex(int ledIndex, int /*numLeds*/) const{
   return ledIndex + beatsin8(9, 0, 255) + beatsin8(8, 0, 255) + beatsin8(7, 0, 255) + beatsin8(6, 0, 255);
 }
 
 inline bool EffectBeatWave::isReadyToBlendPal() const{
   return _step % 50 == 0 ? true : false; 
 }
+
+
 
 
 //////////////////////////////

@@ -1,8 +1,15 @@
 #ifndef __PINS_H
 #define __PINS_H
 
-//Analog PIN to control number of LEDs
+//Analog pin to control number of LEDs
 #define NUMLEDS_PIN 0
+
+
+//Analog pin to control microphone sensitivity
+#define MIC_SENS_PIN 4
+
+//Analog pin to control microphone
+#define MIC_PIN 5
 
 //PIN of IR remote receiver
 #define REMOTE_PIN  7

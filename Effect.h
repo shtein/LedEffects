@@ -1,10 +1,14 @@
 #ifndef __EFFECT_H
 #define __EFFECT_H
 
+#include "EffectEngineCtx.h"
+
 ///////////////////
 // Basic effect
 
+
 class CRGB;
+class CHSV;
 
 class Effect{
   public:
@@ -16,6 +20,9 @@ class Effect{
     
     //Process
     void loop(CRGB *leds, int numLeds); 
+
+    //Command processing
+    virtual void onCmd(const struct CtrlQueueItem &itm);
 
     //Color
     CRGB getColor() const;
@@ -65,7 +72,8 @@ class EffectPaletteTransform: public Effect{
     virtual void updateColors();
     virtual void updateLeds(CRGB *leds, int numLeds);
 
-    virtual int getPalClrIndex(int ledIndex, int numLeds) const;
+    virtual uint8_t getPalClrIndex(int ledIndex, int numLeds) const;
+    virtual uint8_t getPalClrBrightenss(int ledIndex, int numLeds, int clrIndex) const;
     virtual CRGBPalette16 getNewPal() const;
     
     virtual bool isReadyToBlendPal() const;
@@ -81,6 +89,7 @@ class EffectPaletteTransform: public Effect{
     
     static int           _step;
 };
+
 
 
 #endif //__EFFECT_H

@@ -17,7 +17,7 @@ int powInt(int x, int y, int limit){
 
 ////////////////////////////
 // EffectControl
-CtrlItem::CtrlItem(uint8_t cmd, AnalogInput *input) {
+CtrlItem::CtrlItem(uint8_t cmd, BaseInput *input) {
    _input = input;
    _cmd   = cmd;
 }
@@ -25,7 +25,7 @@ CtrlItem::CtrlItem(uint8_t cmd, AnalogInput *input) {
 CtrlItem::~CtrlItem(){
 }
 
-AnalogInput *CtrlItem::getInput() const{
+BaseInput *CtrlItem::getInput() const{
   return _input;
 }
 
@@ -43,10 +43,11 @@ void CtrlItem::loop(CtrlQueueItem &itm){
 
 ////////////////////////////
 // CtrlItemPb
-CtrlItemPb::CtrlItemPb(uint8_t cmd, PushButton *btn, uint8_t ctrl, uint8_t flag):
+CtrlItemPb::CtrlItemPb(uint8_t cmd, PushButton *btn, uint8_t ctrl, uint8_t flag, int8_t value):
   CtrlItem(cmd, btn){
-  _flag = flag;
-  _ctrl = ctrl;  
+  _flag  = flag;
+  _ctrl  = ctrl;  
+  _value = value;
 }
 
 CtrlItemPb::~CtrlItemPb(){
@@ -58,7 +59,7 @@ bool CtrlItemPb::triggered() const{
 
 void CtrlItemPb::getData(CtrlQueueData &data){
   data.flag  = _flag;
-  data.value = 0;
+  data.value = _value;
   data.min   = 0;
   data.max   = 0;
 }
@@ -67,23 +68,25 @@ void CtrlItemPb::getData(CtrlQueueData &data){
 ////////////////////////////
 //CtrlItemPtmtr
 
-CtrlItemPtmtr::CtrlItemPtmtr(uint8_t cmd, Potentiometer *ptn, int noiseThreshold):
+CtrlItemPtmtr::CtrlItemPtmtr(uint8_t cmd, AnalogInput *ptn, int noiseThreshold):
   CtrlItem(cmd, ptn) {
-  _value          = POT_MAX + 1; //just to make sure it is different from what we read
+  _value          = POT_MAX + 1;    //just to make sure it is different from what we read
   _noiseThreshold = noiseThreshold; 
 }
 
 CtrlItemPtmtr::~CtrlItemPtmtr(){
 }
 
+#define alfa 0.5
+
 bool CtrlItemPtmtr::triggered() const{ 
-  uint16_t value = ((Potentiometer *)getInput())->value();
+  uint16_t value = _value * alfa + (1 - alfa) * ((AnalogInput *)getInput())->value() + 0.5;
 
   return (abs(value - _value) > _noiseThreshold);
 }
 
 void CtrlItemPtmtr::getData(CtrlQueueData &data){
-  _value     = ((Potentiometer *)getInput())->value();
+  _value  = _value * alfa + (1 - alfa) * ((AnalogInput *)getInput())->value() + 0.5;
   
   data.flag  = CTF_VAL_ABS;
   data.value = _value;
@@ -91,6 +94,26 @@ void CtrlItemPtmtr::getData(CtrlQueueData &data){
   data.max   = POT_MAX;
 }
 
+
+/////////////////////////////
+// CtrlMic
+CtrlMic::CtrlMic(uint8_t cmd, AnalogInput *mic): 
+  CtrlItem(cmd, mic){
+}
+
+CtrlMic::~CtrlMic(){
+}
+
+bool CtrlMic::triggered() const{ 
+  return true;
+}
+
+void CtrlMic::getData(CtrlQueueData &data){
+  data.flag  = CTF_VAL_ABS;
+  data.value = ((AnalogInput *)getInput())->value();
+  data.min   = POT_MIN;
+  data.max   = POT_MAX;
+}
 
 ////////////////////////////
 // CtrlItemIRBtn
@@ -179,7 +202,7 @@ void CtrlPanel::addControl(CtrlItem *ctrl){
 
   
   //Add analog input - should be only of instance to avoid reading it twice
-  AnalogInput *input = ctrl->getInput();
+  BaseInput *input = ctrl->getInput();
   if(!input)
     return;
 

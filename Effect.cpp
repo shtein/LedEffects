@@ -1,6 +1,7 @@
 #include "precomp.h"
-#include "effect.h"
 #include "effectenginectx.h"
+#include "effect.h"
+
 
 /////////////////////////////////
 // Effect
@@ -27,6 +28,26 @@ void Effect::loop(CRGB *leds, int numLeds){
  
 }
 
+
+void Effect::onCmd(const struct CtrlQueueItem &itm){
+  
+  switch(itm.cmd){
+    case EEMC_COLOR_HUE:case EEMC_COLOR_SAT: case EEMC_COLOR_VAL: {
+      //Get effect color
+      CHSV hsv = getHSV();
+
+      //Update corresponding color value
+      hsv.raw[itm.cmd - EEMC_COLOR_HUE] = (uint8_t)itm.data.translate( (int)hsv.raw[itm.cmd - EEMC_COLOR_HUE], 0, 255);
+  
+      //Set effect color
+      setHSV(hsv);   
+    }   
+    break;
+    case EEMC_SPEED:
+      setSpeedDelay(itm.data.translate(getSpeedDelay(), SPEED_DELAY_MIN, SPEED_DELAY_MAX));
+    break;
+  }    
+}
 
 CRGB Effect::getColor() const{
   return getHSV();
@@ -104,9 +125,13 @@ int EffectPaletteTransform::getMaxStep() const{
 }
 
 
-int EffectPaletteTransform::getPalClrIndex(int /*ledIndex*/, int /*numLeds*/) const{
+uint8_t EffectPaletteTransform::getPalClrIndex(int /*ledIndex*/, int /*numLeds*/) const{
   //First index by default - need to experiment with this
   return 0;
+}
+
+uint8_t EffectPaletteTransform::getPalClrBrightenss(int /*ledIndex*/, int /*numLeds*/, int /*clrIndex*/) const{
+  return 255;
 }
 
 bool EffectPaletteTransform::isReadyToBlendPal() const{
@@ -140,8 +165,10 @@ void EffectPaletteTransform::updateColors(){
 }
 
 void EffectPaletteTransform::updateLeds(CRGB *leds, int numLeds){  
-  for(int i = 0; i < numLeds; i++){                                    
-    leds[i] = ColorFromPalette(_palCurrent, getPalClrIndex(i, numLeds), 255, LINEARBLEND);
+  for(int i = 0; i < numLeds; i++){     
+    uint8_t clrIndex      = getPalClrIndex(i, numLeds);
+    uint8_t clrBrightness = getPalClrBrightenss(i, numLeds, clrIndex);      
+    leds[i] = ColorFromPalette(_palCurrent, clrIndex, clrBrightness, LINEARBLEND);
   }
 }
 
@@ -171,6 +198,9 @@ void EffectPaletteTransform::proceed(CRGB *leds, int numLeds){
   //Prepare for the next move                                        
   _step--;
 }
+
+
+
 
 
 

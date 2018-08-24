@@ -14,8 +14,10 @@ void setup() {
     //Effects   
     BEGIN_EFFECTS()
       BEGIN_MODE(Effects, 15)
+        ADD_EFFECT(EffectMeteorRain)
+        ADD_EFFECT(EffectPlasma)
         //ADD_EFFECT(EffectFire)
-        //ADD_EFFECT(EffectEmergencyLights) //For David
+        //ADD_EFFECT(EffectEmergencyLights)       //For David
         ADD_EFFECT(EffectConfetti)
         //ADD_EFFECT(EffectMatrix) 
         ADD_EFFECT(EffectPaletteTransformFast) 
@@ -26,8 +28,8 @@ void setup() {
         ADD_EFFECT(EffectMoodBlobs) 
         ADD_EFFECT(EffectRainbow)
         ADD_EFFECT(EffectFadeInOut)
-        ADD_EFFECT(EffectRunningLights)        //Single color
-        ADD_EFFECT(EffectColorWipe)            //Not intersting
+        ADD_EFFECT(EffectRunningLights)           //Single color
+        ADD_EFFECT(EffectColorWipe)               //Not intersting
         ADD_EFFECT(EffectTheaterChaseRainbow) 
       END_MODE()
       BEGIN_MODE(Static, 3)
@@ -35,7 +37,7 @@ void setup() {
         ADD_STATIC_COLOR(CHSV(HUE_GREEN, 0xFF, 0xFF))
         ADD_STATIC_COLOR(CHSV(HUE_BLUE, 0xFF, 0xFF))
       END_MODE()
-      BLACK_MODE()
+      //BLACK_MODE()
     END_EFFECTS()
 
     //Leds
@@ -63,6 +65,8 @@ void setup() {
       //PUSH_BUTTON_SA_TO_CMD(EEMC_EFFECT, EFFECT_PIN)        //Effect
       //POT_TO_CMD(EEMC_NUMLEDS, NUMLEDS_PIN)                 //Number of leds
       //ROTENC_TO_CMD(EEMC_SPEED, SPEED_PIN, SPEED_CLOCK_PIN) //Speed
+      //POT_TO_CMD(EEMC_MIC_SENS, MIC_SENS_PIN)               //Micrphone sensitivity
+      //MIC_TO_CMD(EEMC_MIC, MIC_PIN)                         //Micrphone samples
 
 
       //Make sure ir remote receiver is wired and connected properly to arduino otherwise the program misbehaves: stops, slows down, etc

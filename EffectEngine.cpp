@@ -157,7 +157,7 @@ void EffectEngine::onEffectChange(const struct CtrlQueueData &data){
   
   //Black the leds
   fill_solid(_leds, _maxLeds, CRGB::Black);
-
+  
   //Change effect
   setEffect(effectNum);
 
@@ -165,36 +165,11 @@ void EffectEngine::onEffectChange(const struct CtrlQueueData &data){
   preSafeConfig();     
 }
 
-void EffectEngine::onColorChange(int index, const struct CtrlQueueData &data){
-  //Check if effect is there
-  Effect *curEffect = getEffect();
-  if(!curEffect)
-    return;
-
-  //Get effect color
-  CHSV hsv = curEffect->getHSV();
-
-  //Update corresponding color value
-  hsv.raw[index] = (uint8_t)data.translate( (int)hsv.raw[index], 0, 255);
-  
-  //Set effect color
-  curEffect->setHSV(hsv);
-}
-
-
-void EffectEngine::onSpeedChange(const struct CtrlQueueData &data){
-  
-  //Check if effect is there
-  Effect *curEffect = getEffect();
-  if(!curEffect)
-    return;
-
-  //Set new speed delay
-  curEffect->setSpeedDelay(data.translate(curEffect->getSpeedDelay(), SPEED_DELAY_MIN, SPEED_DELAY_MAX));
-}
-
 
 void EffectEngine::loop(const struct CtrlQueueItem &itm){
+
+  //Current effect
+  Effect *curEffect = NULL;
 
   //Process command
   switch(itm.cmd){
@@ -206,21 +181,22 @@ void EffectEngine::loop(const struct CtrlQueueItem &itm){
     break;
     case EEMC_EFFECT:
       onEffectChange(itm.data);
-    break;
-    case EEMC_COLOR_HUE:
-    case EEMC_COLOR_SAT:
-    case EEMC_COLOR_VAL:
-      onColorChange(itm.cmd - EEMC_COLOR_HUE, itm.data);
-    break;
-    case EEMC_SPEED:
-      onSpeedChange(itm.data);
-    break;
+    break;    
+    default: //Processed by current effect
+      curEffect = getEffect();
+      if(curEffect)
+        curEffect->onCmd(itm);
+    break;  
   };
 
-  //Proceed with current effect
-  bool updateLeds = itm.cmd != EEMC_NONE;
 
-  Effect *curEffect = getEffect();
+  //Proceed with current effect
+  bool updateLeds = (itm.cmd & EEMC_LED) != EEMC_NONE;
+
+  //Get curretn effect if needed
+  if(!curEffect)
+    curEffect = getEffect();
+
   if(curEffect != NULL){     
       
     //Is it time to process ?
@@ -234,7 +210,6 @@ void EffectEngine::loop(const struct CtrlQueueItem &itm){
         
         updateLeds = true;
      }
-   
   }
   
   //Optimization to avoid calling update leds too often
@@ -259,40 +234,62 @@ void EffectEngine::loop(const struct CtrlQueueItem &itm){
 // Read/Write configuration
 
 struct EffectEngineConfig{
-  uint8_t ver;        //config version
-  uint8_t mode;       //mode
-  uint8_t effect;     //selected effect
+  uint8_t ver;          //config version
+  uint8_t numModes:4;   //total number of modes
+  uint8_t modeNum:4;    //current mode
+  struct EffectConfig{
+    uint8_t numEffects:4;
+    uint8_t effectNum:4;
+  } modes[MAX_MODES];
 };
 
-#define EE_VERSION 0x01
+#define EE_VERSION 0x02
 
 void EffectEngine::readConfig(){
-  struct EffectEngineConfig ec = {0x00, 0xFF, 0x00}; 
-/*
+  struct EffectEngineConfig ec;
+
+  //Read config
   EEPROM.get(0x0000, ec); 
 
   //Check if version is correct 
-  if(ec.ver == EE_VERSION){
+  if(ec.ver != EE_VERSION)
+    return;
 
-    //Check mode
-    if(ec.mode <= EEM_MODEMAX) {
-      _mode = ec.mode;
-    }
+  //Check if number of modes match
+  if(ec.numModes !=  _numModes)
+    return;
 
-    //Check number of effects
-    if(ec.effect < _numEffects)
-      _effectNum = ec.effect;      
+  //Set current mode
+  _modeNum = ec.modeNum < ec.numModes ? ec.modeNum : 0;
+ 
+  //For each mode check consistency and set current effect
+  for(uint8_t i = 0; i < _numModes; i++){
+    if(ec.modes[i].numEffects != _modes[i].numEffects)
+      continue;
+
+    //Save mode effect
+    _modes[i].effectNum = ec.modes[i].effectNum < ec.modes[i].numEffects? ec.modes[i].effectNum : 0;
   }
 
-*/  
+  
 }
 
 void EffectEngine::writeConfig(){
-/*  
-  struct EffectEngineConfig ec = {EE_VERSION, (uint8_t)_mode, _effectNum}; 
+ 
+  struct EffectEngineConfig ec;
 
+  //Prepare data
+  ec.ver = EE_VERSION;
+  ec.numModes = _numModes;
+  ec.modeNum  = _modeNum;
+  
+  for(uint8_t i = 0; i < _numModes; i++){
+    ec.modes[i].numEffects = _modes[i].numEffects;
+    ec.modes[i].effectNum  = _modes[i].effectNum;
+  }
+
+  //Save config
   EEPROM.put(0x0000, ec);  
-*/  
 }
 
 void EffectEngine::preSafeConfig(){

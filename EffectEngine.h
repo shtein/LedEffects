@@ -28,8 +28,8 @@ class EffectEngine{
     void onModeChange(const struct CtrlQueueData &data);
     void onNumLedsChange(const struct CtrlQueueData &data);
     void onEffectChange(const struct CtrlQueueData &data); 
-    void onColorChange(int index, const struct CtrlQueueData &data);
-    void onSpeedChange(const struct CtrlQueueData &data); 
+    void onCmdDefaul(const struct CtrlQueueItem &itm);
+    
 
     //Internal routines
     void setMode(uint8_t mode);
@@ -50,7 +50,7 @@ class EffectEngine{
     } _modes[MAX_MODES]; 
 
     uint8_t    _numModes:4;           //Total number of modes
-    uint8_t    _modeNum:4;               //Current mode
+    uint8_t    _modeNum:4;            //Current mode
 
     CRGB       *_leds;              //Leds
     uint16_t   _maxLeds;            //Max number of leds    

@@ -26,6 +26,10 @@
 #define ROT_CTRL VAR_NAME(ecrot)
 
 
+#define MIC_NAME VAR_NAME(mic)
+#define MIC_CTRL VAR_NAME(ecmic)
+
+
 //Effect Engine
 #define BEGIN_EFFECT_ENGINE() \
   _CM EffectEngine ee; \
@@ -75,7 +79,7 @@
 ///////////////////////////////////////
 //Control map
 #define BEGIN_CONTROL_MAP() \
-  _CM AnalogInput *ai = NULL;
+  _CM BaseInput *ai = NULL;
 
 #define END_CONTROL_MAP() \
   ai = NULL;
@@ -99,9 +103,15 @@
 
 
 #define POT_TO_CMD(cmd, pin) \
-  _CM Potentiometer POT_NAME(pin); \
+  _CM AnalogInput POT_NAME(pin); \
   _CM CtrlItemPtmtr POT_CTRL(cmd, &POT_NAME); \
   cp.addControl(&POT_CTRL);
+
+#define MIC_TO_CMD(cmd, pin) \
+  _CM AnalogInput MIC_NAME(pin); \
+  _CM CtrlItemPtmtr MIC_CTRL(cmd, &MIC_NAME); \
+  cp.addControl(&MIC_CTRL);
+
 
 #define ROTENC_TO_CMD(cmd, pinData, pinClock) \
   _CM RotaryEncoder ROT_NAME(pinData, pinClock); \

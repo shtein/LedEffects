@@ -1,8 +1,10 @@
 #ifndef __EFFECTCONTROLS_H
 #define __EFFECTCONTROLS_H
 
-#include "EffectEngineCtx.h"
 #include <AnalogInput.h>
+
+//Change commands
+#define EEMC_NONE        0x00   //Nothing changed
 
 ///////////////////////////////////
 // Control flags
@@ -54,7 +56,6 @@ struct CtrlQueueData{
 };
 
 
-
 ////////////////////////////////////
 // Control queue element
 struct CtrlQueueItem {
@@ -70,12 +71,12 @@ struct CtrlQueueItem {
 // ProcessControl - base class
 class CtrlItem{
   public:
-    CtrlItem(uint8_t cmd, AnalogInput *input);
+    CtrlItem(uint8_t cmd, BaseInput *input);
    ~CtrlItem();
 
     void loop(CtrlQueueItem &itm);
     
-    AnalogInput *getInput() const;
+    BaseInput *getInput() const;
     
   protected:
     virtual bool triggered() const = 0;
@@ -83,14 +84,14 @@ class CtrlItem{
 
   protected:
     uint8_t       _cmd;     //Command
-    AnalogInput  *_input;   //Analog input to retrieve control data
+    BaseInput    *_input;   //Analog input to retrieve control data
 };
 
 ////////////////////////////////
 // Push button control, reacts on either short click, long click or long push
 class CtrlItemPb: public CtrlItem{
   public:
-    CtrlItemPb(uint8_t cmd, PushButton *input, uint8_t ctrl = PB_CONTROL_CLICK, uint8_t flag = CTF_VAL_NEXT);
+    CtrlItemPb(uint8_t cmd, PushButton *input, uint8_t ctrl = PB_CONTROL_CLICK, uint8_t flag = CTF_VAL_NEXT, int8_t value = 0);
    ~CtrlItemPb();
 
   protected:
@@ -100,13 +101,20 @@ class CtrlItemPb: public CtrlItem{
   protected:
     uint8_t _flag:4;
     uint8_t _ctrl:4;
+    int8_t  _value;
 };
 
 ////////////////////////////////
-// CtrlItemPtmtr - analog input is Potentiometer
+// CtrlItemPtmtr - analog input is Potentiometer - AnalogInput
+#define POT_MIN             0
+#define POT_MAX             1023
+
+#define POT_NOISE_THRESHOLD 4
+
+
 class CtrlItemPtmtr: public CtrlItem{
   public:
-    CtrlItemPtmtr(uint8_t cmd, Potentiometer *ptn, int noiseThreshold = POT_NOISE_THRESHOLD);
+    CtrlItemPtmtr(uint8_t cmd, AnalogInput *ptn, int noiseThreshold = POT_NOISE_THRESHOLD);
    ~CtrlItemPtmtr();
 
   protected:
@@ -116,6 +124,19 @@ class CtrlItemPtmtr: public CtrlItem{
   protected:
    uint16_t  _value:11;
    uint16_t  _noiseThreshold:5;
+};
+
+
+//////////////////////////////
+// CtrlMic - analog input is Microphone - AnalogInput
+class CtrlMic: public CtrlItem{
+  public:
+    CtrlMic(uint8_t cmd, AnalogInput *mic);
+    ~CtrlMic();
+
+   protected:
+    bool triggered() const;
+    void getData(CtrlQueueData &data);
 };
 
 //////////////////////////////
@@ -172,11 +193,11 @@ class CtrlPanel{
     void loop(CtrlQueueItem &itm);
 
   protected:
-    CtrlItem     * _controls[MAX_CONTROLS]; //Controls
+    CtrlItem      *_controls[MAX_CONTROLS]; //Controls
     uint8_t        _numControls;            //Number of controls
     uint8_t        _controlNum;             //Last processed control
 
-    AnalogInput*  _inputs[MAX_INPUTS];     //Analog inputs
+    BaseInput    *_inputs[MAX_INPUTS];     //Analog inputs
     uint8_t       _numInputs;
 };
 
