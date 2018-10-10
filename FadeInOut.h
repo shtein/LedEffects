@@ -17,7 +17,7 @@ class EffectFadeInOut: public Effect{
 
 
 inline EffectFadeInOut::EffectFadeInOut(){
-  setSpeedDelay(75); 
+  setSpeedDelay(50); 
 }
 
 inline EffectFadeInOut::~EffectFadeInOut(){

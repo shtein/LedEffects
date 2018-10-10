@@ -79,7 +79,7 @@ void EffectEngine::showStrip() {
 
 
 void EffectEngine::onModeChange(const struct CtrlQueueData &data){ 
-  //Get new mode value  
+  //Get new mode value    
   uint8_t mode = (uint8_t)data.translate(_modeNum, 0, _numModes - 1);
   
   //Do nothing if did not change
@@ -197,7 +197,10 @@ void EffectEngine::loop(const struct CtrlQueueItem &itm){
   if(!curEffect)
     curEffect = getEffect();
 
-  if(curEffect != NULL){     
+  if(curEffect != NULL){
+
+     //Call idle
+     curEffect->idle();
       
     //Is it time to process ?
      if(_millis <= millis()){

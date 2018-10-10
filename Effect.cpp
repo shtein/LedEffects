@@ -49,6 +49,9 @@ void Effect::onCmd(const struct CtrlQueueItem &itm){
   }    
 }
 
+void Effect::idle(){
+}
+
 CRGB Effect::getColor() const{
   return getHSV();
 }
@@ -114,9 +117,15 @@ EffectPaletteTransform::~EffectPaletteTransform(){
 }
 
 void EffectPaletteTransform::reset(){
-  _palCurrent = getNewPal();
-  _palTarget  = getNewPal();
-  
+  //Init target pallete
+  updateColors();
+
+  //Safe target into current  
+  _palCurrent = _palTarget;
+                      
+   //Update target palette again
+   updateColors();
+   
   _step       = getMaxStep();
 }
 
@@ -124,15 +133,6 @@ int EffectPaletteTransform::getMaxStep() const{
   return CHANGE_PAL_STEP;
 }
 
-
-uint8_t EffectPaletteTransform::getPalClrIndex(int /*ledIndex*/, int /*numLeds*/) const{
-  //First index by default - need to experiment with this
-  return 0;
-}
-
-uint8_t EffectPaletteTransform::getPalClrBrightenss(int /*ledIndex*/, int /*numLeds*/, int /*clrIndex*/) const{
-  return 255;
-}
 
 bool EffectPaletteTransform::isReadyToBlendPal() const{
   return true;
@@ -146,29 +146,20 @@ bool EffectPaletteTransform::isReadyToUpdateLeds() const{
   return true;
 }
 
-CRGBPalette16 EffectPaletteTransform::getNewPal() const{
-  //Random palette
-  return CRGBPalette16(CHSV(random8(), 255, random8(128,255)), 
+
+void EffectPaletteTransform::updateColors(){
+  //Change target palette
+  _palTarget = CRGBPalette16(CHSV(random8(), 255, random8(128,255)), 
                        CHSV(random8(), 255, random8(128,255)), 
                        CHSV(random8(), 192, random8(128,255)), 
                        CHSV(random8(), 255, random8(128,255))
                       );
 }
 
-uint8_t EffectPaletteTransform::getMaxPaxPalChanges() const{
-  return MAX_PAL_CHANGES;
-}
-
-void EffectPaletteTransform::updateColors(){
-  //Change target palette
-  _palTarget = getNewPal();
-}
-
 void EffectPaletteTransform::updateLeds(CRGB *leds, int numLeds){  
+  //Default implementation
   for(int i = 0; i < numLeds; i++){     
-    uint8_t clrIndex      = getPalClrIndex(i, numLeds);
-    uint8_t clrBrightness = getPalClrBrightenss(i, numLeds, clrIndex);      
-    leds[i] = ColorFromPalette(_palCurrent, clrIndex, clrBrightness, LINEARBLEND);
+    leds[i] = ColorFromPalette(_palCurrent, 0, 255, LINEARBLEND);
   }
 }
 
@@ -186,7 +177,7 @@ void EffectPaletteTransform::proceed(CRGB *leds, int numLeds){
   
   //Proceed with palette transtion
   if(isReadyToBlendPal()){
-    nblendPaletteTowardPalette(_palCurrent, _palTarget, getMaxPaxPalChanges()); 
+    nblendPaletteTowardPalette(_palCurrent, _palTarget, MAX_PAL_CHANGES); 
   }
 
 

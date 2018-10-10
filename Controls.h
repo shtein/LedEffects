@@ -34,7 +34,7 @@ struct CtrlQueueData{
     
      switch(flag){ 
       case CTF_VAL_ABS:  //Absolute value
-        base = map(value, min, max, vmin, vmax);
+        base = min == max ? value : map(value, min, max, vmin, vmax);
       break;
       case CTF_VAL_NEXT: //Go next
         base ++;

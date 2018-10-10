@@ -49,7 +49,7 @@ inline void EffectEmergencyLights::proceed(CRGB *leds, int numLeds){
   if(_step % 2 == 0){   
     
     int *p   = bounds[_step / EL_CYCLES];
-    CRGB clr = CRGB::Blue;
+    CRGB clr = CRGB::Red;
     
     for(int i = p[0]; i < p[1]; i+= 2) {      
       leds[i] = clr;

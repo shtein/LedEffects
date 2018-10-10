@@ -50,20 +50,21 @@
   _CM Effect *modeName[maxEffects]; \
   ee.addMode(modeName);
 
- #define END_MODE()
+#define END_MODE()
 
 #define BLACK_MODE() \
   ee.addMode(NULL);
- 
 
 #define ADD_EFFECT(ClassEffect) \
   _CM ClassEffect EFFECT_NAME; \
   ee.addEffect(&EFFECT_NAME);
 
-#define ADD_STATIC_COLOR(hsv) \
-  _CM EffectStatic EFFECT_NAME(hsv); \
+#define ADD_EFFECT_PARAM(ClassEffect, ...) \
+  _CM ClassEffect EFFECT_NAME(__VA_ARGS__); \
   ee.addEffect(&EFFECT_NAME);
 
+#define ADD_STATIC_COLOR(hsv) \
+  ADD_EFFECT_PARAM(EffectStatic, hsv);
 
 
 #define BEGIN_LEDS(xmaxleds) \
@@ -96,9 +97,9 @@
   cp.addControl(&BTN_CTRL);
 
 
-#define PUSH_BUTTON_SA_TO_CMD(cmd, pin) \
+#define PUSH_BUTTON_SA_TO_CMD(cmd, pin, ...) \
   BEGIN_PUSH_BUTTON(pin); \
-  PUSH_BUTTON_TO_CMD(cmd, PB_CONTROL_CLICK); \
+  PUSH_BUTTON_TO_CMD(cmd, PB_CONTROL_CLICK, ## __VA_ARGS__); \
   END_PUSH_BUTTON()
 
 

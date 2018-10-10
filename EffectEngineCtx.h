@@ -16,7 +16,7 @@
 #define EEMC_COLOR_VAL   (EEMC_LED | 0x06)   //Color value changed   
 #define EEMC_SPEED       (EEMC_LED | 0x08)   //Speed changed
 #define EEMC_NUMLEDS     (EEMC_LED | 0x10)   //Number of leds changed
-#define EEMC_MIC         0x11              //For collecting sound - no change in leds
+#define EEMC_MIC         0x11                //For collecting sound - no change in leds
 #define EEMC_MIC_SENS    (EEMC_LED | 0x12)   //Microphone sensitivity
 
 

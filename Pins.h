@@ -4,7 +4,6 @@
 //Analog pin to control number of LEDs
 #define NUMLEDS_PIN 0
 
-
 //Analog pin to control microphone sensitivity
 #define MIC_SENS_PIN 4
 
@@ -16,6 +15,7 @@
 
 //Push button for mode
 #define MODE_PIN    10
+#define MODE_PIN2   11
 
 //Rotary encoder pins
 #define SPEED_CLOCK_PIN 3

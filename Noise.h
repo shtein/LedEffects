@@ -10,7 +10,7 @@ class EffectPaletteTransformFast: public EffectPaletteTransform{
     ~EffectPaletteTransformFast();
 
   protected:
-    uint8_t getPalClrIndex(int ledIndex, int numLeds) const;
+    void updateLeds(CRGB *leds, int numLeds);
     int getMaxStep() const;
 };
 
@@ -20,10 +20,19 @@ inline EffectPaletteTransformFast::EffectPaletteTransformFast(){
 inline EffectPaletteTransformFast::~EffectPaletteTransformFast(){
 }
 
-inline uint8_t EffectPaletteTransformFast::getPalClrIndex(int ledIndex, int numLeds) const{
-  //Full range
-  return map(ledIndex, 0, numLeds - 1, 0, 255);
+
+inline void EffectPaletteTransformFast::updateLeds(CRGB *leds, int numLeds){  
+  //Do full range for current palette
+  for(int i = 0; i < numLeds; i++){       
+    leds[i]  = ColorFromPalette(_palCurrent, 
+                                 (uint8_t)map(i, 0, numLeds - 1, 0, 255), 
+                                 255, 
+                                 LINEARBLEND 
+                               );
+  }
 }
+
+
 
 inline int EffectPaletteTransformFast::getMaxStep() const{
   return  MAX_PAL_CHANGES * 3;
@@ -37,67 +46,64 @@ class EffectNoise: public EffectPaletteTransform{
      EffectNoise(); 
     ~EffectNoise();
 
-    void proceed(CRGB *leds, int numLeds); 
-    void reset();
-
-protected:
-    uint8_t getPalClrIndex(int ledIndex, int numLeds) const;
-
+  protected:
+    void updateLeds(CRGB *leds, int numLeds);   
+     
   protected:
     int _dist;
 };
 
 inline EffectNoise::EffectNoise(){
+
+  //Init distortion
+  _dist = random16(millis());
 }
 
 inline EffectNoise::~EffectNoise(){ 
 }
 
-inline void EffectNoise::reset(){
-  //Do default actions
-  EffectPaletteTransform::reset();
-  
-  //Reset dist
-  _dist = random16(millis());
-}
 
-inline void EffectNoise::proceed(CRGB *leds, int numLeds){
+#define XSCALE          30
+#define YSCALE          30
+
+inline void EffectNoise::updateLeds(CRGB *leds, int numLeds){
+  
   //Do default actions
-  EffectPaletteTransform::proceed(leds, numLeds);
+  for(int i = 0; i < numLeds; i++){       
+    leds[i]  = ColorFromPalette(_palCurrent, 
+                                 (uint8_t)( inoise8(i * XSCALE, _dist + i * YSCALE) % 255 ),
+                                 255, 
+                                 LINEARBLEND 
+                               );
+  }
+
   
   //Prepare for the next move
   _dist += beatsin8(10, 1, 4);                                               
 }
 
-#define XSCALE          30
-#define YSCALE          30
 
-inline uint8_t EffectNoise::getPalClrIndex(int ledIndex, int /*numLeds*/) const{
-  return inoise8(ledIndex  * XSCALE, _dist + ledIndex * YSCALE) % 255;             
-}
-
-
+////////////////////////////////////////
+// EffectPlasma
 class EffectPlasma: public EffectPaletteTransform{
   public: 
     EffectPlasma();
     ~EffectPlasma();
 
   protected:
-    virtual CRGBPalette16 getNewPal() const;
-    virtual void updateLeds(CRGB *leds, int numLeds);
-    virtual int getMaxStep() const;
+    void updateColors();
+    void updateLeds(CRGB *leds, int numLeds);
+    int getMaxStep() const;
 };
 
 inline EffectPlasma::EffectPlasma(){
   setSpeedDelay(50);  
 }
 
-EffectPlasma::~EffectPlasma(){
+inline EffectPlasma::~EffectPlasma(){
 }
 
-#define qsuba(x, b)  ((x > b) ? x-b: 0) 
-
-void EffectPlasma::updateLeds(CRGB *leds, int numLeds){
+inline void EffectPlasma::updateLeds(CRGB *leds, int numLeds){
   int phase1 = beatsin8(6,-64, 64);
   int phase2 = beatsin8(7,-64, 64);
 
@@ -109,50 +115,44 @@ void EffectPlasma::updateLeds(CRGB *leds, int numLeds){
   }  
 }
 
-CRGBPalette16 EffectPlasma::getNewPal() const{
+inline void EffectPlasma::updateColors(){
 
   uint8_t clr = random8();
-  return CRGBPalette16(CHSV(clr + random8(32), 192, random8(128,255)), 
-                       CHSV(clr + random8(32), 255, random8(128,255)), 
-                       CHSV(clr + random8(32), 192, random8(128,255)), 
-                       CHSV(clr + random8(32), 255, random8(128,255))
-                     );
+  _palTarget =  CRGBPalette16(CHSV(clr + random8(32), 192, random8(128,255)), 
+                              CHSV(clr + random8(32), 255, random8(128,255)), 
+                              CHSV(clr + random8(32), 192, random8(128,255)), 
+                              CHSV(clr + random8(32), 255, random8(128,255))
+                             );
+}
+
+#define PLASMA_MAX_STEPS 100
+
+inline int EffectPlasma::getMaxStep() const{
+  return PLASMA_MAX_STEPS;
 }
 
 
-int EffectPlasma::getMaxStep() const{
-  return 100;
-}
- 
-
-/////////////////////////////////////
-// Effect Beat Wave
-class EffectBeatWave: public EffectPaletteTransform{
-  public:
-     EffectBeatWave(); 
-    ~EffectBeatWave();
-
+////////////////////////////// 
+// Effect Plazma Hallowin
+class EffectPlasmaHalloween: public EffectPlasma{
   protected:
-    uint8_t getPalClrIndex(int ledIndex, int numLeds) const;
-    bool isReadyToBlendPal() const;
+    virtual void updateColors();
 };
 
 
-inline EffectBeatWave::EffectBeatWave(){
+#define PURP 0x6611FF
+#define ORAN 0xFF6600
+#define GREN 0x00FF11
+#define WHIT 0xCCCCCC
+
+inline void EffectPlasmaHalloween::updateColors(){
+
+  uint8_t clr = random8();
+  _palTarget =  CRGBPalette16(CRGB::DarkOrange, CRGB::DarkOrange, CRGB::DarkOrange, CRGB::DarkOrange,
+                              CRGB::DarkOrange, CRGB::DarkOrange, CRGB::DarkOrange, CRGB::DarkRed, 
+                              CRGB::DarkOrange, CRGB::DarkOrange,  CRGB::DarkRed,  CRGB::DarkRed, 
+                              CRGB::DarkOrange, CRGB::DarkRed,  CRGB::DarkRed,  CRGB::DarkRed);
 }
-
-inline EffectBeatWave::~EffectBeatWave(){
-}
-
-inline uint8_t EffectBeatWave::getPalClrIndex(int ledIndex, int /*numLeds*/) const{
-  return ledIndex + beatsin8(9, 0, 255) + beatsin8(8, 0, 255) + beatsin8(7, 0, 255) + beatsin8(6, 0, 255);
-}
-
-inline bool EffectBeatWave::isReadyToBlendPal() const{
-  return _step % 50 == 0 ? true : false; 
-}
-
-
 
 
 //////////////////////////////
@@ -189,8 +189,10 @@ inline EffectConfetti::~EffectConfetti(){
 }
 
 
+#define CONFETTI_MAX_STEPS 100
+
 inline int EffectConfetti::getMaxStep() const{
-  return 100;
+  return CONFETTI_MAX_STEPS;
 }
 
 inline void EffectConfetti::updateLeds(CRGB *leds, int numLeds){
@@ -210,12 +212,10 @@ inline void EffectConfetti::updateColors(){
     uint8_t                     hueDiff; 
     uint8_t                     hueInc:2;
     uint8_t                     fade:6;
-  } 
-  
-  stgs[] = { { OceanColors_p,  192, 255, 1, 16 },
-             { LavaColors_p,   128, 64, 2, 8 },  
-             { ForestColors_p, random8(255), 16, 1, 4 },
-             { CloudColors_p, 36, 16, 1, 4 }
+  } stgs[] = { { OceanColors_p,  192, 255, 1, 16 },
+               { LavaColors_p,   128, 64, 2, 8 },  
+               { ForestColors_p, random8(255), 16, 1, 4 },
+               { CloudColors_p, 36, 16, 1, 4 }
            };
 
 
@@ -226,129 +226,6 @@ inline void EffectConfetti::updateColors(){
   _hueDiff   = stgs[idx].hueDiff; 
   _hue       = stgs[idx].hue; 
   _fade      = stgs[idx].fade; 
-}
-
-
-///////////////////////////
-// Effect Matrix, I have no idea why it is called matrix, it is its name in original code
-
-#define MATRIX_STEP_MIN 200
-#define MATRIX_STEP_MAX 100
-
-class EffectMatrix: public EffectPaletteTransform{
-  public:
-    EffectMatrix();
-    ~EffectMatrix();
-
-  protected:
-    void reset();    
-
-    void updateColors();
-    void updateLeds(CRGB *leds, int numLeds);
-
-    int getMaxStep() const;
-
-  protected:
-    uint8_t  _dir:4;         //direction
-    uint8_t  _hueInc:4;      //change hue
-    uint8_t  _indexPal;      //palette index
-};
-
-inline EffectMatrix::EffectMatrix(){
-  setSpeedDelay(50);
-}
-
-inline EffectMatrix::~EffectMatrix(){
-  
-}
-
-inline void EffectMatrix::reset(){  
-  //Default actions
-  EffectPaletteTransform::reset();
-  
-
-  //Blue background  
-  setHSV(CHSV(80, 255, 16));
-
-    //Init with black
-  _palCurrent = CRGBPalette16(CHSV(0, 0, 0));    
-  _palTarget  = CRGBPalette16(CHSV(0, 0, 0));  
-
-
-  //Default update rate
-  _dir        = false;
-  _hueInc     = true;
-  _indexPal   = 0;
-}
-
-inline int EffectMatrix::getMaxStep() const{
-  return random(MATRIX_STEP_MIN, MATRIX_STEP_MAX);  
-}
-
-inline void EffectMatrix::updateColors(){
-  
-   struct MatSettings {
-    CHSV                          bg;
-    const TProgmemRGBPalette16   &pal;
-    uint8_t                       useBg:4;
-    uint8_t                       usePal:4;
-   } 
-   stgs[] = { { CHSV(160, 255, 32), OceanColors_p, true, true },
-              { CHSV(50, 255, 32), LavaColors_p, true, true },
-              { CHSV(80, 255, 16), ForestColors_p, true, true },
-              { CHSV(0, 0, 0), ForestColors_p, true, false },
-              { CHSV(0, 0, 0), PartyColors_p, false, true },
-            };
-
-  
-  uint8_t idx = random8(sizeof(stgs) / sizeof(stgs[0]) + 1);
-  
-
-  //Set background color, target palette and update rate
-  if(stgs[idx].useBg){
-    setHSV(stgs[idx].bg);                    
-  }
-
-  if(stgs[idx].usePal){
-     _palTarget   = stgs[idx].pal;
-  }
-     
-
-  //Reset palette index
-  _indexPal = random8();
-
-  //Change direction
-  _dir = random8() % 2 == 0 ? true: false; 
-}
-
-
-inline void EffectMatrix::updateLeds(CRGB *leds, int numLeds){
-  
-  //First led color
-  CRGB clr = random8(100) > 90 ? ColorFromPalette(_palCurrent, _indexPal, 255, LINEARBLEND) : getColor();
-  
-  if(!_dir){ //forward
-    for (int i = numLeds - 1; i > 0; i--){
-      leds[i] = leds[i-1];
-    }
-
-    //First updated led color
-    leds[0] = clr;
-  } 
-  else { //backward
-    for (int i = 0; i < numLeds - 1; i++){
-      leds[i] = leds[i+1];
-    }
-
-    //First updated led color
-    leds[numLeds - 1] = clr;
-  }
-
-
-  //Change palette index
-  if(_hueInc) {
-    _indexPal++;
-  }
 }
 
 

@@ -23,6 +23,7 @@ class Effect{
 
     //Command processing
     virtual void onCmd(const struct CtrlQueueItem &itm);
+    virtual void idle();
 
     //Color
     CRGB getColor() const;
@@ -57,6 +58,8 @@ class Effect{
 /////////////////////////////////////////
 // Effect Palette Transform - basic palette transformation
 
+
+
 #define MAX_PAL_CHANGES 24
 #define CHANGE_PAL_STEP 500
 
@@ -71,22 +74,18 @@ class EffectPaletteTransform: public Effect{
   protected:
     virtual void updateColors();
     virtual void updateLeds(CRGB *leds, int numLeds);
-
-    virtual uint8_t getPalClrIndex(int ledIndex, int numLeds) const;
-    virtual uint8_t getPalClrBrightenss(int ledIndex, int numLeds, int clrIndex) const;
-    virtual CRGBPalette16 getNewPal() const;
     
     virtual bool isReadyToBlendPal() const;
     virtual bool isReadyToChangePal() const;
     virtual bool isReadyToUpdateLeds() const;
 
-    virtual uint8_t getMaxPaxPalChanges() const;
     virtual int getMaxStep() const;
     
   protected:
     static CRGBPalette16 _palCurrent;
     static CRGBPalette16 _palTarget;
-    
+
+  private:
     static int           _step;
 };
 

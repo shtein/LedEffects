@@ -13,7 +13,7 @@
 #include "Blur.h"
 #include "EmergencyLights.h"
 #include "Fire.h"
-#include "Sound.h"
 #include "Meteor.h"
+#include "Ripple.h"
 
 #endif //__LEDEFFECTS_H

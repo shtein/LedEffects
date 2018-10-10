@@ -109,10 +109,13 @@ bool CtrlMic::triggered() const{
 }
 
 void CtrlMic::getData(CtrlQueueData &data){
+  /*
   data.flag  = CTF_VAL_ABS;
   data.value = ((AnalogInput *)getInput())->value();
   data.min   = POT_MIN;
   data.max   = POT_MAX;
+
+  */
 }
 
 ////////////////////////////
