@@ -135,7 +135,7 @@ inline void EffectRipple::proceed(CRGB *leds, int numLeds){
     }
     else{
         //Prepare color
-        CHSV hsv  = ripple.getHSV();
+        CHSV hsv        = ripple.getHSV();
         hsv.hue        += ripple.getOffset() * 2;
         hsv.saturation -= ripple.getOffset() * 5;
         hsv.value       =  cos8(map(ripple.getOffset(), 1, RIPPLE_MAX, 0, 128));

@@ -154,6 +154,16 @@ void setup() {
         ADD_EFFECT(EffectColorWipe)           
         ADD_EFFECT(EffectTheaterChaseRainbow) 
       END_MODE()
+      BEGIN_MODE(Chrsitmas, 3)      
+        ADD_EFFECT( TransformChristmas<EffectConfetti> )
+        ADD_EFFECT( TransformChristmas<EffectPlasma> )
+        ADD_EFFECT( TransformChristmas<EffectNoise> )
+      END_MODE()      
+      BEGIN_MODE(Halloween, 3)      
+        ADD_EFFECT( TransformHalloween<EffectConfetti> )
+        ADD_EFFECT( TransformAutunm<EffectPlasma> )
+        ADD_EFFECT( TransformHalloween<EffectNoise> )
+      END_MODE() 
       BEGIN_MODE(Emergancy, 1)
         ADD_EFFECT(EffectEmergencyLights)         
       END_MODE()
@@ -254,7 +264,7 @@ void setup() {
     
     //Effects   
     BEGIN_EFFECTS()
-      BEGIN_MODE(Effects, 9)        
+      BEGIN_MODE(Effects, 8)        
         ADD_EFFECT(EffectRipple)
         ADD_EFFECT(EffectMeteorRain)   
         ADD_EFFECT(EffectPlasma)        
@@ -264,6 +274,20 @@ void setup() {
         ADD_EFFECT(EffectNoise)            
         ADD_EFFECT(EffectMoodBlobs) 
       END_MODE()
+      
+      BEGIN_MODE(Halloween, 3)      
+        ADD_EFFECT( TransformHalloween<EffectConfetti> )
+        ADD_EFFECT( TransformAutunm<EffectPlasma> )
+        ADD_EFFECT( TransformHalloween<EffectNoise> )
+      END_MODE()
+      
+      BEGIN_MODE(Chrsitmas, 3)      
+        ADD_EFFECT( TransformChristmas<EffectConfetti> )
+        ADD_EFFECT( TransformChristmas<EffectPlasma> )
+        ADD_EFFECT( TransformChristmas<EffectNoise> )
+      END_MODE()
+
+      
     END_EFFECTS()
     
     //Leds
@@ -274,7 +298,10 @@ void setup() {
 
   //Control    
     BEGIN_CONTROL_MAP()
-      PUSH_BUTTON_SA_TO_CMD(EEMC_EFFECT, MODE_PIN)        //Effect
+      BEGIN_PUSH_BUTTON(MODE_PIN)    
+        PUSH_BUTTON_TO_CMD(EEMC_MODE, PB_CONTROL_PUSH_LONG)
+        PUSH_BUTTON_TO_CMD(EEMC_EFFECT, PB_CONTROL_CLICK_SHORT)      
+      END_PUSH_BUTTON()
     END_CONTROL_MAP()
        
   END_EFFECT_ENGINE() 
@@ -285,7 +312,7 @@ void setup() {
 #elif defined(__CHRISTMAS_TREE_SETUP)
 ////////////////////////////////////////
 // WS2811 string, 150 LEDs, 1 push button, 1 potentiometer, 1 rotary encoder
-#pragma message "Compile for christmass tree"
+#pragma message "Compile for christmas tree"
 
 void setup() {
   DBG_INIT();
@@ -295,26 +322,32 @@ void setup() {
     
     //Effects   
     BEGIN_EFFECTS()
-      BEGIN_MODE(Christmas, 15)        
+      BEGIN_MODE(Christmas, 3)   
+        ADD_EFFECT( TransformChristmas<EffectConfetti> )
+        ADD_EFFECT( TransformChristmas<EffectPlasma> )
+        ADD_EFFECT( TransformChristmas<EffectNoise> )
+      END_MODE() 
+      BEGIN_MODE(Halloween, 3)      
+        ADD_EFFECT( TransformHalloween<EffectConfetti> )
+        ADD_EFFECT( TransformAutunm<EffectPlasma> )
+        ADD_EFFECT( TransformHalloween<EffectNoise> )
+      END_MODE()
+      BEGIN_MODE(Other, 15)        
         ADD_EFFECT(EffectRipple)   
         ADD_EFFECT(EffectMeteorRain)
         ADD_EFFECT(EffectPlasma)
         ADD_EFFECT(EffectConfetti)
-        ADD_EFFECT(EffectPaletteTransformFast) 
+        //ADD_EFFECT(EffectPaletteTransformFast) 
         ADD_EFFECT(EffectBlur)
         ADD_EFFECT(EffectRainbowMove)
         ADD_EFFECT(EffectNoise)            
         ADD_EFFECT(EffectMoodBlobs) 
         ADD_EFFECT(EffectRainbow)
-        ADD_EFFECT(EffectFadeInOut)
-        ADD_EFFECT(EffectRunningLights)       
-        ADD_EFFECT(EffectColorWipe)       
+        //ADD_EFFECT(EffectFadeInOut)
+        //ADD_EFFECT(EffectRunningLights)       
+        //ADD_EFFECT(EffectColorWipe)       
         ADD_EFFECT(EffectTheaterChaseRainbow) 
-      END_MODE()
-      BEGIN_MODE(Halloweeb, 3)
-        ADD_EFFECT(EffectPlasmaHalloween)
-      END_MODE()
-    
+      END_MODE()    
     END_EFFECTS()
     
     //Leds
@@ -352,6 +385,17 @@ void setup() {
     
     //Effects   
     BEGIN_EFFECTS()
+      BEGIN_MODE(Themes, 15)        
+        ADD_EFFECT( TransformAutunm<EffectConfetti> )
+        ADD_EFFECT( TransformAutunm<EffectPlasma> )
+        ADD_EFFECT( TransformAutunm<EffectNoise> )
+        ADD_EFFECT( TransformHalloween<EffectConfetti> )
+        ADD_EFFECT( TransformHalloween<EffectPlasma> )
+        ADD_EFFECT( TransformHalloween<EffectNoise> )
+        ADD_EFFECT( TransformChristmas<EffectConfetti> )
+        ADD_EFFECT( TransformChristmas<EffectPlasma> )
+        ADD_EFFECT( TransformChristmas<EffectNoise> )
+      END_MODE()      
       BEGIN_MODE(Effects, 15)
         ADD_EFFECT(EffectRipple)
         ADD_EFFECT(EffectFire)
@@ -371,12 +415,6 @@ void setup() {
         ADD_EFFECT(EffectColorWipe)               //Not intersting
         ADD_EFFECT(EffectTheaterChaseRainbow) 
       END_MODE()
-      BEGIN_MODE(Static, 3)
-        ADD_STATIC_COLOR(CHSV(HUE_RED, 0xFF, 0xFF))
-        ADD_STATIC_COLOR(CHSV(HUE_GREEN, 0xFF, 0xFF))
-        ADD_STATIC_COLOR(CHSV(HUE_BLUE, 0xFF, 0xFF))
-      END_MODE()
-      BLACK_MODE()
     END_EFFECTS()
     
     //Leds
@@ -403,21 +441,18 @@ void setup() {
 // Everything else
 #pragma message "Compile for default"
 
-#include "Sound.h"
-
 void setup() {
   DBG_INIT();
   DBG_OUTLN("Led effect started - default");  
 
-  //Setup FHT microphone input
-  SETUP_FHT_MIC_INPUT(MIC_PIN)
   
   //Effect Engine
   BEGIN_EFFECT_ENGINE() 
     //Effects   
     BEGIN_EFFECTS()
-      BEGIN_MODE(Sound, 3)        
-        ADD_EFFECT(EffectSound)
+      BEGIN_MODE(Sound, 3)    
+        INIT_SOUND_CAPTURE(SoundCaptureStub)    
+        ADD_EFFECT(EffectSoundSimple)
       END_MODE()
       //BEGIN_MODE(Effects, 15)
         //ADD_EFFECT(EffectFire)

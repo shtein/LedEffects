@@ -30,6 +30,7 @@ inline Meteor::Meteor(){
   _pos  = 0;
   _vel  = 0;
   _size = 0;
+  _hue  = 0;
 }
 
 inline Meteor::~Meteor(){

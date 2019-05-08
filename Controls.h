@@ -109,7 +109,7 @@ class CtrlItemPb: public CtrlItem{
 #define POT_MIN             0
 #define POT_MAX             1023
 
-#define POT_NOISE_THRESHOLD 4
+#define POT_NOISE_THRESHOLD 3
 
 
 class CtrlItemPtmtr: public CtrlItem{

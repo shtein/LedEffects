@@ -2,6 +2,7 @@
 #define __EFFECT_H
 
 #include "EffectEngineCtx.h"
+#include "Palette.h"
 
 ///////////////////
 // Basic effect
@@ -57,9 +58,6 @@ class Effect{
 
 /////////////////////////////////////////
 // Effect Palette Transform - basic palette transformation
-
-
-
 #define MAX_PAL_CHANGES 24
 #define CHANGE_PAL_STEP 500
 
@@ -72,12 +70,14 @@ class EffectPaletteTransform: public Effect{
    virtual void reset();
 
   protected:
+    void onStep();
+  
     virtual void updateColors();
     virtual void updateLeds(CRGB *leds, int numLeds);
     
+    
     virtual bool isReadyToBlendPal() const;
     virtual bool isReadyToChangePal() const;
-    virtual bool isReadyToUpdateLeds() const;
 
     virtual int getMaxStep() const;
     
@@ -90,5 +90,35 @@ class EffectPaletteTransform: public Effect{
 };
 
 
+//////////////////////////////////////////////////////
+// Color schemes - set of transforming theme palettes 
+#define BEGIN_TRANFORM_SCHEMA(className) \
+template<class T> \
+class className: public T{ \
+  protected: \
+    virtual void updateColors() { \
+        const TProgmemRGBGradientPalettePtr ts[] = {
+
+#define END_TRANSFORM_SCHEMA() }; \
+         T::_palTarget = ts[random(0, sizeof(ts) / sizeof(ts[0]) + 1)]; \
+    } \
+};
+
+#define TRANSOFRM_PALETTE(pal) pal, \
+
+/*
+Usage of transform shchema: 
+
+BEGIN_TRANFORM_SCHEMA(YourTemplateName)
+  TRANSOFRM_PALETTE(pallete1)
+  TRANSOFRM_PALETTE(palette2)
+  ...
+  TRANSOFRM_PALETTE(paletteN)
+END_TRANSFORM_SCHEMA()
+
+Instancinate
+YourTemplateName<Class_Derived_from_EffectPaletteTransform>
+
+*/
 
 #endif //__EFFECT_H

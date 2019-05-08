@@ -5,6 +5,7 @@
 
 /////////////////////////////////
 // Effect
+
 Effect::Effect(){
   _speedDelay = 25;
 }
@@ -15,17 +16,24 @@ Effect::~Effect(){
 
 void Effect::init(CRGB *leds, int numLeds){  
 
+  //Black all leds
   setAll(leds, numLeds, CRGB::Black);
-  
+
+  //reset data
   reset();
 }
 
+void Effect::reset(){
+}
 
 void Effect::loop(CRGB *leds, int numLeds){  
   
   //proceed
   proceed(leds, numLeds);
  
+}
+
+void Effect::proceed(CRGB * /*leds*/, int /*numLeds */){
 }
 
 
@@ -125,8 +133,9 @@ void EffectPaletteTransform::reset(){
                       
    //Update target palette again
    updateColors();
-   
-  _step       = getMaxStep();
+
+  //Reset step
+  _step = getMaxStep();
 }
 
 int EffectPaletteTransform::getMaxStep() const{
@@ -141,11 +150,6 @@ bool EffectPaletteTransform::isReadyToBlendPal() const{
 bool EffectPaletteTransform::isReadyToChangePal() const{
   return _step == 0;
 }
-
-bool EffectPaletteTransform::isReadyToUpdateLeds() const{
-  return true;
-}
-
 
 void EffectPaletteTransform::updateColors(){
   //Change target palette
@@ -163,7 +167,7 @@ void EffectPaletteTransform::updateLeds(CRGB *leds, int numLeds){
   }
 }
 
-void EffectPaletteTransform::proceed(CRGB *leds, int numLeds){
+void EffectPaletteTransform::onStep(){
   
   //Check if it is to update target palette
   if(isReadyToChangePal()){
@@ -180,14 +184,16 @@ void EffectPaletteTransform::proceed(CRGB *leds, int numLeds){
     nblendPaletteTowardPalette(_palCurrent, _palTarget, MAX_PAL_CHANGES); 
   }
 
-
-  //Set colors
-  if(isReadyToUpdateLeds()){
-    updateLeds(leds, numLeds);
-  }
-
   //Prepare for the next move                                        
   _step--;
+}
+
+void EffectPaletteTransform::proceed(CRGB *leds, int numLeds){
+  //Process step
+  onStep();
+  
+  //Update Leds
+  updateLeds(leds, numLeds); 
 }
 
 

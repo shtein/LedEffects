@@ -78,6 +78,12 @@
 
 
 ///////////////////////////////////////
+//Sound capture
+#define INIT_SOUND_CAPTURE(className, ...) \
+  _CM className snd; \
+  SoundCapture::initInstance(&snd); 
+
+///////////////////////////////////////
 //Control map
 #define BEGIN_CONTROL_MAP() \
   _CM BaseInput *ai = NULL;

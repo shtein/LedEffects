@@ -3,6 +3,7 @@
 
 //Effects
 #include "Effect.h"
+#include "SoundCapture.h"
 #include "Rainbow.h"
 #include "FadeInOut.h"
 #include "RunningLights.h"
@@ -15,5 +16,7 @@
 #include "Fire.h"
 #include "Meteor.h"
 #include "Ripple.h"
+#include "Sound.h"
+
 
 #endif //__LEDEFFECTS_H

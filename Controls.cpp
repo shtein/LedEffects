@@ -82,16 +82,24 @@ CtrlItemPtmtr::~CtrlItemPtmtr(){
 bool CtrlItemPtmtr::triggered() const{ 
   uint16_t value = _value * alfa + (1 - alfa) * ((AnalogInput *)getInput())->value() + 0.5;
 
-  return (abs(value - _value) > _noiseThreshold);
+  
+  return (abs(value - _value) > min(_noiseThreshold, min(value - POT_MIN, POT_MAX - value))); 
 }
+
+
 
 void CtrlItemPtmtr::getData(CtrlQueueData &data){
   _value  = _value * alfa + (1 - alfa) * ((AnalogInput *)getInput())->value() + 0.5;
   
   data.flag  = CTF_VAL_ABS;
+  data.min   = POT_MIN + _noiseThreshold;
+  data.max   = POT_MAX - _noiseThreshold;
   data.value = _value;
-  data.min   = POT_MIN;
-  data.max   = POT_MAX;
+
+  if(data.value < data.min)
+    data.value = data.min;
+  else if (data.value > data.max)
+    data.value = data.max;
 }
 
 

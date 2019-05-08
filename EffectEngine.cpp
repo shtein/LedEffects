@@ -144,6 +144,7 @@ void EffectEngine::onNumLedsChange(const struct CtrlQueueData &data){
   //Save new value
   _numLeds = numLeds;
 
+  DBG_OUTLN("Value: %d", data.value);  
   DBG_OUTLN("New number of leds: %d", _numLeds);  
 
  //Black the lights

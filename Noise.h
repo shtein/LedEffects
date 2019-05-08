@@ -132,29 +132,6 @@ inline int EffectPlasma::getMaxStep() const{
 }
 
 
-////////////////////////////// 
-// Effect Plazma Hallowin
-class EffectPlasmaHalloween: public EffectPlasma{
-  protected:
-    virtual void updateColors();
-};
-
-
-#define PURP 0x6611FF
-#define ORAN 0xFF6600
-#define GREN 0x00FF11
-#define WHIT 0xCCCCCC
-
-inline void EffectPlasmaHalloween::updateColors(){
-
-  uint8_t clr = random8();
-  _palTarget =  CRGBPalette16(CRGB::DarkOrange, CRGB::DarkOrange, CRGB::DarkOrange, CRGB::DarkOrange,
-                              CRGB::DarkOrange, CRGB::DarkOrange, CRGB::DarkOrange, CRGB::DarkRed, 
-                              CRGB::DarkOrange, CRGB::DarkOrange,  CRGB::DarkRed,  CRGB::DarkRed, 
-                              CRGB::DarkOrange, CRGB::DarkRed,  CRGB::DarkRed,  CRGB::DarkRed);
-}
-
-
 //////////////////////////////
 // Effect Confetti
 class EffectConfetti: public EffectPaletteTransform{
@@ -166,22 +143,10 @@ class EffectConfetti: public EffectPaletteTransform{
     void updateLeds(CRGB *leds, int numLeds);
     void updateColors(); 
 
-    int getMaxStep() const;
-
-  protected:
-    uint8_t _hue;
-    uint8_t _hueDiff;
-    uint8_t _hueInc:2;
-    uint8_t _fade:6;
-    
+    int getMaxStep() const;    
 };
 
 inline EffectConfetti::EffectConfetti(){  
-  _hue     = 50;
-  _hueDiff = 255;
-  _hueInc  = 1;
-  _fade    = 8;
-
   setSpeedDelay(20);
 }
 
@@ -197,36 +162,40 @@ inline int EffectConfetti::getMaxStep() const{
 
 inline void EffectConfetti::updateLeds(CRGB *leds, int numLeds){
   
-  fadeToBlackBy(leds, numLeds, _fade);                     
-  leds[random16(numLeds)] = ColorFromPalette(_palCurrent, _hue + random8(_hueDiff) / 4 , 255, LINEARBLEND);
-  
-  _hue += _hueInc;
+  fadeToBlackBy(leds, numLeds, 8);                     
+  leds[random16(numLeds)] = ColorFromPalette(_palCurrent, random8(255), 255, LINEARBLEND);
 }
-
 
 inline void EffectConfetti::updateColors(){
-  
-  struct ConfSettings {
-    const TProgmemRGBPalette16 &pal;    
-    uint8_t                     hue;
-    uint8_t                     hueDiff; 
-    uint8_t                     hueInc:2;
-    uint8_t                     fade:6;
-  } stgs[] = { { OceanColors_p,  192, 255, 1, 16 },
-               { LavaColors_p,   128, 64, 2, 8 },  
-               { ForestColors_p, random8(255), 16, 1, 4 },
-               { CloudColors_p, 36, 16, 1, 4 }
-           };
-
-
-   uint8_t idx = random8(sizeof(stgs) / sizeof(stgs[0]) + 1);
-
-  _palTarget = stgs[idx].pal;
-  _hueInc    = stgs[idx].hueInc; 
-  _hueDiff   = stgs[idx].hueDiff; 
-  _hue       = stgs[idx].hue; 
-  _fade      = stgs[idx].fade; 
+   struct { const TProgmemRGBPalette16 &pal;
+   } ts[] = { OceanColors_p, LavaColors_p, ForestColors_p, CloudColors_p }; 
+   
+  _palTarget = ts[random(0, sizeof(ts) / sizeof(ts[0]) + 1)].pal;
 }
+
+
+
+////////////////////////////////////////
+// Palettes for different type of transformation
+
+/////////////////////
+//Christmas
+BEGIN_TRANFORM_SCHEMA(TransformChristmas)
+  TRANSOFRM_PALETTE(christmattree1_gp)
+END_TRANSFORM_SCHEMA()
+
+////////////////////
+// Autumn
+BEGIN_TRANFORM_SCHEMA(TransformAutunm)
+  TRANSOFRM_PALETTE(es_autumn_01_gp)
+  TRANSOFRM_PALETTE(es_autumn_03_gp)
+END_TRANSFORM_SCHEMA()
+
+///////////////////
+//Halloween - better autumn than autumn
+BEGIN_TRANFORM_SCHEMA(TransformHalloween)
+  TRANSOFRM_PALETTE(halloween_gp)
+END_TRANSFORM_SCHEMA()
 
 
 #endif //__NOISE_H

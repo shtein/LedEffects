@@ -70,44 +70,4 @@ inline const uint8_t *CFHT::getLogOut() const{
   return fht_log_out;
 }
 
-////////////////////////////////////////////
-// EffectSoundFHT - template for sound effect with FHT
-template<class T>
-class EffectSoundFHT: public T{
-  public:
-    EffectSoundFHT();
-    ~EffectSoundFHT();
-    
-    void idle();
-    
-  protected:
-    void reset();
-
-};
-
-template<class T>
-EffectSoundFHT<T>::EffectSoundFHT(){
-  T::setSpeedDelay(20);
-}
-
-template<class T>
-EffectSoundFHT<T>::~EffectSoundFHT(){
-}
-
-
-template<class T>
-void EffectSoundFHT<T>::reset(){
-  CFHT::_instance.reset();
-}
-
-
-template<class T>
- void EffectSoundFHT<T>::idle(){    
-  CFHT::_instance.process();
-}
-
-#define SETUP_FHT_MIC_INPUT(pin) \
-    CFHT::_instance.init(pin);
-
-
 #endif //__SOUNDFHT_H
