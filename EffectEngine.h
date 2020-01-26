@@ -39,7 +39,7 @@ class EffectEngine{
     //Reading/writing config from/to EEPROM
     void readConfig();
     void writeConfig(); 
-    void preSafeConfig();
+    void preSaveConfig();
     
   protected:
     //Effects for modes
@@ -49,15 +49,15 @@ class EffectEngine{
       uint8_t      effectNum:4;           //Index of the current or last effect from _effects
     } _modes[MAX_MODES]; 
 
-    uint8_t    _numModes:4;           //Total number of modes
-    uint8_t    _modeNum:4;            //Current mode
+    uint8_t    _numModes:4;               //Total number of modes
+    uint8_t    _modeNum:4;                //Current mode
 
-    CRGB       *_leds;              //Leds
-    uint16_t   _maxLeds;            //Max number of leds    
-    uint16_t   _numLeds;            //Actual number of leds    
+    CRGB       *_leds;                    //Leds
+    uint16_t   _maxLeds;                  //Max number of leds    
+    uint16_t   _numLeds;                  //Actual number of leds    
    
-    unsigned long _millis;              //Processing
-    unsigned long _millisToSaveCfg;     //When to safe config
+    unsigned long _millis;                //Processing
+    unsigned long _millisToSaveCfg;       //When to safe config
 };
 
 #endif //__EFFECTENGINE_H

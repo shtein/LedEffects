@@ -90,7 +90,7 @@ void EffectEngine::onModeChange(const struct CtrlQueueData &data){
   setMode(mode);  
 
   //Safe config
-  preSafeConfig();     
+  preSaveConfig();     
 }
 
 void EffectEngine::setMode(uint8_t mode){
@@ -162,8 +162,8 @@ void EffectEngine::onEffectChange(const struct CtrlQueueData &data){
   //Change effect
   setEffect(effectNum);
 
-  //Safe config
-  preSafeConfig();     
+  //Save config
+  preSaveConfig();     
 }
 
 
@@ -217,7 +217,7 @@ void EffectEngine::loop(const struct CtrlQueueItem &itm){
   }
   
   //Optimization to avoid calling update leds too often
-  if(updateLeds ){
+  if(updateLeds){
      showStrip();      
   }
 
@@ -296,7 +296,7 @@ void EffectEngine::writeConfig(){
   EEPROM.put(0x0000, ec);  
 }
 
-void EffectEngine::preSafeConfig(){
+void EffectEngine::preSaveConfig(){
   _millisToSaveCfg = millis() + SAVE_CONFIG_TIMEOUT;
 }
 

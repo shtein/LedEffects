@@ -1,7 +1,7 @@
 #ifndef __STATIC_H
 #define __STATIC_H
 
-class EffectStatic: public Effect{
+class EffectStatic: public EffectColor{
   public:
     EffectStatic(const CHSV &hsv);
     ~EffectStatic();
@@ -11,8 +11,9 @@ class EffectStatic: public Effect{
     void reset();
 };
 
-inline EffectStatic::EffectStatic(const CHSV &hsv = CHSV(HUE_RED, 0xFF, 0xFF)){
-  setHSV(hsv);
+inline EffectStatic::EffectStatic(const CHSV &hsv):
+  EffectColor(hsv){
+
   setSpeedDelay(100);
 }
 

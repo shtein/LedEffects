@@ -17,7 +17,7 @@
 #define MODE_PIN    10
 #define MODE_PIN2   11
 
-//Rotary encoder pins
+//Rotary encoder speed pins
 #define SPEED_CLOCK_PIN 3
 #define SPEED_PIN       4
 #define EFFECT_PIN      5
@@ -31,6 +31,13 @@
 
 #define LED_PIN3        6
 #define LED_CLOCK_PIN3  5
+
+
+//MSGEQ7 Default Pins - analog, strobe, reset
+#define MSGEQ7_ANALOG_PIN 3
+#define MSGEQ7_STROBE_PIN 2
+#define MSGEQ7_RESET_PIN  3
+
 
 
 #endif //__PINS_H

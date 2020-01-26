@@ -14,6 +14,9 @@ class EffectRainbow: public Effect{
   
     void reset();
     void proceed(CRGB *leds, int numLeds); 
+
+  protected:
+    uint8_t _hue;    
 };
 
 inline EffectRainbow::EffectRainbow(){
@@ -23,22 +26,23 @@ inline EffectRainbow::EffectRainbow(){
 inline EffectRainbow::~EffectRainbow(){
 }
 
-inline void EffectRainbow::reset(){
-  setHSV(CHSV(0, 255, 255)); 
+inline void EffectRainbow::reset(){  
+  _hue = 0;
 }
 
 
 inline void EffectRainbow::proceed(CRGB *leds, int numLeds){
 
-  //Get current colors
-  CHSV hsv      = getHSV();
+  //Get current colors  
   uint8_t delta = numLeds >= 255 ? 1 : 255 / numLeds;
 
   //Move forward and save
-  hsv.hue = (hsv.hue + delta) & 0xFF;
-  setHSV(hsv);
-
+  _hue = (_hue + delta) & 0xFF;
+  
+  
   //Set colors - same as fill_rainbow
+  CHSV hsv(_hue, 0xFF, 0xFF);
+  
   for(int i = 0; i < numLeds; i++){ 
     leds[i] = hsv;
     hsv.hue = (hsv.hue + delta) & 0xFF;
@@ -58,7 +62,7 @@ class EffectTheaterChaseRainbow: public Effect{
 
   protected:
     uint8_t _step;
-
+    uint8_t _hue;
 };
 
 inline EffectTheaterChaseRainbow::EffectTheaterChaseRainbow(){
@@ -66,10 +70,8 @@ inline EffectTheaterChaseRainbow::EffectTheaterChaseRainbow(){
 }
 
 inline void EffectTheaterChaseRainbow::reset(){
-
-  _step = 0;
-  
-  setHSV(CHSV(0, 255, 255)); setHSV(CHSV(0, 255, 255)); 
+  _step = 0;  
+  _hue  = 0;
 }
 
 
@@ -80,7 +82,6 @@ inline void EffectTheaterChaseRainbow::proceed(CRGB *leds, int numLeds){
       setPixel(leds[(i + _step) % numLeds], 0, 0, 0);          
   }
 
-  CHSV hsv      = getHSV();
   uint8_t delta = numLeds >= 255 ? 1 : 255 / numLeds;
   
   //Move forward
@@ -88,12 +89,10 @@ inline void EffectTheaterChaseRainbow::proceed(CRGB *leds, int numLeds){
   if (_step  == 0){ // Next cycle    
     
     //Move to the next color
-    hsv.hue = (hsv.hue + delta) & 0xFF;
-
-    //Save it
-    setHSV(hsv);
+    _hue = (_hue + delta) & 0xFF;
   }
 
+  CHSV hsv = CHSV(_hue, 0xFF, 0xFF);
   //Turn every third pixell on
   for(int i = 0; i < numLeds; i = i + 3){ 
     leds[(i + _step ) % numLeds] = hsv;

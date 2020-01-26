@@ -39,18 +39,7 @@ void Effect::proceed(CRGB * /*leds*/, int /*numLeds */){
 
 void Effect::onCmd(const struct CtrlQueueItem &itm){
   
-  switch(itm.cmd){
-    case EEMC_COLOR_HUE:case EEMC_COLOR_SAT: case EEMC_COLOR_VAL: {
-      //Get effect color
-      CHSV hsv = getHSV();
-
-      //Update corresponding color value
-      hsv.raw[itm.cmd - EEMC_COLOR_HUE] = (uint8_t)itm.data.translate( (int)hsv.raw[itm.cmd - EEMC_COLOR_HUE], 0, 255);
-  
-      //Set effect color
-      setHSV(hsv);   
-    }   
-    break;
+  switch(itm.cmd){    
     case EEMC_SPEED:
       setSpeedDelay(itm.data.translate(getSpeedDelay(), SPEED_DELAY_MIN, SPEED_DELAY_MAX));
     break;
@@ -60,13 +49,6 @@ void Effect::onCmd(const struct CtrlQueueItem &itm){
 void Effect::idle(){
 }
 
-CRGB Effect::getColor() const{
-  return getHSV();
-}
-    
-void Effect::setRandomColor(){
-  setHSV(CHSV(random(256), 0xFF, 0xFF));
-}
 
 void Effect::setSpeedDelay(uint16_t speedDelay){
   //Scale down
@@ -97,14 +79,52 @@ void Effect::setAll(CRGB *leds, int numLeds, byte red, byte green, byte blue) {
 }
 
 
-const CHSV &Effect::getHSV() const{
+
+//////////////////////////////////////
+// EffectColor
+EffectColor::EffectColor(const CHSV &hsv){
+  _hsv = hsv;
+}
+
+EffectColor::~EffectColor(){  
+}
+
+const CHSV &EffectColor::getHSV() const{
   return _hsv;
 }
 
-void Effect::setHSV(const CHSV &hsv){
+void EffectColor::setHSV(const CHSV &hsv){
   _hsv   = hsv;
 }
 
+CRGB EffectColor::getColor() const{
+  return _hsv;
+}
+    
+void EffectColor::setRandomColor(){
+  setHSV(CHSV(random(256), 0xFF, 0xFF));
+}
+
+
+void EffectColor::onCmd(const struct CtrlQueueItem &itm){
+  switch(itm.cmd){
+    case EEMC_COLOR_HUE:case EEMC_COLOR_SAT: case EEMC_COLOR_VAL: {
+      //Get effect color
+      CHSV hsv = getHSV();
+
+      //Update corresponding color value
+      hsv.raw[itm.cmd - EEMC_COLOR_HUE] = (uint8_t)itm.data.translate( (int)hsv.raw[itm.cmd - EEMC_COLOR_HUE], 0, 255);
+  
+      //Set effect color
+      setHSV(hsv);   
+    }   
+    break;
+    default:
+      Effect::onCmd(itm);
+    break;
+  }    
+  
+}
 
 
 //////////////////////////////////////

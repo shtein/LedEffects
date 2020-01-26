@@ -2,6 +2,7 @@
 #define __SOUND_H
 
 #include "SoundCapture.h"
+#include "EffectSound.h"
 
 /////////////////////////////////////////
 //SoundCaptureStub - for testing
@@ -34,20 +35,23 @@ inline void SoundCaptureStub::getData(SoundCaptureData &data) const{
 
 ////////////////////////////////
 // EffectSoundSimple - very basic sound effect
-
 class EffectSoundSimple: public EffectSound<Effect>{
 
   protected:
-    virtual void updateLeds(CRGB *leds, int numLeds, const SoundCaptureData &data); 
+   void updateLeds(CRGB *leds, int numLeds, const SoundCaptureData &data); 
 };
 
 void EffectSoundSimple::updateLeds(CRGB *leds, int numLeds, const SoundCaptureData &data){
 
-  int inc = numLeds / MAX_BANDS; 
+  //Number of sections
+  int inc = numLeds / MAX_BANDS;
+    
 
   for(int i = 0; i < MAX_BANDS; i++){
-    leds[i*inc] = CHSV(HUE_RED, 0xFF, data.bands[i]); 
-  }
+    for(int j = 0; j < inc; j++) {
+      leds[i * inc + j] = CHSV(HUE_RED, 0xFF, data.bands[i]);   
+    }
+  }  
 }
 
 #endif//__SOUND_H

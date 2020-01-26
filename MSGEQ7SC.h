@@ -14,7 +14,7 @@ class SoundCaptureMSGEQ7: public SoundCapture{
     void getData(SoundCaptureData &data) const;
 
 
-  protected:
+  private:
     uint8_t _pinAnalog;
     uint8_t _pinStrobe:4;
     uint8_t _pinReset:4;

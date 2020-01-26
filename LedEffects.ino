@@ -6,9 +6,10 @@
 //#define __SASHA_SETUP
 //#define __DAVID_SETUP
 //#define __IGOR_SETUP
-#define __DECK_SETUP
+//#define __DECK_SETUP
 //#define __CHRISTMAS_TREE_SETUP
 //#define __WINDOW_SETUP
+#define __VADIM_SETUP
 
 
 //This is where setup() function is
@@ -18,6 +19,3 @@
 
 void loop(){
 }
-
-
-

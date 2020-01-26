@@ -116,9 +116,3 @@ DEFINE_GRADIENT_PALETTE( christmattree1_gp ) {
   232,   1, 80,  3,
   249, 232,235,237,
   255, 140, 97, 11};
-
-
-
-
-
-

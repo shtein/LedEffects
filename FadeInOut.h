@@ -5,7 +5,7 @@
 // Fade in and out effect
 
 
-class EffectFadeInOut: public Effect{
+class EffectFadeInOut: public EffectColor{
   public:
     EffectFadeInOut();
     ~EffectFadeInOut();

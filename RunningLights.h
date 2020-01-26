@@ -5,7 +5,7 @@
 // Running Lights Effect
 
 
-class EffectRunningLights: public Effect{
+class EffectRunningLights: public EffectColor{
   public:
     EffectRunningLights();
     ~EffectRunningLights();

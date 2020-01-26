@@ -7,7 +7,7 @@
 #define DBG_TO_SERIAL
 #include <DbgTool.h>
 
-#define CHECK_MEM
+//#define CHECK_MEM
 #ifdef CHECK_MEM 
   #define _CM static
 #else

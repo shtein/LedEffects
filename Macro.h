@@ -80,7 +80,7 @@
 ///////////////////////////////////////
 //Sound capture
 #define INIT_SOUND_CAPTURE(className, ...) \
-  _CM className snd; \
+  _CM className snd (__VA_ARGS__); \
   SoundCapture::initInstance(&snd); 
 
 ///////////////////////////////////////

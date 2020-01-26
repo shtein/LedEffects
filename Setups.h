@@ -436,30 +436,93 @@ void setup() {
 
 //__WINDOW_SETUP
 
+#elif defined(__VADIM_SETUP)
+////////////////////////////////////////
+// 2 WS2811 string, 100 LEDs, 1 push button
+#pragma message "Compile for Vadim"
+
+void setup() {
+  DBG_INIT();
+  DBG_OUTLN("Led effect started - Vadim");  
+  //Effect Engine
+  BEGIN_EFFECT_ENGINE() 
+    
+    //Effects   
+    BEGIN_EFFECTS()
+      BEGIN_MODE(Christmas, 3)   
+        ADD_EFFECT( TransformChristmas<EffectConfetti> )
+        ADD_EFFECT( TransformChristmas<EffectPlasma> )
+        ADD_EFFECT( TransformChristmas<EffectNoise> )
+      END_MODE() 
+      BEGIN_MODE(Halloween, 3)      
+        ADD_EFFECT( TransformHalloween<EffectConfetti> )
+        ADD_EFFECT( TransformAutunm<EffectPlasma> )
+        ADD_EFFECT( TransformHalloween<EffectNoise> )
+      END_MODE()
+      BEGIN_MODE(Other, 15)        
+        ADD_EFFECT(EffectRipple)   
+        ADD_EFFECT(EffectMeteorRain)
+        ADD_EFFECT(EffectPlasma)
+        ADD_EFFECT(EffectConfetti)
+        //ADD_EFFECT(EffectPaletteTransformFast) 
+        ADD_EFFECT(EffectBlur)
+        ADD_EFFECT(EffectRainbowMove)
+        ADD_EFFECT(EffectNoise)            
+        ADD_EFFECT(EffectMoodBlobs) 
+        ADD_EFFECT(EffectRainbow)
+        //ADD_EFFECT(EffectFadeInOut)
+        //ADD_EFFECT(EffectRunningLights)       
+        //ADD_EFFECT(EffectColorWipe)       
+        ADD_EFFECT(EffectTheaterChaseRainbow) 
+      END_MODE()    
+    END_EFFECTS()
+    
+    //Leds
+    BEGIN_LEDS(100) 
+      ADD_STRIP(WS2811, LED_PIN, RGB)  
+      ADD_STRIP(WS2811, LED_PIN2, RGB) 
+    END_LEDS()
+
+  //Control    
+    BEGIN_CONTROL_MAP()
+      BEGIN_PUSH_BUTTON(MODE_PIN)    
+        PUSH_BUTTON_TO_CMD(EEMC_MODE, PB_CONTROL_PUSH_LONG)
+        PUSH_BUTTON_TO_CMD(EEMC_EFFECT, PB_CONTROL_CLICK_SHORT)      
+     END_PUSH_BUTTON()
+    END_CONTROL_MAP()
+       
+  END_EFFECT_ENGINE() 
+}
+
+
+// __CHRISTMAS_TREE_STUP
+
+
 #else 
 ////////////////////////////////////////
 // Everything else
+#include "Sound.h"
+#include "MSGEQ7SC.h"
+
 #pragma message "Compile for default"
 
 void setup() {
   DBG_INIT();
   DBG_OUTLN("Led effect started - default");  
 
+  INIT_SOUND_CAPTURE(SoundCaptureMSGEQ7, MSGEQ7_ANALOG_PIN, MSGEQ7_STROBE_PIN, MSGEQ7_RESET_PIN)    
   
   //Effect Engine
   BEGIN_EFFECT_ENGINE() 
     //Effects   
     BEGIN_EFFECTS()
-      BEGIN_MODE(Sound, 3)    
-        INIT_SOUND_CAPTURE(SoundCaptureStub)    
+      BEGIN_MODE(Sound, 3)            
         ADD_EFFECT(EffectSoundSimple)
       END_MODE()
-      //BEGIN_MODE(Effects, 15)
+      BEGIN_MODE(Effects, 15)
         //ADD_EFFECT(EffectFire)
         //ADD_EFFECT(EffectMeteorRain)
         //ADD_EFFECT(EffectPlasma)
-        //ADD_EFFECT(EffectFire)                 
-        //ADD_EFFECT(EffectEmergencyLights)      
         //ADD_EFFECT(EffectConfetti)
         //ADD_EFFECT(EffectPaletteTransformFast) 
         //ADD_EFFECT(EffectBlur)
@@ -471,7 +534,7 @@ void setup() {
         //ADD_EFFECT(EffectRunningLights)           //Single color
         //ADD_EFFECT(EffectColorWipe)               //Not intersting
         //ADD_EFFECT(EffectTheaterChaseRainbow) 
-      //END_MODE()
+      END_MODE()
       //BEGIN_MODE(Static, 3)
         //ADD_STATIC_COLOR(CHSV(HUE_RED, 0xFF, 0xFF))
         //ADD_STATIC_COLOR(CHSV(HUE_GREEN, 0xFF, 0xFF))
@@ -483,13 +546,6 @@ void setup() {
     //Leds
     BEGIN_LEDS(33) //31 for EK outage lamp, 50 for test or David, 267 for deck, 88 for Igor, 212 for Sasha, 300 for Christmass Tree (150 for new Christmass Tree), 100 for old 2801 leds
       ADD_STRIP(NEOPIXEL, LED_PIN)
-      //ADD_STRIP(NEOPIXEL, LED_PIN2)   //Second strip for deck
-      
-      //ADD_STRIP(WS2811, LED_PIN, RGB)  //Christmas Tree or David
-      //ADD_STRIP(WS2811, LED_PIN2, RGB) //Second strip for Christmass Tree
-      //ADD_STRIP(WS2811, LED_PIN3, RGB) //Third strip for Christmass Tree
-      
-      //ADD_STRIP(WS2801, LED_PIN, LED_CLOCK_PIN, RGB) //Old 2801 strip or EK outage lamp
     END_LEDS()
 
   //Control    

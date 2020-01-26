@@ -3,7 +3,6 @@
 
 //Effects
 #include "Effect.h"
-#include "SoundCapture.h"
 #include "Rainbow.h"
 #include "FadeInOut.h"
 #include "RunningLights.h"
