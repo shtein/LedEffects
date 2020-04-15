@@ -49,7 +49,7 @@
 #define BEGIN_MODE(modeName, maxEffects) \
   _CM Effect *modeName[maxEffects]; \
   ee.addMode(modeName);
-
+  
 #define END_MODE()
 
 #define BLACK_MODE() \
@@ -57,8 +57,8 @@
 
 #define ADD_EFFECT(ClassEffect) \
   _CM ClassEffect EFFECT_NAME; \
-  ee.addEffect(&EFFECT_NAME);
-
+  ee.addEffect(&EFFECT_NAME); 
+  
 #define ADD_EFFECT_PARAM(ClassEffect, ...) \
   _CM ClassEffect EFFECT_NAME(__VA_ARGS__); \
   ee.addEffect(&EFFECT_NAME);
@@ -144,4 +144,3 @@
 
 
 #endif //__MACRO_H  
-

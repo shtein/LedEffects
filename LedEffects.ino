@@ -9,7 +9,8 @@
 //#define __DECK_SETUP
 //#define __CHRISTMAS_TREE_SETUP
 //#define __WINDOW_SETUP
-#define __VADIM_SETUP
+//#define __VADIM_SETUP
+#define __TAHOE_SETUP
 
 
 //This is where setup() function is

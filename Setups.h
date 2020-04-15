@@ -274,19 +274,19 @@ void setup() {
         ADD_EFFECT(EffectNoise)            
         ADD_EFFECT(EffectMoodBlobs) 
       END_MODE()
-      
+      /*
       BEGIN_MODE(Halloween, 3)      
-        ADD_EFFECT( TransformHalloween<EffectConfetti> )
-        ADD_EFFECT( TransformAutunm<EffectPlasma> )
-        ADD_EFFECT( TransformHalloween<EffectNoise> )
+        ADD_EFFECT_PARAM( EffectConfetti, &TransformHalloween )
+        ADD_EFFECT_PARAM( EffectPlasma, &TransformAutunm )
+        ADD_EFFECT_PARAM( EffectNoise, &TransformHalloween)
       END_MODE()
       
       BEGIN_MODE(Chrsitmas, 3)      
-        ADD_EFFECT( TransformChristmas<EffectConfetti> )
-        ADD_EFFECT( TransformChristmas<EffectPlasma> )
-        ADD_EFFECT( TransformChristmas<EffectNoise> )
+        ADD_EFFECT_PARAM( EffectConfetti, &TransformChristmas )
+        ADD_EFFECT_PARAM( EffectPlasma, &TransformChristmas )
+        ADD_EFFECT_PARAM( EffectNoise, &TransformChristmas )
       END_MODE()
-
+      */
       
     END_EFFECTS()
     
@@ -323,14 +323,14 @@ void setup() {
     //Effects   
     BEGIN_EFFECTS()
       BEGIN_MODE(Christmas, 3)   
-        ADD_EFFECT( TransformChristmas<EffectConfetti> )
-        ADD_EFFECT( TransformChristmas<EffectPlasma> )
-        ADD_EFFECT( TransformChristmas<EffectNoise> )
+        ADD_EFFECT_PARAM( EffectConfetti, &TransformChristmas )
+        ADD_EFFECT_PARAM( EffectPlasma, &TransformChristmas )
+        ADD_EFFECT_PARAM( EffectNoise, &TransformChristmas )
       END_MODE() 
       BEGIN_MODE(Halloween, 3)      
-        ADD_EFFECT( TransformHalloween<EffectConfetti> )
-        ADD_EFFECT( TransformAutunm<EffectPlasma> )
-        ADD_EFFECT( TransformHalloween<EffectNoise> )
+        ADD_EFFECT_PARAM( EffectConfetti, &TransformHalloween )
+        ADD_EFFECT_PARAM( EffectPlasma, &TransformAutunm )
+        ADD_EFFECT( EffectNoise, &TransformHalloween )
       END_MODE()
       BEGIN_MODE(Other, 15)        
         ADD_EFFECT(EffectRipple)   
@@ -386,15 +386,15 @@ void setup() {
     //Effects   
     BEGIN_EFFECTS()
       BEGIN_MODE(Themes, 15)        
-        ADD_EFFECT( TransformAutunm<EffectConfetti> )
-        ADD_EFFECT( TransformAutunm<EffectPlasma> )
-        ADD_EFFECT( TransformAutunm<EffectNoise> )
-        ADD_EFFECT( TransformHalloween<EffectConfetti> )
-        ADD_EFFECT( TransformHalloween<EffectPlasma> )
-        ADD_EFFECT( TransformHalloween<EffectNoise> )
-        ADD_EFFECT( TransformChristmas<EffectConfetti> )
-        ADD_EFFECT( TransformChristmas<EffectPlasma> )
-        ADD_EFFECT( TransformChristmas<EffectNoise> )
+        ADD_EFFECT_PARAM( EffectConfetti, &TransformAutunm )
+        ADD_EFFECT_PARAM( EffectPlasma, &TransformAutunm )
+        ADD_EFFECT_PARAM( EffectNoise, &TransformAutunm )
+        ADD_EFFECT_PARAM( EffectConfetti, &TransformHalloween )
+        ADD_EFFECT_PARAM( EffectPlasma, &TransformHalloween )
+        ADD_EFFECT_PARAM( EffectNoise, &TransformHalloween )
+        ADD_EFFECT_PARAM( EffectConfetti, &TransformChristmas )
+        ADD_EFFECT_PARAM( EffectPlasma, &TransformChristmas )
+        ADD_EFFECT_PARAM( EffectNoise, &TransformChristmas )
       END_MODE()      
       BEGIN_MODE(Effects, 15)
         ADD_EFFECT(EffectRipple)
@@ -495,8 +495,63 @@ void setup() {
 }
 
 
-// __CHRISTMAS_TREE_STUP
+// __VADIM_SETUP
 
+#elif defined(__TAHOE_SETUP)
+
+////////////////////////////////////////
+// WS2811 string, 12v 300 LEDs, 1 push button - change effect only
+#pragma message "Compile Tahoe"
+
+void setup() {
+  DBG_INIT();
+  DBG_OUTLN("Led effect started -- Tahoe");  
+  //Effect Engine
+  BEGIN_EFFECT_ENGINE() 
+  
+    //Effects   
+    BEGIN_EFFECTS()
+      BEGIN_MODE(Effects, 7)        
+        ADD_EFFECT(EffectRipple)
+        ADD_EFFECT(EffectMeteorRain)   
+        ADD_EFFECT(EffectPlasma)        
+        ADD_EFFECT(EffectConfetti)
+        ADD_EFFECT(EffectBlur)
+        ADD_EFFECT(EffectNoise)            
+        ADD_EFFECT(EffectMoodBlobs) 
+      END_MODE()
+      
+      BEGIN_MODE(Halloween, 3)      
+        ADD_EFFECT_PARAM( EffectConfetti, &TransformAutunm )
+        ADD_EFFECT_PARAM( EffectNoise, &TransformHalloween )
+        ADD_EFFECT_PARAM( EffectPlasma, &TransformAutunm )
+      END_MODE()
+      
+      BEGIN_MODE(Chrsitmas, 3)      
+        ADD_EFFECT_PARAM( EffectConfetti, &TransformChristmas)
+        ADD_EFFECT_PARAM( EffectPlasma, &TransformChristmas )
+        //ADD_EFFECT_PARAM( EffectNoise, &TransformChristmas )
+      END_MODE()
+      
+    END_EFFECTS()
+    
+    //Leds
+    BEGIN_LEDS(300)
+      ADD_STRIP(NEOPIXEL, LED_PIN)
+    END_LEDS()
+
+  //Control    
+    BEGIN_CONTROL_MAP()
+      BEGIN_PUSH_BUTTON(MODE_PIN)    
+        PUSH_BUTTON_TO_CMD(EEMC_MODE, PB_CONTROL_PUSH_LONG)
+        PUSH_BUTTON_TO_CMD(EEMC_EFFECT, PB_CONTROL_CLICK_SHORT)      
+      END_PUSH_BUTTON()
+    END_CONTROL_MAP()
+       
+  END_EFFECT_ENGINE() 
+}
+
+// __TAHOE_SETUP
 
 #else 
 ////////////////////////////////////////

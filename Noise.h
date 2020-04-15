@@ -6,7 +6,7 @@
 // Effect EffectPaletteTransformFast - simple transition between palettes
 class EffectPaletteTransformFast: public EffectPaletteTransform{
   public:
-    EffectPaletteTransformFast();
+    EffectPaletteTransformFast(FuncGetPalette_t getPal = &FuncGetPal_Default);
     ~EffectPaletteTransformFast();
 
   protected:
@@ -14,7 +14,7 @@ class EffectPaletteTransformFast: public EffectPaletteTransform{
     int getMaxStep() const;
 };
 
-inline EffectPaletteTransformFast::EffectPaletteTransformFast(){
+inline EffectPaletteTransformFast::EffectPaletteTransformFast(FuncGetPalette_t getPal): EffectPaletteTransform(getPal){
 }
 
 inline EffectPaletteTransformFast::~EffectPaletteTransformFast(){
@@ -43,7 +43,7 @@ inline int EffectPaletteTransformFast::getMaxStep() const{
 //EffectNoise
 class EffectNoise: public EffectPaletteTransform{
   public:
-     EffectNoise(); 
+     EffectNoise(FuncGetPalette_t getPal = &FuncGetPal_Default);
     ~EffectNoise();
 
   protected:
@@ -53,7 +53,7 @@ class EffectNoise: public EffectPaletteTransform{
     int _dist;
 };
 
-inline EffectNoise::EffectNoise(){
+inline EffectNoise::EffectNoise(FuncGetPalette_t getPal): EffectPaletteTransform(getPal){
 
   //Init distortion
   _dist = random16(millis());
@@ -85,18 +85,28 @@ inline void EffectNoise::updateLeds(CRGB *leds, int numLeds){
 
 ////////////////////////////////////////
 // EffectPlasma
+
+inline void FuncGetPal_Plazma(CRGBPalette16 &pal){
+
+  uint8_t clr = random8();
+  pal =  CRGBPalette16(CHSV(clr + random8(32), 192, random8(128,255)), 
+                       CHSV(clr + random8(32), 255, random8(128,255)), 
+                       CHSV(clr + random8(32), 192, random8(128,255)), 
+                       CHSV(clr + random8(32), 255, random8(128,255))
+                      );
+}
+
 class EffectPlasma: public EffectPaletteTransform{
   public: 
-    EffectPlasma();
+    EffectPlasma(FuncGetPalette_t getPal = &FuncGetPal_Plazma);
     ~EffectPlasma();
 
   protected:
-    void updateColors();
     void updateLeds(CRGB *leds, int numLeds);
     int getMaxStep() const;
 };
 
-inline EffectPlasma::EffectPlasma(){
+inline EffectPlasma::EffectPlasma(FuncGetPalette_t getPal): EffectPaletteTransform(getPal){
   setSpeedDelay(50);  
 }
 
@@ -115,16 +125,6 @@ inline void EffectPlasma::updateLeds(CRGB *leds, int numLeds){
   }  
 }
 
-inline void EffectPlasma::updateColors(){
-
-  uint8_t clr = random8();
-  _palTarget =  CRGBPalette16(CHSV(clr + random8(32), 192, random8(128,255)), 
-                              CHSV(clr + random8(32), 255, random8(128,255)), 
-                              CHSV(clr + random8(32), 192, random8(128,255)), 
-                              CHSV(clr + random8(32), 255, random8(128,255))
-                             );
-}
-
 #define PLASMA_MAX_STEPS 100
 
 inline int EffectPlasma::getMaxStep() const{
@@ -134,19 +134,29 @@ inline int EffectPlasma::getMaxStep() const{
 
 //////////////////////////////
 // Effect Confetti
+
+
+BEGIN_TRANFORM_SCHEMA_RGB16_PALETTE(FuncGetPal_Confetti)
+  TRANSOFRM_PALETTE(&OceanColors_p)
+  TRANSOFRM_PALETTE(&LavaColors_p)
+  TRANSOFRM_PALETTE(&ForestColors_p)
+  TRANSOFRM_PALETTE(&CloudColors_p)
+END_TRANSFORM_SCHEMA()
+
+
 class EffectConfetti: public EffectPaletteTransform{
   public:
-    EffectConfetti();
+    EffectConfetti(FuncGetPalette_t getPal = &FuncGetPal_Confetti);
     ~EffectConfetti();
 
   protected:
     void updateLeds(CRGB *leds, int numLeds);
-    void updateColors(); 
 
     int getMaxStep() const;    
 };
 
-inline EffectConfetti::EffectConfetti(){  
+
+inline EffectConfetti::EffectConfetti(FuncGetPalette_t getPal): EffectPaletteTransform(getPal) {
   setSpeedDelay(20);
 }
 
@@ -166,34 +176,27 @@ inline void EffectConfetti::updateLeds(CRGB *leds, int numLeds){
   leds[random16(numLeds)] = ColorFromPalette(_palCurrent, random8(255), 255, LINEARBLEND);
 }
 
-inline void EffectConfetti::updateColors(){
-   struct { const TProgmemRGBPalette16 &pal;
-   } ts[] = { OceanColors_p, LavaColors_p, ForestColors_p, CloudColors_p }; 
-   
-  _palTarget = ts[random(0, sizeof(ts) / sizeof(ts[0]) + 1)].pal;
-}
-
-
 
 ////////////////////////////////////////
 // Palettes for different type of transformation
 
+
 /////////////////////
 //Christmas
-BEGIN_TRANFORM_SCHEMA(TransformChristmas)
+BEGIN_TRANFORM_SCHEMA_GRADIENT_PALETTE(TransformChristmas)
   TRANSOFRM_PALETTE(christmattree1_gp)
 END_TRANSFORM_SCHEMA()
 
 ////////////////////
 // Autumn
-BEGIN_TRANFORM_SCHEMA(TransformAutunm)
+BEGIN_TRANFORM_SCHEMA_GRADIENT_PALETTE(TransformAutunm)
   TRANSOFRM_PALETTE(es_autumn_01_gp)
   TRANSOFRM_PALETTE(es_autumn_03_gp)
 END_TRANSFORM_SCHEMA()
 
 ///////////////////
 //Halloween - better autumn than autumn
-BEGIN_TRANFORM_SCHEMA(TransformHalloween)
+BEGIN_TRANFORM_SCHEMA_GRADIENT_PALETTE(TransformHalloween)
   TRANSOFRM_PALETTE(halloween_gp)
 END_TRANSFORM_SCHEMA()
 

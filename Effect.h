@@ -74,9 +74,15 @@ class EffectColor: public Effect{
 #define MAX_PAL_CHANGES 24
 #define CHANGE_PAL_STEP 500
 
+//Palette change routine
+typedef void (*FuncGetPalette_t) (CRGBPalette16 &);
+
+//Default palette change routine
+void FuncGetPal_Default(CRGBPalette16 &pal);
+
 class EffectPaletteTransform: public Effect{
   public: 
-    EffectPaletteTransform();
+    EffectPaletteTransform(FuncGetPalette_t getPal);
    ~EffectPaletteTransform();
 
    virtual void proceed(CRGB *leds, int numLeds); 
@@ -98,6 +104,8 @@ class EffectPaletteTransform: public Effect{
     static CRGBPalette16 _palCurrent;
     static CRGBPalette16 _palTarget;
 
+    FuncGetPalette_t     _getPal;
+
   private:
     static int           _step;
 };
@@ -105,33 +113,34 @@ class EffectPaletteTransform: public Effect{
 
 //////////////////////////////////////////////////////
 // Color schemes - set of transforming theme palettes 
-#define BEGIN_TRANFORM_SCHEMA(className) \
-template<class T> \
-class className: public T{ \
-  protected: \
-    virtual void updateColors() { \
-        const TProgmemRGBGradientPalettePtr ts[] = {
+
+#define BEGIN_TRANFORM_SCHEMA_TYPE(FunctionName, Type) \
+void FunctionName(CRGBPalette16 &pal){ \
+  const Type ts[] = {
+
+
+#define BEGIN_TRANFORM_SCHEMA_GRADIENT_PALETTE(FunctionName)  BEGIN_TRANFORM_SCHEMA_TYPE(FunctionName, TProgmemRGBGradientPalettePtr)
+#define BEGIN_TRANFORM_SCHEMA_RGB16_PALETTE(FunctionName)  BEGIN_TRANFORM_SCHEMA_TYPE(FunctionName, TProgmemRGBPalette16)
+
 
 #define END_TRANSFORM_SCHEMA() }; \
-         T::_palTarget = ts[random(0, sizeof(ts) / sizeof(ts[0]) + 1)]; \
-    } \
-};
+  pal = ts[random(0, sizeof(ts) / sizeof(ts[0]) + 1)]; \
+} 
 
 #define TRANSOFRM_PALETTE(pal) pal, \
 
+ 
 /*
 Usage of transform shchema: 
-
-BEGIN_TRANFORM_SCHEMA(YourTemplateName)
+BEGIN_TRANFORM_SCHEMA_XXX(YourFunctionName)
   TRANSOFRM_PALETTE(pallete1)
   TRANSOFRM_PALETTE(palette2)
   ...
   TRANSOFRM_PALETTE(paletteN)
 END_TRANSFORM_SCHEMA()
 
-Instancinate
-YourTemplateName<Class_Derived_from_EffectPaletteTransform>
-
+It creates 
+void YourFunctionName(CRGBPalette16 &pal);
 */
 
 #endif //__EFFECT_H

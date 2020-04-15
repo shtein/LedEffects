@@ -30,7 +30,7 @@
 #define LED_CLOCK_PIN2  9
 
 #define LED_PIN3        6
-#define LED_CLOCK_PIN3  5
+#define LED_CLOCK_PIN3  7
 
 
 //MSGEQ7 Default Pins - analog, strobe, reset

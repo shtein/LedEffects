@@ -130,14 +130,23 @@ void EffectColor::onCmd(const struct CtrlQueueItem &itm){
 //////////////////////////////////////
 // EffectPaletteTransform
 
+void FuncGetPal_Default(CRGBPalette16 &pal){
+   pal = CRGBPalette16(CHSV(random8(), 255, random8(128,255)), 
+                       CHSV(random8(), 255, random8(128,255)), 
+                       CHSV(random8(), 192, random8(128,255)), 
+                       CHSV(random8(), 255, random8(128,255))
+                      );
+}
+
 CRGBPalette16 EffectPaletteTransform::_palCurrent;
 CRGBPalette16 EffectPaletteTransform::_palTarget;
     
 int EffectPaletteTransform::_step;
 
 
-EffectPaletteTransform::EffectPaletteTransform() {
+EffectPaletteTransform::EffectPaletteTransform(FuncGetPalette_t getPal){
   setSpeedDelay(25);  
+  _getPal = getPal;
 }
 
 EffectPaletteTransform::~EffectPaletteTransform(){
@@ -173,11 +182,8 @@ bool EffectPaletteTransform::isReadyToChangePal() const{
 
 void EffectPaletteTransform::updateColors(){
   //Change target palette
-  _palTarget = CRGBPalette16(CHSV(random8(), 255, random8(128,255)), 
-                       CHSV(random8(), 255, random8(128,255)), 
-                       CHSV(random8(), 192, random8(128,255)), 
-                       CHSV(random8(), 255, random8(128,255))
-                      );
+  if(_getPal)
+    _getPal(_palTarget);
 }
 
 void EffectPaletteTransform::updateLeds(CRGB *leds, int numLeds){  
@@ -215,9 +221,3 @@ void EffectPaletteTransform::proceed(CRGB *leds, int numLeds){
   //Update Leds
   updateLeds(leds, numLeds); 
 }
-
-
-
-
-
-

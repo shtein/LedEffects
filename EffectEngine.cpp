@@ -299,4 +299,3 @@ void EffectEngine::writeConfig(){
 void EffectEngine::preSaveConfig(){
   _millisToSaveCfg = millis() + SAVE_CONFIG_TIMEOUT;
 }
-
