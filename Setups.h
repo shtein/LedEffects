@@ -530,14 +530,14 @@ void setup() {
       BEGIN_MODE(Chrsitmas, 3)      
         ADD_EFFECT_PARAM( EffectConfetti, &TransformChristmas)
         ADD_EFFECT_PARAM( EffectPlasma, &TransformChristmas )
-        //ADD_EFFECT_PARAM( EffectNoise, &TransformChristmas )
+        ADD_EFFECT_PARAM( EffectNoise, &TransformChristmas )
       END_MODE()
       
     END_EFFECTS()
     
     //Leds
-    BEGIN_LEDS(300)
-      ADD_STRIP(NEOPIXEL, LED_PIN)
+    BEGIN_LEDS(425)
+      ADD_STRIP(WS2811, LED_PIN2)
     END_LEDS()
 
   //Control    
@@ -546,6 +546,10 @@ void setup() {
         PUSH_BUTTON_TO_CMD(EEMC_MODE, PB_CONTROL_PUSH_LONG)
         PUSH_BUTTON_TO_CMD(EEMC_EFFECT, PB_CONTROL_CLICK_SHORT)      
       END_PUSH_BUTTON()
+
+      PUSH_BUTTON_SA_TO_CMD(EEMC_MODE, MODE_PIN3)
+      PUSH_BUTTON_SA_TO_CMD(EEMC_EFFECT, EFFECT_PIN)
+      
     END_CONTROL_MAP()
        
   END_EFFECT_ENGINE() 

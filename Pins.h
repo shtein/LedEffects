@@ -16,6 +16,7 @@
 //Push button for mode
 #define MODE_PIN    10
 #define MODE_PIN2   11
+#define MODE_PIN3   15
 
 //Rotary encoder speed pins
 #define SPEED_CLOCK_PIN 3
