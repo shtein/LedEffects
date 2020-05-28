@@ -4,7 +4,7 @@
 #include "EffectEngineCtx.h"
 #include <EEPROM.h>
 
-#define CUR_MODE _modes[_modeNum] 
+#define CUR_MODE _modes[_modeNum]  
 
 EffectEngine::EffectEngine(){
   _numModes = 0;

@@ -229,7 +229,7 @@ void setup() {
     END_EFFECTS()
     
     //Leds
-    BEGIN_LEDS(88) //31 for EK outage lamp, 50 for test or David, 267 for deck, 88 for Igor, 212 for Sasha, 300 for Christmass Tree (150 for new Christmass Tree), 100 for old 2801 leds
+    BEGIN_LEDS(88) 
       ADD_STRIP(NEOPIXEL, LED_PIN)
     END_LEDS()
 
@@ -449,16 +449,18 @@ void setup() {
     
     //Effects   
     BEGIN_EFFECTS()
-      BEGIN_MODE(Christmas, 3)   
-        ADD_EFFECT( TransformChristmas<EffectConfetti> )
-        ADD_EFFECT( TransformChristmas<EffectPlasma> )
-        ADD_EFFECT( TransformChristmas<EffectNoise> )
-      END_MODE() 
       BEGIN_MODE(Halloween, 3)      
-        ADD_EFFECT( TransformHalloween<EffectConfetti> )
-        ADD_EFFECT( TransformAutunm<EffectPlasma> )
-        ADD_EFFECT( TransformHalloween<EffectNoise> )
+        ADD_EFFECT_PARAM( EffectConfetti, &TransformAutunm )
+        ADD_EFFECT_PARAM( EffectNoise, &TransformHalloween )
+        ADD_EFFECT_PARAM( EffectPlasma, &TransformAutunm )
       END_MODE()
+      
+      BEGIN_MODE(Chrsitmas, 3)      
+        ADD_EFFECT_PARAM( EffectConfetti, &TransformChristmas)
+        ADD_EFFECT_PARAM( EffectPlasma, &TransformChristmas )
+        ADD_EFFECT_PARAM( EffectNoise, &TransformChristmas )
+      END_MODE()
+      
       BEGIN_MODE(Other, 15)        
         ADD_EFFECT(EffectRipple)   
         ADD_EFFECT(EffectMeteorRain)
@@ -536,7 +538,7 @@ void setup() {
     END_EFFECTS()
     
     //Leds
-    BEGIN_LEDS(425)
+    BEGIN_LEDS(406)
       ADD_STRIP(WS2811, LED_PIN2)
     END_LEDS()
 
