@@ -4,10 +4,9 @@
 #include <Arduino.h>
 #include <FastLED.h>
 
-#define DBG_TO_SERIAL
+
 #include <DbgTool.h>
 
-//#define CHECK_MEM
 #ifdef CHECK_MEM 
   #define _CM static
 #else

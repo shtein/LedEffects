@@ -158,8 +158,7 @@ void EffectEngine::onNumLedsChange(const struct CtrlQueueData &data){
   //Save new value
   _numLeds = numLeds;
 
-  DBG_OUTLN("Value: %d", data.value);  
-  DBG_OUTLN("New number of leds: %d", _numLeds);  
+  DBG_OUTLN("new number of leds: %d", _numLeds);  
 
  //Black the lights
   fill_solid(_leds + _numLeds, _maxLeds - _numLeds, CRGB::Black);
@@ -242,7 +241,7 @@ void EffectEngine::loop(const struct CtrlQueueItem &itm){
     
     //Safe config
     writeConfig();
-    DBG_OUTLN("Config saved");    
+    DBG_OUTLN("config saved");    
   }
 
 
