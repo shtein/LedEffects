@@ -18,8 +18,11 @@ EffectEngine::EffectEngine(){
   _millis          = 0;
   _millisToSaveCfg = 0;
 
-  //Random number initialization
-  randomSeed(analogRead(A0)); 
+  _flags           = 0;
+
+  //FastLed randmization seeding Random number initialization  
+  random16_set_seed(analogRead(0)); 
+  
 }
 
 EffectEngine::~EffectEngine(){
@@ -52,7 +55,7 @@ void EffectEngine::addEffect(Effect *effect){
   
 }  
 
-void EffectEngine::init(CRGB *leds, int maxLeds) {  
+void EffectEngine::init(CRGB *leds, int maxLeds, uint8_t flags) {  
  
   //Don't uncomment it if you don;t know what it is 
   //FastLED.setMaxPowerInVoltsAndMilliamps(5,1000);
@@ -60,11 +63,23 @@ void EffectEngine::init(CRGB *leds, int maxLeds) {
   _leds    = leds;
   _numLeds = maxLeds;
   _maxLeds = maxLeds;
+  _flags   = flags;
   
   fill_solid(_leds, _maxLeds, CRGB::Black);
   
   //Try to read from EEPROM
   readConfig();
+
+  //Check startup flags
+  if(_flags & EFF_RANDOM_START_MODE){
+    _modeNum           = random8(_numModes - 1); //random mode
+    CUR_MODE.effectNum = 0;                      //first effect
+  }
+
+  if(_flags & EFF_RANDOM_START_EFFECT){
+    CUR_MODE.effectNum = random8(CUR_MODE.numEffects - 1); //random effect
+
+  }
 
   //Set mode
   setMode(_modeNum);
@@ -76,7 +91,6 @@ void EffectEngine::init(CRGB *leds, int maxLeds) {
 void EffectEngine::showStrip() {
   FastLED.show();
 }
-
 
 void EffectEngine::onModeChange(const struct CtrlQueueData &data){ 
   //Get new mode value    

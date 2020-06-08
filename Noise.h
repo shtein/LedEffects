@@ -136,11 +136,11 @@ inline int EffectPlasma::getMaxStep() const{
 // Effect Confetti
 
 
-BEGIN_TRANFORM_SCHEMA_RGB16_PALETTE(FuncGetPal_Confetti)
-  TRANSOFRM_PALETTE(&OceanColors_p)
-  TRANSOFRM_PALETTE(&LavaColors_p)
-  TRANSOFRM_PALETTE(&ForestColors_p)
-  TRANSOFRM_PALETTE(&CloudColors_p)
+BEGIN_TRANSFORM_SCHEMA_RGB16_PALETTE(FuncGetPal_Confetti)
+  TRANSOFRM_PALETTE(OceanColors_p)
+  TRANSOFRM_PALETTE(LavaColors_p)
+  TRANSOFRM_PALETTE(ForestColors_p)
+  TRANSOFRM_PALETTE(CloudColors_p)
 END_TRANSFORM_SCHEMA()
 
 
@@ -183,20 +183,20 @@ inline void EffectConfetti::updateLeds(CRGB *leds, int numLeds){
 
 /////////////////////
 //Christmas
-BEGIN_TRANFORM_SCHEMA_GRADIENT_PALETTE(TransformChristmas)
+BEGIN_TRANSFORM_SCHEMA_GRADIENT_PALETTE(TransformChristmas)
   TRANSOFRM_PALETTE(christmattree1_gp)
 END_TRANSFORM_SCHEMA()
 
 ////////////////////
 // Autumn
-BEGIN_TRANFORM_SCHEMA_GRADIENT_PALETTE(TransformAutunm)
+BEGIN_TRANSFORM_SCHEMA_GRADIENT_PALETTE(TransformAutunm)
   TRANSOFRM_PALETTE(es_autumn_01_gp)
   TRANSOFRM_PALETTE(es_autumn_03_gp)
 END_TRANSFORM_SCHEMA()
 
 ///////////////////
 //Halloween - better autumn than autumn
-BEGIN_TRANFORM_SCHEMA_GRADIENT_PALETTE(TransformHalloween)
+BEGIN_TRANSFORM_SCHEMA_GRADIENT_PALETTE(TransformHalloween)
   TRANSOFRM_PALETTE(halloween_gp)
 END_TRANSFORM_SCHEMA()
 

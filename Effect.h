@@ -114,22 +114,24 @@ class EffectPaletteTransform: public Effect{
 //////////////////////////////////////////////////////
 // Color schemes - set of transforming theme palettes 
 
-#define BEGIN_TRANFORM_SCHEMA_TYPE(FunctionName, Type) \
+#define BEGIN_TRANSFORM_SCHEMA_TYPE(FunctionName, Type) \
 void FunctionName(CRGBPalette16 &pal){ \
-  const Type ts[] = {
+  struct _ts{ \
+    const Type &item; \
+  } const ts[] = {
 
 
-#define BEGIN_TRANFORM_SCHEMA_GRADIENT_PALETTE(FunctionName)  BEGIN_TRANFORM_SCHEMA_TYPE(FunctionName, TProgmemRGBGradientPalettePtr)
-#define BEGIN_TRANFORM_SCHEMA_RGB16_PALETTE(FunctionName)  BEGIN_TRANFORM_SCHEMA_TYPE(FunctionName, TProgmemRGBPalette16)
+#define BEGIN_TRANSFORM_SCHEMA_GRADIENT_PALETTE(FunctionName)  BEGIN_TRANSFORM_SCHEMA_TYPE(FunctionName, TProgmemRGBGradientPalettePtr)
+#define BEGIN_TRANSFORM_SCHEMA_RGB16_PALETTE(FunctionName)  BEGIN_TRANSFORM_SCHEMA_TYPE(FunctionName, TProgmemRGBPalette16)
 
 
 #define END_TRANSFORM_SCHEMA() }; \
-  pal = ts[random(0, sizeof(ts) / sizeof(ts[0]) + 1)]; \
+  pal = ts[random(0, sizeof(ts) / sizeof(ts[0]) + 1)].item; \
 } 
 
-#define TRANSOFRM_PALETTE(pal) pal, \
+#define TRANSOFRM_PALETTE(pal) pal,
 
- 
+
 /*
 Usage of transform shchema: 
 BEGIN_TRANFORM_SCHEMA_XXX(YourFunctionName)

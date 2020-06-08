@@ -34,6 +34,7 @@
 #define BEGIN_EFFECT_ENGINE() \
   _CM EffectEngine ee; \
   _CM CtrlPanel cp; \
+  _CM uint8_t flags = 0;
 
 #define END_EFFECT_ENGINE()  \
   _CM CtrlQueueItem itm; \
@@ -41,6 +42,9 @@
      cp.loop(itm); \
      ee.loop(itm); \
   }
+
+#define EFFECT_ENGION_FLAG(flag) \
+  flags |= flag;
 
 #define BEGIN_EFFECTS()
 
@@ -74,7 +78,7 @@
   FastLED.addLeds<Type, __VA_ARGS__ >(leds, sizeof(leds) / sizeof(leds[0])).setCorrection( TypicalLEDStrip );  
 
 #define END_LEDS() \
-    ee.init(leds, sizeof(leds) / sizeof(leds[0]));
+    ee.init(leds, sizeof(leds) / sizeof(leds[0]), flags);
 
 
 ///////////////////////////////////////

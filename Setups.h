@@ -155,15 +155,15 @@ void setup() {
         ADD_EFFECT(EffectTheaterChaseRainbow) 
       END_MODE()
       BEGIN_MODE(Chrsitmas, 3)      
-        ADD_EFFECT( TransformChristmas<EffectConfetti> )
-        ADD_EFFECT( TransformChristmas<EffectPlasma> )
-        ADD_EFFECT( TransformChristmas<EffectNoise> )
-      END_MODE()      
+        ADD_EFFECT_PARAM( EffectConfetti, &TransformChristmas)
+        ADD_EFFECT_PARAM( EffectPlasma, &TransformChristmas )
+        ADD_EFFECT_PARAM( EffectNoise, &TransformChristmas )
+      END_MODE()
       BEGIN_MODE(Halloween, 3)      
-        ADD_EFFECT( TransformHalloween<EffectConfetti> )
-        ADD_EFFECT( TransformAutunm<EffectPlasma> )
-        ADD_EFFECT( TransformHalloween<EffectNoise> )
-      END_MODE() 
+        ADD_EFFECT_PARAM( EffectConfetti, &TransformAutunm )
+        ADD_EFFECT_PARAM( EffectNoise, &TransformHalloween )
+        ADD_EFFECT_PARAM( EffectPlasma, &TransformAutunm )
+      END_MODE()
       BEGIN_MODE(Emergancy, 1)
         ADD_EFFECT(EffectEmergencyLights)         
       END_MODE()
@@ -260,8 +260,8 @@ void setup() {
   DBG_INIT();
   DBG_OUTLN("Led effect started -- deck");  
   //Effect Engine
-  BEGIN_EFFECT_ENGINE() 
-    
+  BEGIN_EFFECT_ENGINE()    
+    EFFECT_ENGION_FLAG(EFF_RANDOM_START_EFFECT)
     //Effects   
     BEGIN_EFFECTS()
       BEGIN_MODE(Effects, 8)        
@@ -510,7 +510,7 @@ void setup() {
   DBG_OUTLN("Led effect started -- Tahoe");  
   //Effect Engine
   BEGIN_EFFECT_ENGINE() 
-  
+    EFFECT_ENGION_FLAG(EFF_RANDOM_START_EFFECT)
     //Effects   
     BEGIN_EFFECTS()
       BEGIN_MODE(Effects, 7)        

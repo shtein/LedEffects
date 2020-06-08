@@ -5,8 +5,13 @@
 
 class Effect;
 
+//Data limits
 #define MAX_EFFECTS 15
 #define MAX_MODES   5
+
+//Engine flags
+#define EFF_RANDOM_START_MODE     0x01
+#define EFF_RANDOM_START_EFFECT   0x02
 
 /////////////////////////////////
 // EffectEngine
@@ -15,9 +20,9 @@ class EffectEngine{
     EffectEngine();
     ~EffectEngine();
 
-    void init(CRGB *leds, int maxLeds);
+    void init(CRGB *leds, int maxLeds, uint8_t flags = 0);
     void addMode(Effect **effects); //add mode
-    void addEffect(Effect *effect);                    //add effect to current mode
+    void addEffect(Effect *effect); //add effect to current mode
     
     void loop(const struct CtrlQueueItem &itm);    
     
@@ -28,7 +33,6 @@ class EffectEngine{
     void onModeChange(const struct CtrlQueueData &data);
     void onNumLedsChange(const struct CtrlQueueData &data);
     void onEffectChange(const struct CtrlQueueData &data); 
-    void onCmdDefaul(const struct CtrlQueueItem &itm);
     
 
     //Internal routines
@@ -53,8 +57,10 @@ class EffectEngine{
     uint8_t    _modeNum:4;                //Current mode
 
     CRGB       *_leds;                    //Leds
-    uint16_t   _maxLeds;                  //Max number of leds    
-    uint16_t   _numLeds;                  //Actual number of leds    
+    uint16_t   _maxLeds:12;               //Max number of leds    
+    uint16_t   _numLeds:12;               //Actual number of leds
+
+    uint16_t   _flags:8;                  //Flags 
    
     unsigned long _millis;                //Processing
     unsigned long _millisToSaveCfg;       //When to safe config
