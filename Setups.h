@@ -330,7 +330,7 @@ void setup() {
       BEGIN_MODE(Halloween, 3)      
         ADD_EFFECT_PARAM( EffectConfetti, &TransformHalloween )
         ADD_EFFECT_PARAM( EffectPlasma, &TransformAutunm )
-        ADD_EFFECT( EffectNoise, &TransformHalloween )
+        ADD_EFFECT_PARAM( EffectNoise, &TransformHalloween )
       END_MODE()
       BEGIN_MODE(Other, 15)        
         ADD_EFFECT(EffectRipple)   

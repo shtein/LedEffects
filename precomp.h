@@ -4,7 +4,6 @@
 #include <Arduino.h>
 #include <FastLED.h>
 
-
 #include <DbgTool.h>
 
 #ifdef CHECK_MEM 
