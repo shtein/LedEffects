@@ -5,7 +5,7 @@
 // MSGEQ7 sound captupre
 class SoundCaptureMSGEQ7: public SoundCapture{
   public:
-    SoundCaptureMSGEQ7(uint8_t pinAnalog, uint8_t pinStrobe, uint8_t pinReset);
+    SoundCaptureMSGEQ7(unsigned char pinAnalog, uint8_t pinStrobe, uint8_t pinReset);
     ~SoundCaptureMSGEQ7();
 
     void init();

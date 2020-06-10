@@ -1,15 +1,18 @@
 #ifndef __EFFECT_H
 #define __EFFECT_H
 
-#include "EffectEngineCtx.h"
 #include "Palette.h"
+
+///////////////////
+// Helpers
+#define qsuba(x, b)  ((x > b) ? x - b : 0) 
 
 ///////////////////
 // Basic effect
 
-
 class CRGB;
 class CHSV;
+class CtrlQueueItem;
 
 class Effect{
   public:

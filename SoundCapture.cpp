@@ -1,5 +1,5 @@
-#include "precomp.h"
-#include "Effect.h"
+#include "LedEffects.h"
+//#include "Effect.h"
 #include "SoundCapture.h"
 
 ////////////////////////////

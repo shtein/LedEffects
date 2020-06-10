@@ -1,8 +1,6 @@
 #ifndef __EFFECTENGINECTX_H
 #define __EFFECTENGINECTX_H
 
-#include <Controls.h>
-
 //Speed delay
 #define SPEED_DELAY_MIN 10
 #define SPEED_DELAY_MAX 1000

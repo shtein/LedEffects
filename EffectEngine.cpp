@@ -1,8 +1,13 @@
-#include "precomp.h"
+#include "LedEffects.h"
+
+#include <EEPROM.h>
+#include <Fastled.h>
+#include <Controls.h>
+
 #include "Effect.h"
 #include "EffectEngine.h"
 #include "EffectEngineCtx.h"
-#include <EEPROM.h>
+
 
 #define CUR_MODE _modes[_modeNum]  
 

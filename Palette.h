@@ -1,7 +1,6 @@
 #ifndef __PALETTE_H
 #define __PALETTE_H
 
-
 //Halloween
 DECLARE_GRADIENT_PALETTE( halloween_gp);
 

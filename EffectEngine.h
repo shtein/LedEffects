@@ -1,8 +1,8 @@
 #ifndef __EFFECTENGINE_H
 #define __EFFECTENGINE_H
 
-#include "EffectEngineCtx.h"
 
+class CtrlQueueItem;
 class Effect;
 
 //Data limits

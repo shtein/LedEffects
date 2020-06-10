@@ -1,6 +1,15 @@
 #ifndef __MACRO_H
 #define __MACRO_H
 
+///////////////////////////////
+//Memory check during compilation
+#ifdef CHECK_MEM 
+  #define _CM static
+#else
+  #define _CM
+#endif
+
+
 ///////////////////////////////////////
 //Macros for temp variable names
 #define TOKEN_CONCAT(x, y) x ## y

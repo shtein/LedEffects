@@ -1,4 +1,5 @@
-#include "precomp.h"
+#include "LedEffects.h"
+
 #include "SoundCapture.h"
 #include "MSGEQ7SC.h"
 

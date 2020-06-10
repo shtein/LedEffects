@@ -1,4 +1,6 @@
-#include "precomp.h"
+#include "LedEffects.h"
+
+#include <FastLED.h>
 #include "Palette.h"
 
 //Autumn and Halloween

@@ -1,6 +1,4 @@
 
-
-
 //Define configuration
 //#define __OUTAGE_LAMP_SETUP
 //#define __SASHA_SETUP
@@ -12,8 +10,6 @@
 //#define __VADIM_SETUP
 //#define __TAHOE_SETUP
 
-#include <AnalogInput.h>
-#include <Controls.h>
 
 //This is where setup() function is
 #include "setups.h"

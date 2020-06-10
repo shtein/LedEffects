@@ -1,12 +1,34 @@
 #ifndef __SETUPS_H
 #define __SETUPS_H
 
-#include "precomp.h"
 #include "LedEffects.h"
+
+#include <FastLED.h>
+
+#include <AnalogInput.h>
+#include <Controls.h>
+
 #include "EffectEngine.h"
-#include "Controls.h"
+#include "EffectEngineCtx.h"
+#include "Effect.h"
+
 #include "Macro.h"
 #include "Pins.h"
+
+//Effects
+#include "Effects/Rainbow.h"
+#include "Effects/FadeInOut.h"
+#include "Effects/RunningLights.h"
+#include "Effects/ColorWipe.h"
+#include "Effects/MoodBlobs.h"
+#include "Effects/Static.h"
+#include "Effects/Noise.h"
+#include "Effects/Blur.h"
+#include "Effects/EmergencyLights.h"
+#include "Effects/Fire.h"
+#include "Effects/Meteor.h"
+#include "Effects/Ripple.h"
+#include "Sound.h"
 
 
 #if defined(__OUTAGE_LAMP_SETUP)

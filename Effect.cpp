@@ -1,4 +1,8 @@
-#include "precomp.h"
+#include "LedEffects.h"
+
+#include <Fastled.h>
+#include <Controls.h>
+
 #include "effectenginectx.h"
 #include "effect.h"
 
