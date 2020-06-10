@@ -1,14 +1,6 @@
+//For Platformio specific setup is defined in platformio.ini using build_flags -DXXX option
+//Far arduino IDE it needs to be #define XXX explictely in ledeffects.h
 
-//Define configuration
-//#define __OUTAGE_LAMP_SETUP
-//#define __SASHA_SETUP
-//#define __DAVID_SETUP
-//#define __IGOR_SETUP
-//#define __DECK_SETUP
-//#define __CHRISTMAS_TREE_SETUP
-//#define __WINDOW_SETUP
-//#define __VADIM_SETUP
-//#define __TAHOE_SETUP
 
 
 #include "LedEffects.h"
@@ -21,6 +13,7 @@
 #include "EffectEngine.h"
 #include "EffectEngineCtx.h"
 #include "Effect.h"
+#include "EffectSound.h"
 
 #include "Macro.h"
 #include "Pins.h"
@@ -92,6 +85,8 @@ void setup(){
 ////////////////////////////////////////
 // WS2812b strip, 212 LEDs, 1 push button, remote control
 #pragma message "Compile for Sasha"
+
+
 
 void setup() {
   DBG_INIT();
@@ -305,7 +300,7 @@ void setup() {
         ADD_EFFECT(EffectNoise)            
         ADD_EFFECT(EffectMoodBlobs) 
       END_MODE()
-      /*
+      
       BEGIN_MODE(Halloween, 3)      
         ADD_EFFECT_PARAM( EffectConfetti, &TransformHalloween )
         ADD_EFFECT_PARAM( EffectPlasma, &TransformAutunm )
@@ -317,7 +312,7 @@ void setup() {
         ADD_EFFECT_PARAM( EffectPlasma, &TransformChristmas )
         ADD_EFFECT_PARAM( EffectNoise, &TransformChristmas )
       END_MODE()
-      */
+    
       
     END_EFFECTS()
     

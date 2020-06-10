@@ -1,8 +1,6 @@
 #ifndef __SOUND_H
 #define __SOUND_H
 
-#include "SoundCapture.h"
-#include "EffectSound.h"
 
 ////////////////////////////////
 // EffectSoundSimple - very basic sound effect for testing
