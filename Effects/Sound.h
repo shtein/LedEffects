@@ -4,14 +4,9 @@
 #include "SoundCapture.h"
 #include "EffectSound.h"
 
-/////////////////////////////////////////
-//SoundCaptureStub - for testing
-
-
-
-
 ////////////////////////////////
-// EffectSoundSimple - very basic sound effect
+// EffectSoundSimple - very basic sound effect for testing
+
 class EffectSoundSimple: public EffectSound<Effect>{
 
   protected:
