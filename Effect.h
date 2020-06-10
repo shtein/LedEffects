@@ -97,7 +97,7 @@ class EffectPaletteTransform: public Effect{
     virtual void updateColors();
     virtual void updateLeds(CRGB *leds, int numLeds);
     
-    
+      
     virtual bool isReadyToBlendPal() const;
     virtual bool isReadyToChangePal() const;
 

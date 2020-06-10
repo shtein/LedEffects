@@ -675,5 +675,7 @@ void setup() {
   END_EFFECT_ENGINE() 
 }
 
+#endif
+
 void loop(){
 }
