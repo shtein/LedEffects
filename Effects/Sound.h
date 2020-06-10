@@ -7,30 +7,7 @@
 /////////////////////////////////////////
 //SoundCaptureStub - for testing
 
-class SoundCaptureStub:public SoundCapture{
-public:
-    void init();
-    void reset(); 
-    void idle(); 
-    void getData(SoundCaptureData &data) const;
-};
 
-
-inline void SoundCaptureStub::init(){
-}
-
-inline void SoundCaptureStub::reset(){
-}
-
-inline void SoundCaptureStub::idle(){
-}
-
-inline void SoundCaptureStub::getData(SoundCaptureData &data) const{
-
-  for(int i = 0; i < MAX_BANDS; i++){
-    data.bands[i] = random8();
-  }
-}
 
 
 ////////////////////////////////

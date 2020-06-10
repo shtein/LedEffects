@@ -28,8 +28,7 @@
 #include "Effects/Fire.h"
 #include "Effects/Meteor.h"
 #include "Effects/Ripple.h"
-#include "Sound.h"
-
+#include "Effects/Sound.h"
 
 #if defined(__OUTAGE_LAMP_SETUP)
 ////////////////////////////////////////
@@ -584,8 +583,7 @@ void setup() {
 #else 
 ////////////////////////////////////////
 // Everything else
-#include "Sound.h"
-#include "MSGEQ7SC.h"
+#include <SoundCapture.h>
 
 #pragma message "Compile for default"
 
