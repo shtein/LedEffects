@@ -72,7 +72,7 @@ inline CHSV Meteor::getHSV() const{
 // Effect Meteor Rain
 
 
-#define METEORS_NUMBER 2
+
 
 #define METEOR_SIZE_MIN 2
 #define METEOR_SIZE_MAX 5
@@ -80,7 +80,7 @@ inline CHSV Meteor::getHSV() const{
 #define METEOR_SPEED_MIN 2
 #define METEOR_SPEED_MAX 3
 
-
+template <const int MAX_METEORS = 2>
 class EffectMeteorRain: public Effect{
 public:
   EffectMeteorRain();
@@ -92,29 +92,30 @@ protected:
 
 protected:
 
-  Meteor _meteors[METEORS_NUMBER];
+  Meteor _meteors[MAX_METEORS];
 };
 
-
-inline EffectMeteorRain::EffectMeteorRain(){
+template <const int MAX_METEORS>
+inline EffectMeteorRain<MAX_METEORS>::EffectMeteorRain(){
   setSpeedDelay(50);
 }
 
-inline EffectMeteorRain::~EffectMeteorRain(){
+template <const int MAX_METEORS>
+inline EffectMeteorRain<MAX_METEORS>::~EffectMeteorRain(){
 }
 
+template <const int MAX_METEORS>
+inline void EffectMeteorRain<MAX_METEORS>::reset(){    
 
-inline void EffectMeteorRain::reset(){    
-
-  for(int16_t i = 0; i < METEORS_NUMBER; i++){
+  for(int16_t i = 0; i < MAX_METEORS; i++){
     //Ret meteor position
     _meteors[i].setup(random8(METEOR_SPEED_MIN, METEOR_SPEED_MAX + 1), random8(METEOR_SIZE_MIN, METEOR_SIZE_MAX + 1));
   }
 }
 
 
-
-void EffectMeteorRain::proceed(CRGB *leds, int numLeds){
+template <const int MAX_METEORS>
+void EffectMeteorRain<MAX_METEORS>::proceed(CRGB *leds, int numLeds){
   //Fade it all first
   for(int16_t i = 0; i < numLeds; i++ ){
     
@@ -124,7 +125,7 @@ void EffectMeteorRain::proceed(CRGB *leds, int numLeds){
 
   //Proceed with meteors
   uint8_t done = 0;  
-  for(int16_t i = 0; i < METEORS_NUMBER; i++){
+  for(int16_t i = 0; i < MAX_METEORS; i++){
 
     Meteor &meteor = _meteors[i];
     
@@ -150,7 +151,7 @@ void EffectMeteorRain::proceed(CRGB *leds, int numLeds){
   }
 
   //Start meteors
-  if(done == METEORS_NUMBER){
+  if(done == MAX_METEORS){
     reset();
   }
   

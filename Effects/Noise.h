@@ -170,10 +170,22 @@ inline int EffectConfetti::getMaxStep() const{
   return CONFETTI_MAX_STEPS;
 }
 
+
+#define LEDS_MAX 150
+
 inline void EffectConfetti::updateLeds(CRGB *leds, int numLeds){
-  
+  //Fade all
   fadeToBlackBy(leds, numLeds, 8);                     
-  leds[random16(numLeds)] = ColorFromPalette(_palCurrent, random8(255), 255, LINEARBLEND);
+
+  //Once per each LEDS_MAX leds
+  int cnt = numLeds / LEDS_MAX + 1;
+  for(int i = 0; i < cnt; i++){
+    int ledIndex = random16(cnt * LEDS_MAX);
+
+    if(ledIndex < numLeds)
+      leds[ledIndex] = ColorFromPalette(_palCurrent, random8(255), 255, LINEARBLEND);
+  } 
+  
 }
 
 
@@ -198,6 +210,13 @@ END_TRANSFORM_SCHEMA()
 //Halloween - better autumn than autumn
 BEGIN_TRANSFORM_SCHEMA_GRADIENT_PALETTE(TransformHalloween)
   TRANSOFRM_PALETTE(halloween_gp)
+END_TRANSFORM_SCHEMA()
+
+
+///////////////////
+//Patriot - US 4th of July
+BEGIN_TRANSFORM_SCHEMA_GRADIENT_PALETTE(July4th)
+  TRANSOFRM_PALETTE(july4_2_gp)
 END_TRANSFORM_SCHEMA()
 
 

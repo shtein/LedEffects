@@ -5,7 +5,7 @@
 //#define __OUTAGE_LAMP_SETUP
 //#define __SASHA_SETUP
 
-//To enable debug log via serail or IR Remote for Arduino IDE, use arduinolib.h 
+//To enable debug log via serail or IR Remote when compile in Arduino IDE, use arduinolib.h 
 
 #include <Arduino.h>
 #include <arduinolib.h>

@@ -1,120 +1,53 @@
 #ifndef __EFFECT_SOUND_H
 #define __EFFECT_SOUND_H
 
-#include "SoundCapture.h"
+
 
 ////////////////////////////////////////////
-// EffectSound - sound effect template
-// This template is intended to instantiated with Effect, EffectColor or classes inhertied from them except for EffectPaletteTransform
+// EffectSound - sound effect 
 // 
+#define MAX_BANDS 7
 
+class SoundCapture;
 
-template <class T>
-class EffectSound: public T{
+typedef struct {
+  uint8_t bands[MAX_BANDS]; //8 bit for each band
+
+  uint8_t lower;            //Lower boundary
+  uint8_t upper;            //Upper boundary
+  uint8_t max;              //Maximum
+  uint8_t min;              //Minimum
+} band8_visual; 
+
+class EffectSound: public Effect{
   public:
     EffectSound();
     ~EffectSound();
+
+    static void initSoundCapture(SoundCapture *sc);
     
     virtual void idle();
+    virtual void onCmd(const struct CtrlQueueItem &itm);
     
   protected:
     virtual void reset();
-    virtual void proceed(CRGB *leds, int numLeds);
+    virtual void proceed(CRGB *leds, int numLeds);    
 
     virtual void updateLeds(CRGB *leds, 
                             int numLeds, 
-                            const SoundCaptureData &data) = 0;
-};
+                            const band8_visual &data) = 0;
 
+    void getBands(band8_visual &output);
 
-template<class T>
-EffectSound<T>::EffectSound(){
-  T::setSpeedDelay(10);
-}
-
-template<class T>
-EffectSound<T>::~EffectSound(){
-}
-
-
-template<class T>
-void EffectSound<T>::reset(){
-
-  //Retrive instance
-  SoundCapture *sc = SoundCapture::getInstance();
-  
-  if(sc){
-    //Reset instance
-    sc->reset();
-  }
-
-  T::reset();
-}
-
-template<class T>
-void EffectSound<T>::proceed(CRGB *leds, int numLeds){
-
-  //Retrive instance
-  SoundCapture *sc = SoundCapture::getInstance();
-
-  if(sc){
+  private:
+    static SoundCapture *_sc;       //Single instance of sound capture
     
-    //Retrieve data
-    SoundCaptureData data;
-    sc->getData(data);
+    static uint8_t      _lower;    //Lower boundary from 0 to _upper
+    static uint8_t      _upper;    //Upper boundary from _lower to 255
 
-    //Show leds
-    updateLeds(leds, numLeds, data);
-  }
-}
-
-
-
-template<class T>
- void EffectSound<T>::idle(){    
-
-  //Retrive instance
-  SoundCapture *sc = SoundCapture::getInstance();
-
-  if(sc){
-    //Call idle
-    sc->idle();
-  }
-}
-
-//////////////////////////////////////
-// EffectSoundPT - sound effect with palette transformation template
-// This template is intended to use with EffectPaletteTransform or classes inherited from it
-//
-
-
-template<class T>
-class EffectSoundPT: public EffectSound<T>{
-  public:
-    EffectSoundPT();
-    ~EffectSoundPT();
-
-  
-  protected:
-    //Need to be overitten
-    virtual void proceed(CRGB *leds, int numLeds);
-  
+    static uint8_t      _max;         //Maximum
+    static uint8_t      _min;         //Minimum
 };
-
-template<class T>
-EffectSoundPT<T>::EffectSoundPT(){
-}
-
-template<class T>
-EffectSoundPT<T>::~EffectSoundPT(){
-}
-
-
-template<class T>
-void EffectSoundPT<T>::proceed(CRGB *leds, int numLeds){
-    T::onStep();
-    EffectSound<T>::proceed(leds, numLeds);
-}
 
 
 

@@ -13,8 +13,12 @@ DECLARE_GRADIENT_PALETTE( es_autumn_20_gp );
 DECLARE_GRADIENT_PALETTE( es_autumn_16_gp );
 
 //Christmas
-DECLARE_GRADIENT_PALETTE(christmattree1_gp);
+DECLARE_GRADIENT_PALETTE( christmattree1_gp );
 
+//US Patriot
+DECLARE_GRADIENT_PALETTE( patriot_gp );
+DECLARE_GRADIENT_PALETTE( patriot_black_gp );
+DECLARE_GRADIENT_PALETTE( july4_2_gp );
 
 
 

@@ -4,9 +4,6 @@
 //Analog pin to control number of LEDs
 #define NUMLEDS_PIN 0
 
-//Analog pin to control microphone sensitivity
-#define MIC_SENS_PIN 4
-
 //Analog pin to control microphone
 #define MIC_PIN 5
 
@@ -38,6 +35,10 @@
 #define MSGEQ7_ANALOG_PIN 3
 #define MSGEQ7_STROBE_PIN 2
 #define MSGEQ7_RESET_PIN  3
+
+//Analog pin to control noise threshold and sensitivity
+#define SOUND_LOW_PIN  4
+#define SOUND_HIGH_PIN 5
 
 
 

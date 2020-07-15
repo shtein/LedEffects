@@ -77,13 +77,12 @@ void EffectEngine::init(CRGB *leds, int maxLeds, uint8_t flags) {
 
   //Check startup flags
   if(_flags & EFF_RANDOM_START_MODE){
-    _modeNum           = random8(_numModes - 1); //random mode
+    _modeNum           = random8(_numModes); //random mode
     CUR_MODE.effectNum = 0;                      //first effect
   }
 
   if(_flags & EFF_RANDOM_START_EFFECT){
-    CUR_MODE.effectNum = random8(CUR_MODE.numEffects - 1); //random effect
-
+    CUR_MODE.effectNum = random8(CUR_MODE.numEffects); //random effect
   }
 
   //Set mode

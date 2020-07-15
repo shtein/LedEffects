@@ -118,3 +118,64 @@ DEFINE_GRADIENT_PALETTE( christmattree1_gp ) {
   232,   1, 80,  3,
   249, 232,235,237,
   255, 140, 97, 11};
+
+
+
+// Gradient palette "patriot_gp", originally from
+// http://soliton.vm.bytemark.co.uk/pub/cpt-city/rc/tn/patriot.png.index.html
+// converted for FastLED with gammas (2.6, 2.2, 2.5)
+// Size: 16 bytes of program space.
+
+DEFINE_GRADIENT_PALETTE( patriot_gp ) {
+    0, 255,  0,  0,
+  122, 255,  0,  0,
+  132,   0, 16,255,
+  255,   0, 16,255};
+
+
+  // Gradient palette "patriot_black_gp", originally from
+// http://soliton.vm.bytemark.co.uk/pub/cpt-city/pj/classic/tn/patriot-black.png.index.html
+// converted for FastLED with gammas (2.6, 2.2, 2.5)
+// Size: 24 bytes of program space.
+
+DEFINE_GRADIENT_PALETTE( patriot_black_gp ) {
+    0, 227,  1,  1,
+   61, 255,255,255,
+  127,   0,  0,125,
+  191,   0,  0,  0,
+  252, 227,  1,  1,
+  255, 227,  1,  1};
+
+
+// Gradient palette "july4_2_gp", originally from
+// http://soliton.vm.bytemark.co.uk/pub/cpt-city/pj/7/tn/july4-2.png.index.html
+// converted for FastLED with gammas (2.6, 2.2, 2.5)
+// Size: 96 bytes of program space.
+
+DEFINE_GRADIENT_PALETTE( july4_2_gp ) {
+    0, 206,213,203,
+    7, 242,241,237,
+    7, 255,255,255,
+   15,  60, 73, 88,
+   25,   1,  1, 18,
+   43,   2,  3, 96,
+   58,   1,  4, 33,
+   71,   1,  4, 33,
+   86,   2,  3, 96,
+   94,  45, 60, 88,
+  101, 242,241,237,
+  109, 242,241,237,
+  117, 242,241,237,
+  127,  65, 40, 30,
+  140, 107,  1,  1,
+  150, 121,  1,  1,
+  165, 121,  1,  1,
+  173,  25,  1,  1,
+  183,  25,  1,  1,
+  209, 107,  1,  1,
+  219,  25,  1,  1,
+  226, 171,138,156,
+  237, 234,255,233,
+  255, 234,255,233};
+
+

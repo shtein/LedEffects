@@ -9,6 +9,7 @@
 
 #include <AnalogInput.h>
 #include <Controls.h>
+#include <SoundCapture.h>
 
 #include "EffectEngine.h"
 #include "EffectEngineCtx.h"
@@ -98,7 +99,7 @@ void setup() {
     //Effects   
     BEGIN_EFFECTS()
       BEGIN_MODE(Effects, 15)
-        ADD_EFFECT(EffectMeteorRain)
+        ADD_EFFECT(EffectMeteorRain<>)
         ADD_EFFECT(EffectPlasma)
         ADD_EFFECT(EffectConfetti)
         ADD_EFFECT(EffectPaletteTransformFast) 
@@ -166,7 +167,7 @@ void setup() {
     BEGIN_EFFECTS()
       BEGIN_MODE(Effects, 15)
         ADD_EFFECT(EffectFire)
-        ADD_EFFECT(EffectMeteorRain)
+        ADD_EFFECT(EffectMeteorRain<>)
         ADD_EFFECT(EffectPlasma)
         ADD_EFFECT(EffectConfetti)
         ADD_EFFECT(EffectPaletteTransformFast) 
@@ -232,7 +233,7 @@ void setup() {
     BEGIN_EFFECTS()
       BEGIN_MODE(Effects, 15)
         ADD_EFFECT(EffectFire)
-        ADD_EFFECT(EffectMeteorRain)
+        ADD_EFFECT(EffectMeteorRain<>)
         ADD_EFFECT(EffectPlasma)
         ADD_EFFECT(EffectConfetti)
         ADD_EFFECT(EffectPaletteTransformFast) 
@@ -291,8 +292,8 @@ void setup() {
     //Effects   
     BEGIN_EFFECTS()
       BEGIN_MODE(Effects, 8)        
-        ADD_EFFECT(EffectRipple)
-        ADD_EFFECT(EffectMeteorRain)   
+        ADD_EFFECT(EffectRipple<>)
+        ADD_EFFECT(EffectMeteorRain<>)   
         ADD_EFFECT(EffectPlasma)        
         ADD_EFFECT(EffectConfetti)
         ADD_EFFECT(EffectBlur)
@@ -359,8 +360,8 @@ void setup() {
         ADD_EFFECT_PARAM( EffectNoise, &TransformHalloween )
       END_MODE()
       BEGIN_MODE(Other, 15)        
-        ADD_EFFECT(EffectRipple)   
-        ADD_EFFECT(EffectMeteorRain)
+        ADD_EFFECT(EffectRipple<>)   
+        ADD_EFFECT(EffectMeteorRain<>)
         ADD_EFFECT(EffectPlasma)
         ADD_EFFECT(EffectConfetti)
         //ADD_EFFECT(EffectPaletteTransformFast) 
@@ -423,9 +424,9 @@ void setup() {
         ADD_EFFECT_PARAM( EffectNoise, &TransformChristmas )
       END_MODE()      
       BEGIN_MODE(Effects, 15)
-        ADD_EFFECT(EffectRipple)
+        ADD_EFFECT(EffectRipple<>)
         ADD_EFFECT(EffectFire)
-        ADD_EFFECT(EffectMeteorRain)
+        ADD_EFFECT(EffectMeteorRain<>)
         ADD_EFFECT(EffectPlasma)
         ADD_EFFECT(EffectConfetti)
         ADD_EFFECT(EffectPaletteTransformFast) 
@@ -488,8 +489,8 @@ void setup() {
       END_MODE()
       
       BEGIN_MODE(Other, 15)        
-        ADD_EFFECT(EffectRipple)   
-        ADD_EFFECT(EffectMeteorRain)
+        ADD_EFFECT(EffectRipple<>)   
+        ADD_EFFECT(EffectMeteorRain<>)
         ADD_EFFECT(EffectPlasma)
         ADD_EFFECT(EffectConfetti)
         //ADD_EFFECT(EffectPaletteTransformFast) 
@@ -528,7 +529,7 @@ void setup() {
 #elif defined(__TAHOE_SETUP)
 
 ////////////////////////////////////////
-// WS2811 string, 12v 300 LEDs, 1 push button - change effect only
+// WS2811 string, 12v 406 LEDs, remote with separate buttons for effect and mode change, one button for effect and mode change
 #pragma message "Compile Tahoe"
 
 void setup() {
@@ -540,8 +541,8 @@ void setup() {
     //Effects   
     BEGIN_EFFECTS()
       BEGIN_MODE(Effects, 7)        
-        ADD_EFFECT(EffectRipple)
-        ADD_EFFECT(EffectMeteorRain)   
+        ADD_EFFECT(EffectRipple<10>)
+        ADD_EFFECT(EffectMeteorRain<>)   
         ADD_EFFECT(EffectPlasma)        
         ADD_EFFECT(EffectConfetti)
         ADD_EFFECT(EffectBlur)
@@ -552,15 +553,17 @@ void setup() {
       BEGIN_MODE(Halloween, 3)      
         ADD_EFFECT_PARAM( EffectConfetti, &TransformAutunm )
         ADD_EFFECT_PARAM( EffectNoise, &TransformHalloween )
-        ADD_EFFECT_PARAM( EffectPlasma, &TransformAutunm )
       END_MODE()
       
       BEGIN_MODE(Chrsitmas, 3)      
         ADD_EFFECT_PARAM( EffectConfetti, &TransformChristmas)
         ADD_EFFECT_PARAM( EffectPlasma, &TransformChristmas )
-        ADD_EFFECT_PARAM( EffectNoise, &TransformChristmas )
       END_MODE()
-      
+
+      BEGIN_MODE(July4, 3)      
+        ADD_EFFECT_PARAM( EffectConfetti, &July4th )
+        ADD_EFFECT_PARAM( EffectNoise, &July4th )
+      END_MODE()
     END_EFFECTS()
     
     //Leds
@@ -604,10 +607,14 @@ void setup() {
     BEGIN_EFFECTS()
       BEGIN_MODE(Sound, 3)            
         ADD_EFFECT(EffectSoundSimple)
+        //ADD_EFFECT_PARAM( EffectConfetti, &July4th)
+        //ADD_EFFECT_PARAM( EffectNoise, &July4th )
+        //ADD_EFFECT_PARAM( EffectPlasma, &July4th )
+        
       END_MODE()
       BEGIN_MODE(Effects, 15)
         //ADD_EFFECT(EffectFire)
-        //ADD_EFFECT(EffectMeteorRain)
+        //ADD_EFFECT(EffectMeteorRain<>)
         //ADD_EFFECT(EffectPlasma)
         //ADD_EFFECT(EffectConfetti)
         //ADD_EFFECT(EffectPaletteTransformFast) 
@@ -630,7 +637,7 @@ void setup() {
     END_EFFECTS()
     
     //Leds
-    BEGIN_LEDS(33) //31 for EK outage lamp, 50 for test or David, 267 for deck, 88 for Igor, 212 for Sasha, 300 for Christmass Tree (150 for new Christmass Tree), 100 for old 2801 leds
+    BEGIN_LEDS(35) //31 for EK outage lamp, 50 for test or David, 267 for deck, 88 for Igor, 212 for Sasha, 300 for Christmass Tree (150 for new Christmass Tree), 100 for old 2801 leds
       ADD_STRIP(NEOPIXEL, LED_PIN)
     END_LEDS()
 
@@ -642,6 +649,9 @@ void setup() {
         PUSH_BUTTON_TO_CMD(EEMC_MODE, PB_CONTROL_PUSH_LONG)
         PUSH_BUTTON_TO_CMD(EEMC_EFFECT, PB_CONTROL_CLICK_SHORT)      
       END_PUSH_BUTTON() 
+
+      POT_TO_CMD(EEMC_SOUND_LOW, SOUND_LOW_PIN)
+      POT_TO_CMD(EEMC_SOUND_HIGH, SOUND_HIGH_PIN)
      
     
       //PUSH_BUTTON_SA_TO_CMD(EEMC_MODE, MODE_PIN)            //Mode
