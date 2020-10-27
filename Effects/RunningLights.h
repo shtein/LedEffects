@@ -13,14 +13,10 @@ class EffectRunningLights: public EffectColor{
   protected:
     void proceed(CRGB *leds, int numLeds); 
     void reset();
-
-  protected:
-    uint8_t  _step;
 };
 
 
 inline EffectRunningLights::EffectRunningLights(){
-  _step = 0;
   setHSV(CHSV(HUE_RED, 0xFF, 0xFF));
   setSpeedDelay(50);
 }
@@ -29,7 +25,7 @@ inline EffectRunningLights::~EffectRunningLights(){
 }
 
 inline void EffectRunningLights::reset(){
-  _step = 0;
+  _ctx.step = 0;
 }
 
 
@@ -39,11 +35,11 @@ inline void EffectRunningLights::proceed(CRGB *leds, int numLeds){
   for(int i = 0; i< numLeds; i++) {   
     
     CHSV hsv = getHSV();
-    hsv.v  = sin8( ((i + _step) % RL_SIZE) * 255 / (RL_SIZE - 1) );
+    hsv.v  = sin8( ((i + _ctx.step) % RL_SIZE) * 255 / (RL_SIZE - 1) );
     setPixel(leds[i], hsv);
   }  
   
-  _step = (_step + 1) % RL_SIZE;
+  _ctx.step = (_ctx.step + 1) % RL_SIZE;
 }
 
 

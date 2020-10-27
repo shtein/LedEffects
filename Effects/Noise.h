@@ -24,11 +24,7 @@ inline EffectPaletteTransformFast::~EffectPaletteTransformFast(){
 inline void EffectPaletteTransformFast::updateLeds(CRGB *leds, int numLeds){  
   //Do full range for current palette
   for(int i = 0; i < numLeds; i++){       
-    leds[i]  = ColorFromPalette(_palCurrent, 
-                                 (uint8_t)map(i, 0, numLeds - 1, 0, 255), 
-                                 255, 
-                                 LINEARBLEND 
-                               );
+    leds[i]  = getCurrentPalColor((uint8_t)map(i, 0, numLeds - 1, 0, 255));
   }
 }
 
@@ -70,11 +66,7 @@ inline void EffectNoise::updateLeds(CRGB *leds, int numLeds){
   
   //Do default actions
   for(int i = 0; i < numLeds; i++){       
-    leds[i]  = ColorFromPalette(_palCurrent, 
-                                 (uint8_t)( inoise8(i * XSCALE, _dist + i * YSCALE) % 255 ),
-                                 255, 
-                                 LINEARBLEND 
-                               );
+    leds[i]  = getCurrentPalColor((uint8_t)( inoise8(i * XSCALE, _dist + i * YSCALE) % 255 ));
   }
 
   
@@ -121,7 +113,7 @@ inline void EffectPlasma::updateLeds(CRGB *leds, int numLeds){
     int clrIndex      = cubicwave8( (i * 23) + phase1) / 2 + cos8( (i * 15) + phase2) / 2;
     int clrBrightness = qsuba(clrIndex, beatsin8(7, 0, 96));
     
-    leds[i] = ColorFromPalette(_palCurrent, clrIndex, clrBrightness, LINEARBLEND);
+    leds[i] = getCurrentPalColor(clrIndex, clrBrightness);
   }  
 }
 
@@ -183,7 +175,7 @@ inline void EffectConfetti::updateLeds(CRGB *leds, int numLeds){
     int ledIndex = random16(cnt * LEDS_MAX);
 
     if(ledIndex < numLeds)
-      leds[ledIndex] = ColorFromPalette(_palCurrent, random8(255), 255, LINEARBLEND);
+      leds[ledIndex] = getCurrentPalColor(random8());
   } 
   
 }

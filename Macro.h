@@ -20,7 +20,7 @@
 
 #define EFFECT_NAME VAR_NAME(efct)
 
-#define BTN VAR_NAME(btn) //Temp button variable
+#define BTN VAR_NAME(btn) 
 #define BTN_CTRL VAR_NAME(ecbtn)
 
 #define IR_NAME VAR_NAME(rmt)
@@ -34,26 +34,25 @@
 #define ROT_NAME VAR_NAME(rot)
 #define ROT_CTRL VAR_NAME(ecrot)
 
-
 #define MIC_NAME VAR_NAME(mic)
 #define MIC_CTRL VAR_NAME(ecmic)
 
+#define SW2POS_NAME VAR_NAME(sw2p)
+#define SW2POS_CTRL VAR_NAME(exsw2p)
+
 
 //Effect Engine
-#define BEGIN_EFFECT_ENGINE() \
-  _CM EffectEngine ee; \
+#define BEGIN_EFFECT_ENGINE(flags) \
+  _CM EffectEngine ee(flags); \
   _CM CtrlPanel cp; \
-  _CM uint8_t flags = 0;
 
 #define END_EFFECT_ENGINE()  \
+  ee.init(); \
   _CM CtrlQueueItem itm; \
   for( ;; ){\
      cp.loop(itm); \
      ee.loop(itm); \
   }
-
-#define EFFECT_ENGION_FLAG(flag) \
-  flags |= flag;
 
 #define BEGIN_EFFECTS()
 
@@ -80,14 +79,13 @@
   ADD_EFFECT_PARAM(EffectStatic, hsv);
 
 
-#define BEGIN_LEDS(xmaxleds) \
-   _CM CRGB leds[xmaxleds];
-    
-#define ADD_STRIP(Type, ...) \
-  FastLED.addLeds<Type, __VA_ARGS__ >(leds, sizeof(leds) / sizeof(leds[0])).setCorrection( TypicalLEDStrip );  
+#define BEGIN_LEDS() \
+   
 
-#define END_LEDS() \
-    ee.init(leds, sizeof(leds) / sizeof(leds[0]), flags);
+#define ADD_STRIP(Type, ...) \
+  FastLED.addLeds<Type, __VA_ARGS__ >(ee.getLeds(), MAX_LEDS).setCorrection( TypicalLEDStrip );  
+
+#define END_LEDS() 
 
 
 ///////////////////////////////////////
@@ -121,10 +119,15 @@
   PUSH_BUTTON_TO_CMD(cmd, PB_CONTROL_CLICK, ## __VA_ARGS__); \
   END_PUSH_BUTTON()
 
+#define SW2POS_TO_CMD(cmd, pin) \
+  _CM Switch2Pos SW2POS_NAME(pin); \
+  _CM CtrlSwicth2Pos SW2POS_CTRL(cmd, &SW2POS_NAME); \
+  cp.addControl(&SW2POS_CTRL);
 
-#define POT_TO_CMD(cmd, pin) \
+
+#define POT_TO_CMD(cmd, pin, ...) \
   _CM AnalogInput POT_NAME(pin); \
-  _CM CtrlItemPtmtr POT_CTRL(cmd, &POT_NAME); \
+  _CM CtrlItemPtmtr POT_CTRL(cmd, &POT_NAME, ## __VA_ARGS__); \
   cp.addControl(&POT_CTRL);
 
 #define ROTENC_TO_CMD(cmd, pinData, pinClock) \

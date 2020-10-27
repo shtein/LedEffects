@@ -6,25 +6,35 @@ class CtrlQueueItem;
 class Effect;
 
 //Data limits
-#define MAX_EFFECTS 15
-#define MAX_MODES   5
+#ifndef MAX_EFFECTS
+  #define MAX_EFFECTS 15
+#endif //MAX_EFFECTS
+
+#ifndef MAX_MODES
+  #define MAX_MODES   5
+#endif //MAX_MODES
 
 //Engine flags
 #define EFF_RANDOM_START_MODE     0x01
 #define EFF_RANDOM_START_EFFECT   0x02
 
+typedef CRGB EELEDS[MAX_LEDS];
+
+
 /////////////////////////////////
 // EffectEngine
 class EffectEngine{
   public:
-    EffectEngine();
+    EffectEngine(uint8_t flags = 0);
     ~EffectEngine();
 
-    void init(CRGB *leds, int maxLeds, uint8_t flags = 0);
+    void init();
     void addMode(Effect **effects); //add mode
     void addEffect(Effect *effect); //add effect to current mode
     
-    void loop(const struct CtrlQueueItem &itm);    
+    void loop(const struct CtrlQueueItem &itm);   
+
+    CRGB *getLeds() const;
     
   protected:
     void showStrip();
@@ -56,11 +66,9 @@ class EffectEngine{
     uint8_t    _numModes:4;               //Total number of modes
     uint8_t    _modeNum:4;                //Current mode
 
-    CRGB       *_leds;                    //Leds
-    uint16_t   _maxLeds:12;               //Max number of leds    
-    uint16_t   _numLeds:12;               //Actual number of leds
-
-    uint16_t   _flags:8;                  //Flags 
+    EELEDS      _leds;           //Leds
+    uint16_t   _numLeds:12;               //Max number of leds    
+    uint16_t   _flags:4;                  //Flags 
    
     unsigned long _millis;                //Processing
     unsigned long _millisToSaveCfg;       //When to safe config

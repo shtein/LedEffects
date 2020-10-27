@@ -37,8 +37,8 @@
 #define MSGEQ7_RESET_PIN  3
 
 //Analog pin to control noise threshold and sensitivity
-#define SOUND_LOW_PIN  4
-#define SOUND_HIGH_PIN 5
+#define SOUND_LOW_PIN  6
+#define SOUND_HIGH_PIN 7
 
 
 

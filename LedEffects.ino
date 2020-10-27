@@ -44,7 +44,7 @@ void setup(){
   DBG_OUTLN("Led effect started -- Outage Lamp");    
 
   //Effect Engine
-  BEGIN_EFFECT_ENGINE() 
+  BEGIN_EFFECT_ENGINE(0) 
     
     //Effects   
     BEGIN_EFFECTS()
@@ -64,7 +64,7 @@ void setup(){
     END_EFFECTS()
     
     //Leds
-    BEGIN_LEDS(31)      
+    BEGIN_LEDS()      
       ADD_STRIP(WS2801, LED_PIN, LED_CLOCK_PIN, RGB) //Old 2801 strip or EK outage lamp
     END_LEDS()
 
@@ -94,7 +94,7 @@ void setup() {
   DBG_OUTLN("Led effect started -- Sasha");  
   
   //Effect Engine
-  BEGIN_EFFECT_ENGINE() 
+  BEGIN_EFFECT_ENGINE(0) 
     
     //Effects   
     BEGIN_EFFECTS()
@@ -122,7 +122,7 @@ void setup() {
     END_EFFECTS()
     
     //Leds
-    BEGIN_LEDS(212)
+    BEGIN_LEDS()
       ADD_STRIP(NEOPIXEL, LED_PIN)
     END_LEDS()
 
@@ -150,6 +150,64 @@ void setup() {
 }
 
 //__SASHA_SETUP
+#elif defined( __SASHA_TAHOE_SETUP )
+////////////////////////////////////////
+// WS2811 12v strip, 150 LEDs, 1 push button
+#pragma message "Compile for Sasha at Tahoe"
+
+
+void setup() {
+  DBG_INIT();
+  DBG_OUTLN("Led effect started -- Sasha's at Tahoe");  
+  
+  //Effect Engine
+  BEGIN_EFFECT_ENGINE(0) 
+    
+    //Effects   
+    BEGIN_EFFECTS()
+      BEGIN_MODE(Effects, 15)
+        ADD_EFFECT(EffectMeteorRain<>)
+        ADD_EFFECT(EffectRipple<>)   
+        ADD_EFFECT(EffectPlasma)
+        ADD_EFFECT(EffectConfetti)
+        ADD_EFFECT(EffectPaletteTransformFast) 
+        ADD_EFFECT(EffectBlur)
+        ADD_EFFECT(EffectRainbowMove)
+        ADD_EFFECT(EffectNoise)            
+        ADD_EFFECT(EffectMoodBlobs) 
+        ADD_EFFECT(EffectRainbow)
+        ADD_EFFECT(EffectFadeInOut)
+        ADD_EFFECT(EffectRunningLights)           
+        ADD_EFFECT(EffectColorWipe)               
+        ADD_EFFECT(EffectTheaterChaseRainbow) 
+      END_MODE()
+      BEGIN_MODE(Static, 3)
+        ADD_STATIC_COLOR(CHSV(HUE_BLUE, 0xFF, 0xFF))        
+        ADD_STATIC_COLOR(CHSV(HUE_PURPLE, 0xFF, 0xFF))
+        ADD_STATIC_COLOR(CHSV(HUE_ORANGE, 0xFF, 0xFF))
+      END_MODE()
+      BLACK_MODE()
+    END_EFFECTS()
+    
+    //Leds
+    BEGIN_LEDS()
+      ADD_STRIP(WS2811, LED_PIN)
+    END_LEDS()
+
+  //Control    
+    BEGIN_CONTROL_MAP()
+     
+      BEGIN_PUSH_BUTTON(MODE_PIN)    
+        PUSH_BUTTON_TO_CMD(EEMC_MODE, PB_CONTROL_PUSH_LONG)
+        PUSH_BUTTON_TO_CMD(EEMC_EFFECT, PB_CONTROL_CLICK_SHORT)      
+      END_PUSH_BUTTON()     
+    
+    END_CONTROL_MAP()
+       
+  END_EFFECT_ENGINE() 
+}
+
+//__SASHA_SETUP
 
 #elif defined( __DAVID_SETUP)
 ////////////////////////////////////////
@@ -161,7 +219,7 @@ void setup() {
   DBG_OUTLN("Led effect started -- David");  
   
   //Effect Engine
-  BEGIN_EFFECT_ENGINE() 
+  BEGIN_EFFECT_ENGINE(0) 
     
     //Effects   
     BEGIN_EFFECTS()
@@ -197,7 +255,7 @@ void setup() {
     END_EFFECTS()
     
     //Leds
-    BEGIN_LEDS(50)
+    BEGIN_LEDS()
       ADD_STRIP(WS2811, LED_PIN, RGB)
     END_LEDS()
 
@@ -227,7 +285,7 @@ void setup() {
   DBG_OUTLN("Led effect started -- Igor");  
   
   //Effect Engine
-  BEGIN_EFFECT_ENGINE() 
+  BEGIN_EFFECT_ENGINE(0) 
     
     //Effects   
     BEGIN_EFFECTS()
@@ -256,7 +314,7 @@ void setup() {
     END_EFFECTS()
     
     //Leds
-    BEGIN_LEDS(88) 
+    BEGIN_LEDS() 
       ADD_STRIP(NEOPIXEL, LED_PIN)
     END_LEDS()
 
@@ -287,8 +345,7 @@ void setup() {
   DBG_INIT();
   DBG_OUTLN("Led effect started -- deck");  
   //Effect Engine
-  BEGIN_EFFECT_ENGINE()    
-    EFFECT_ENGION_FLAG(EFF_RANDOM_START_EFFECT)
+  BEGIN_EFFECT_ENGINE(EFF_RANDOM_START_EFFECT)    
     //Effects   
     BEGIN_EFFECTS()
       BEGIN_MODE(Effects, 8)        
@@ -318,7 +375,7 @@ void setup() {
     END_EFFECTS()
     
     //Leds
-    BEGIN_LEDS(267)
+    BEGIN_LEDS()
       ADD_STRIP(NEOPIXEL, LED_PIN)
       ADD_STRIP(NEOPIXEL, LED_PIN2)   //Second strip for deck
     END_LEDS()
@@ -345,7 +402,7 @@ void setup() {
   DBG_INIT();
   DBG_OUTLN("Led effect started - christmas tree");  
   //Effect Engine
-  BEGIN_EFFECT_ENGINE() 
+  BEGIN_EFFECT_ENGINE(0) 
     
     //Effects   
     BEGIN_EFFECTS()
@@ -359,27 +416,23 @@ void setup() {
         ADD_EFFECT_PARAM( EffectPlasma, &TransformAutunm )
         ADD_EFFECT_PARAM( EffectNoise, &TransformHalloween )
       END_MODE()
-      BEGIN_MODE(Other, 15)        
+      BEGIN_MODE(Other, 10)        
         ADD_EFFECT(EffectRipple<>)   
         ADD_EFFECT(EffectMeteorRain<>)
         ADD_EFFECT(EffectPlasma)
-        ADD_EFFECT(EffectConfetti)
-        //ADD_EFFECT(EffectPaletteTransformFast) 
+        ADD_EFFECT(EffectConfetti)        
         ADD_EFFECT(EffectBlur)
         ADD_EFFECT(EffectRainbowMove)
         ADD_EFFECT(EffectNoise)            
         ADD_EFFECT(EffectMoodBlobs) 
         ADD_EFFECT(EffectRainbow)
-        //ADD_EFFECT(EffectFadeInOut)
-        //ADD_EFFECT(EffectRunningLights)       
-        //ADD_EFFECT(EffectColorWipe)       
         ADD_EFFECT(EffectTheaterChaseRainbow) 
       END_MODE()    
     END_EFFECTS()
     
     //Leds
-    BEGIN_LEDS(150) 
-      ADD_STRIP(WS2811, LED_PIN, RGB)  //Christmas Tree or David
+    BEGIN_LEDS() 
+      ADD_STRIP(WS2811, LED_PIN, RGB)  //First strip for Christmass Tree
       ADD_STRIP(WS2811, LED_PIN2, RGB) //Second strip for Christmass Tree
       ADD_STRIP(WS2811, LED_PIN3, RGB) //Third strip for Christmass Tree
     END_LEDS()
@@ -390,7 +443,7 @@ void setup() {
         PUSH_BUTTON_TO_CMD(EEMC_MODE, PB_CONTROL_PUSH_LONG)
         PUSH_BUTTON_TO_CMD(EEMC_EFFECT, PB_CONTROL_CLICK_SHORT)      
      END_PUSH_BUTTON()
-     POT_TO_CMD(EEMC_NUMLEDS, NUMLEDS_PIN)
+     POT_TO_CMD(EEMC_NUMLEDS, NUMLEDS_PIN, POT_NOISE_THRESHOLD, 100, 900)
     END_CONTROL_MAP()
        
   END_EFFECT_ENGINE() 
@@ -408,7 +461,7 @@ void setup() {
   DBG_INIT();
   DBG_OUTLN("Led effect started - window");  
   //Effect Engine
-  BEGIN_EFFECT_ENGINE() 
+  BEGIN_EFFECT_ENGINE(0) 
     
     //Effects   
     BEGIN_EFFECTS()
@@ -445,7 +498,7 @@ void setup() {
     END_EFFECTS()
     
     //Leds
-    BEGIN_LEDS(100) 
+    BEGIN_LEDS() 
       ADD_STRIP(WS2801, LED_PIN, LED_CLOCK_PIN, RGB) //Old 2801 strip
     END_LEDS()
 
@@ -472,7 +525,7 @@ void setup() {
   DBG_INIT();
   DBG_OUTLN("Led effect started - Vadim");  
   //Effect Engine
-  BEGIN_EFFECT_ENGINE() 
+  BEGIN_EFFECT_ENGINE(0) 
     
     //Effects   
     BEGIN_EFFECTS()
@@ -507,7 +560,7 @@ void setup() {
     END_EFFECTS()
     
     //Leds
-    BEGIN_LEDS(100) 
+    BEGIN_LEDS() 
       ADD_STRIP(WS2811, LED_PIN, RGB)  
       ADD_STRIP(WS2811, LED_PIN2, RGB) 
     END_LEDS()
@@ -536,8 +589,7 @@ void setup() {
   DBG_INIT();
   DBG_OUTLN("Led effect started -- Tahoe");  
   //Effect Engine
-  BEGIN_EFFECT_ENGINE() 
-    EFFECT_ENGION_FLAG(EFF_RANDOM_START_EFFECT)
+  BEGIN_EFFECT_ENGINE(EFF_RANDOM_START_EFFECT)
     //Effects   
     BEGIN_EFFECTS()
       BEGIN_MODE(Effects, 7)        
@@ -567,7 +619,7 @@ void setup() {
     END_EFFECTS()
     
     //Leds
-    BEGIN_LEDS(406)
+    BEGIN_LEDS()
       ADD_STRIP(WS2811, LED_PIN2)
     END_LEDS()
 
@@ -602,20 +654,18 @@ void setup() {
   INIT_SOUND_CAPTURE(SoundCaptureMSGEQ7, MSGEQ7_ANALOG_PIN, MSGEQ7_STROBE_PIN, MSGEQ7_RESET_PIN)    
   
   //Effect Engine
-  BEGIN_EFFECT_ENGINE() 
+  BEGIN_EFFECT_ENGINE(0) 
     //Effects   
     BEGIN_EFFECTS()
       BEGIN_MODE(Sound, 3)            
-        ADD_EFFECT(EffectSoundSimple)
-        //ADD_EFFECT_PARAM( EffectConfetti, &July4th)
-        //ADD_EFFECT_PARAM( EffectNoise, &July4th )
-        //ADD_EFFECT_PARAM( EffectPlasma, &July4th )
-        
+        ADD_EFFECT(EffectSoundMatrixSymmetric)
+        ADD_EFFECT(EffectSoundMatrixColumn)
+
       END_MODE()
       BEGIN_MODE(Effects, 15)
-        //ADD_EFFECT(EffectFire)
-        //ADD_EFFECT(EffectMeteorRain<>)
-        //ADD_EFFECT(EffectPlasma)
+        ADD_EFFECT(EffectFire)
+        ADD_EFFECT(EffectMeteorRain<>)
+        ADD_EFFECT(EffectPlasma)
         //ADD_EFFECT(EffectConfetti)
         //ADD_EFFECT(EffectPaletteTransformFast) 
         //ADD_EFFECT(EffectBlur)
@@ -637,7 +687,7 @@ void setup() {
     END_EFFECTS()
     
     //Leds
-    BEGIN_LEDS(35) //31 for EK outage lamp, 50 for test or David, 267 for deck, 88 for Igor, 212 for Sasha, 300 for Christmass Tree (150 for new Christmass Tree), 100 for old 2801 leds
+    BEGIN_LEDS() 
       ADD_STRIP(NEOPIXEL, LED_PIN)
     END_LEDS()
 
@@ -650,8 +700,11 @@ void setup() {
         PUSH_BUTTON_TO_CMD(EEMC_EFFECT, PB_CONTROL_CLICK_SHORT)      
       END_PUSH_BUTTON() 
 
-      POT_TO_CMD(EEMC_SOUND_LOW, SOUND_LOW_PIN)
-      POT_TO_CMD(EEMC_SOUND_HIGH, SOUND_HIGH_PIN)
+      SW2POS_TO_CMD(EEMC_SOUND_LOG, 7)
+      SW2POS_TO_CMD(EEMC_SOUND_USE_MAX, 6)
+      SW2POS_TO_CMD(EEMC_SOUND_USE_MIN, 5)
+      POT_TO_CMD(EEMC_SOUND_LOW, SOUND_LOW_PIN, POT_NOISE_THRESHOLD, 100)
+      POT_TO_CMD(EEMC_SOUND_SENSITIVITY, SOUND_HIGH_PIN, POT_NOISE_THRESHOLD, 300)
      
     
       //PUSH_BUTTON_SA_TO_CMD(EEMC_MODE, MODE_PIN)            //Mode

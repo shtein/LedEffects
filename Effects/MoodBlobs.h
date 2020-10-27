@@ -15,14 +15,12 @@ protected:
 
 protected:
   byte _blobPhase;
-  int  _step;
 };
 
 
 inline EffectMoodBlobs::EffectMoodBlobs(){
   setSpeedDelay(100);
   _blobPhase  = 0;
-  _step       = 0;
 }
 
 inline EffectMoodBlobs::~EffectMoodBlobs(){
@@ -30,7 +28,7 @@ inline EffectMoodBlobs::~EffectMoodBlobs(){
 
 
 void EffectMoodBlobs::reset(){
-  _step      = 0;
+  _ctx.step  = 0;
   _blobPhase = 0;
 }
 
@@ -46,7 +44,7 @@ void EffectMoodBlobs::proceed(CRGB *leds, int numLeds){
     hsv.value = val < 0 ? 0 : val * 2; 
 
     //Calculate hue
-    int index = (i + _step / 2) % numLeds;
+    int index = (i + _ctx.step / 2) % numLeds;
     int hue   = ((int)sin8( index * 255 / numLeds) - 128 ) ;   
     hsv.hue += hue; 
    
@@ -58,7 +56,7 @@ void EffectMoodBlobs::proceed(CRGB *leds, int numLeds){
   _blobPhase += 2;
 
   //Increment color rotation step
-  _step = (_step + 1) % ( numLeds * 2 );
+  _ctx.step = (_ctx.step + 1) % ( numLeds * 2 );
 
 }
 

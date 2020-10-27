@@ -11,9 +11,6 @@ class EffectEmergencyLights: public Effect{
 
     void proceed(CRGB *leds, int numLeds); 
     void reset();
-
-  protected:
-    uint8_t _step;
 };
 
 
@@ -25,7 +22,7 @@ inline EffectEmergencyLights::~EffectEmergencyLights(){
 }
 
 inline void EffectEmergencyLights::reset(){
-  _step = 0;
+  _ctx.step = 0;
 }
 
 #define EL_BLINKS         5               //Number of ons and offs
@@ -46,9 +43,9 @@ inline void EffectEmergencyLights::proceed(CRGB *leds, int numLeds){
   //EL_BLINKS ties each
 
   //Only even step turns it on
-  if(_step % 2 == 0){   
+  if(_ctx.step % 2 == 0){   
     
-    int *p   = bounds[_step / EL_CYCLES];
+    int *p   = bounds[_ctx.step / EL_CYCLES];
     CRGB clr = CRGB::Blue;
     
     for(int i = p[0]; i < p[1]; i+= 2) {      
@@ -56,7 +53,7 @@ inline void EffectEmergencyLights::proceed(CRGB *leds, int numLeds){
     }
   }
   
-  _step  = (_step + 1) % (EL_CYCLES * (sizeof(bounds) / sizeof(bounds[0])) );
+  _ctx.step  = (_ctx.step + 1) % (EL_CYCLES * (sizeof(bounds) / sizeof(bounds[0])) );
 }
 
 

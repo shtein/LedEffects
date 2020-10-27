@@ -11,14 +11,14 @@
 
 #define CUR_MODE _modes[_modeNum]  
 
-EffectEngine::EffectEngine(){
+EffectEngine::EffectEngine(uint8_t flags){
+  _flags = flags;
+  
   _numModes = 0;
-  _modeNum     = 0;
+  _modeNum  = 0;
   ::memset(_modes, 0, sizeof(_modes));
 
-  _numLeds = 0;
-  _maxLeds = 0;
-  _leds    = 0;
+  _numLeds = MAX_LEDS;
 
   _millis          = 0;
   _millisToSaveCfg = 0;
@@ -27,7 +27,10 @@ EffectEngine::EffectEngine(){
 
   //FastLed randmization seeding Random number initialization  
   random16_set_seed(analogRead(0)); 
-  
+}
+
+CRGB *EffectEngine::getLeds() const{
+  return _leds;
 }
 
 EffectEngine::~EffectEngine(){
@@ -60,17 +63,11 @@ void EffectEngine::addEffect(Effect *effect){
   
 }  
 
-void EffectEngine::init(CRGB *leds, int maxLeds, uint8_t flags) {  
+void EffectEngine::init() {  
  
   //Don't uncomment it if you don;t know what it is 
   //FastLED.setMaxPowerInVoltsAndMilliamps(5,1000);
-
-  _leds    = leds;
-  _numLeds = maxLeds;
-  _maxLeds = maxLeds;
-  _flags   = flags;
-  
-  fill_solid(_leds, _maxLeds, CRGB::Black);
+  fill_solid(_leds, MAX_LEDS, CRGB::Black);
   
   //Try to read from EEPROM
   readConfig();
@@ -116,7 +113,7 @@ void EffectEngine::setMode(uint8_t mode){
   _modeNum = mode;
 
   //Black the lights
-  fill_solid(_leds, _maxLeds, CRGB::Black);
+  fill_solid(_leds, MAX_LEDS, CRGB::Black);
 
   //Refresh effect
   setEffect(CUR_MODE.effectNum);
@@ -153,7 +150,7 @@ Effect *EffectEngine::getEffect() const{
 void EffectEngine::onNumLedsChange(const struct CtrlQueueData &data){
   
   //Get new mode value
-  uint16_t numLeds = data.translate(_numLeds, 0, _maxLeds);
+  uint16_t numLeds = data.translate(_numLeds, 0, MAX_LEDS);
 
   //Do nothing if did not change
   if(_numLeds == numLeds)
@@ -165,7 +162,7 @@ void EffectEngine::onNumLedsChange(const struct CtrlQueueData &data){
   DBG_OUTLN("new number of leds: %d", _numLeds);  
 
  //Black the lights
-  fill_solid(_leds + _numLeds, _maxLeds - _numLeds, CRGB::Black);
+  fill_solid(_leds + _numLeds, MAX_LEDS - _numLeds, CRGB::Black);
 }
 
 void EffectEngine::onEffectChange(const struct CtrlQueueData &data){
@@ -174,7 +171,7 @@ void EffectEngine::onEffectChange(const struct CtrlQueueData &data){
   uint8_t effectNum = (uint8_t)data.translate(CUR_MODE.effectNum, 0, CUR_MODE.numEffects - 1);
   
   //Black the leds
-  fill_solid(_leds, _maxLeds, CRGB::Black);
+  fill_solid(_leds, MAX_LEDS, CRGB::Black);
   
   //Change effect
   setEffect(effectNum);

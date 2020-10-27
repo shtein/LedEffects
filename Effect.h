@@ -2,10 +2,14 @@
 #define __EFFECT_H
 
 #include "Palette.h"
+#ifdef USE_MATRIX
+  #include "Matrix.h"
+#endif
 
 ///////////////////
 // Helpers
 #define qsuba(x, b)  ((x > b) ? x - b : 0) 
+
 
 ///////////////////
 // Basic effect
@@ -31,7 +35,7 @@ class Effect{
    
     //Speed delay
     void setSpeedDelay(uint16_t speedDelay);
-    uint16_t  getSpeedDelay() const;
+    uint16_t  getSpeedDelay() const;    
 
   protected:
     virtual void reset() = 0;
@@ -41,9 +45,23 @@ class Effect{
     static void setPixel(CRGB &led, byte red, byte green, byte blue);
     static void setPixel(CRGB &led, const CRGB &color);
     static void setAll(CRGB *leds, int numLeds, byte red, byte green, byte blue);
-    static void setAll(CRGB *leds, int numLeds, const CRGB &color);     
+    static void setAll(CRGB *leds, int numLeds, const CRGB &color);  
+
+ protected:
+    ///////////////////
+    //Structure to support real-time processing elements to save some memory
+    struct EffectContext { 
+      int            step;        //current step
+      CRGBPalette16  palCurrent;  //palette 1
+      CRGBPalette16  palTarget;   //palette 2
+#ifdef USE_MATRIX      
+      XY             xy;          //Coordinate calcualtor for matrix 
+#endif //USE_MATRIX      
+    };
+
+    static EffectContext _ctx;
    
- private:   
+ private:      
    //Speed
    uint8_t  _speedDelay; //byte, i.e. range is 0 - 255, that maps to range from SPEED_DELAY_MIN to SPEED_DELAY_MAX by setSpeedDelay and getSpeedDelay
 };
@@ -88,11 +106,12 @@ class EffectPaletteTransform: public Effect{
     EffectPaletteTransform(FuncGetPalette_t getPal);
    ~EffectPaletteTransform();
 
-   virtual void proceed(CRGB *leds, int numLeds); 
+   virtual void proceed(CRGB *leds, int numLeds);
    virtual void reset();
 
   protected:
     void onStep();
+    CRGB getCurrentPalColor(uint8_t index, uint8_t brightness = 255, TBlendType blendType = LINEARBLEND) const;
   
     virtual void updateColors();
     virtual void updateLeds(CRGB *leds, int numLeds);
@@ -103,14 +122,8 @@ class EffectPaletteTransform: public Effect{
 
     virtual int getMaxStep() const;
     
-  protected:
-    static CRGBPalette16 _palCurrent;
-    static CRGBPalette16 _palTarget;
-
+  protected:    
     FuncGetPalette_t     _getPal;
-
-  private:
-    static int           _step;
 };
 
 

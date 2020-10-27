@@ -6,9 +6,15 @@
 #include "effectenginectx.h"
 #include "effect.h"
 
+#ifdef USE_MATRIX
+#include "Matrix.h"
+#endif
+
 
 /////////////////////////////////
 // Effect
+
+Effect::EffectContext Effect::_ctx;
 
 Effect::Effect(){
   _speedDelay = 25;
@@ -16,7 +22,6 @@ Effect::Effect(){
 
 Effect::~Effect(){
 }
-
 
 void Effect::init(CRGB *leds, int numLeds){  
 
@@ -30,16 +35,9 @@ void Effect::init(CRGB *leds, int numLeds){
 void Effect::reset(){
 }
 
-void Effect::loop(CRGB *leds, int numLeds){  
-  
-  //proceed
+void Effect::loop(CRGB *leds, int numLeds){    
   proceed(leds, numLeds);
- 
 }
-
-void Effect::proceed(CRGB * /*leds*/, int /*numLeds */){
-}
-
 
 void Effect::onCmd(const struct CtrlQueueItem &itm){
   
@@ -81,8 +79,6 @@ void Effect::setAll(CRGB *leds, int numLeds, const CRGB &color) {
 void Effect::setAll(CRGB *leds, int numLeds, byte red, byte green, byte blue) {  
   fill_solid(leds, numLeds, CRGB (red, green, blue));
 }
-
-
 
 //////////////////////////////////////
 // EffectColor
@@ -142,11 +138,6 @@ void FuncGetPal_Default(CRGBPalette16 &pal){
                       );
 }
 
-CRGBPalette16 EffectPaletteTransform::_palCurrent;
-CRGBPalette16 EffectPaletteTransform::_palTarget;
-    
-int EffectPaletteTransform::_step;
-
 
 EffectPaletteTransform::EffectPaletteTransform(FuncGetPalette_t getPal){
   setSpeedDelay(25);  
@@ -162,13 +153,13 @@ void EffectPaletteTransform::reset(){
   updateColors();
 
   //Safe target into current  
-  _palCurrent = _palTarget;
+  _ctx.palCurrent = _ctx.palTarget;
                       
    //Update target palette again
    updateColors();
 
   //Reset step
-  _step = getMaxStep();
+  _ctx.step = getMaxStep();
 }
 
 int EffectPaletteTransform::getMaxStep() const{
@@ -181,19 +172,19 @@ bool EffectPaletteTransform::isReadyToBlendPal() const{
 }
 
 bool EffectPaletteTransform::isReadyToChangePal() const{
-  return _step == 0;
+  return _ctx.step == 0;
 }
 
 void EffectPaletteTransform::updateColors(){
   //Change target palette
   if(_getPal)
-    _getPal(_palTarget);
+    _getPal(_ctx.palTarget);
 }
 
 void EffectPaletteTransform::updateLeds(CRGB *leds, int numLeds){  
   //Default implementation
   for(int i = 0; i < numLeds; i++){     
-    leds[i] = ColorFromPalette(_palCurrent, 0, 255, LINEARBLEND);
+    leds[i] = getCurrentPalColor(0);
   }
 }
 
@@ -205,17 +196,17 @@ void EffectPaletteTransform::onStep(){
     updateColors();
 
     //Reset step
-    _step = getMaxStep();       
+    _ctx.step = getMaxStep();       
   }
   
   
   //Proceed with palette transtion
   if(isReadyToBlendPal()){
-    nblendPaletteTowardPalette(_palCurrent, _palTarget, MAX_PAL_CHANGES); 
+    nblendPaletteTowardPalette(_ctx.palCurrent, _ctx.palTarget, MAX_PAL_CHANGES); 
   }
 
   //Prepare for the next move                                        
-  _step--;
+  _ctx.step--;
 }
 
 void EffectPaletteTransform::proceed(CRGB *leds, int numLeds){
@@ -224,4 +215,8 @@ void EffectPaletteTransform::proceed(CRGB *leds, int numLeds){
   
   //Update Leds
   updateLeds(leds, numLeds); 
+}
+
+CRGB EffectPaletteTransform::getCurrentPalColor(uint8_t index, uint8_t brightness, TBlendType blendType) const{
+  return ColorFromPalette(_ctx.palCurrent, index, brightness, blendType);
 }
