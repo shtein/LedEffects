@@ -32,6 +32,9 @@
 #include "Effects/Fire.h"
 #include "Effects/Meteor.h"
 #include "Effects/Ripple.h"
+#include "Effects/Juggle.h"
+#include "Effects/TwinkleFox.h"
+#include "Effects/PacificOcean.h"
 #include "Effects/Sound.h"
 
 #if defined(__OUTAGE_LAMP_SETUP)
@@ -170,7 +173,6 @@ void setup() {
         ADD_EFFECT(EffectRipple<>)   
         ADD_EFFECT(EffectPlasma)
         ADD_EFFECT(EffectConfetti)
-        ADD_EFFECT(EffectPaletteTransformFast) 
         ADD_EFFECT(EffectBlur)
         ADD_EFFECT(EffectRainbowMove)
         ADD_EFFECT(EffectNoise)            
@@ -179,7 +181,9 @@ void setup() {
         ADD_EFFECT(EffectFadeInOut)
         ADD_EFFECT(EffectRunningLights)           
         ADD_EFFECT(EffectColorWipe)               
-        ADD_EFFECT(EffectTheaterChaseRainbow) 
+        ADD_EFFECT(EffectTheaterChaseRainbow)
+        ADD_EFFECT(EffectJuggle)
+        ADD_EFFECT_PARAM(EffectTwinkleFox, FuncGetPal_TwinkleFox)
       END_MODE()
       BEGIN_MODE(Static, 3)
         ADD_STATIC_COLOR(CHSV(HUE_BLUE, 0xFF, 0xFF))        
@@ -592,14 +596,17 @@ void setup() {
   BEGIN_EFFECT_ENGINE(EFF_RANDOM_START_EFFECT)
     //Effects   
     BEGIN_EFFECTS()
-      BEGIN_MODE(Effects, 7)        
+      BEGIN_MODE(Effects, 10)        
         ADD_EFFECT(EffectRipple<10>)
         ADD_EFFECT(EffectMeteorRain<>)   
         ADD_EFFECT(EffectPlasma)        
         ADD_EFFECT(EffectConfetti)
         ADD_EFFECT(EffectBlur)
         ADD_EFFECT(EffectNoise)            
-        ADD_EFFECT(EffectMoodBlobs) 
+        ADD_EFFECT(EffectMoodBlobs)
+        ADD_EFFECT(EffectJuggle)
+        ADD_EFFECT_PARAM(EffectTwinkleFox, FuncGetPal_TwinkleFox)
+        ADD_EFFECT(EffectPacificOcean)
       END_MODE()
       
       BEGIN_MODE(Halloween, 3)      
@@ -621,6 +628,7 @@ void setup() {
     //Leds
     BEGIN_LEDS()
       ADD_STRIP(WS2811, LED_PIN2)
+      ADD_STRIP(WS2811, LED_PIN3)
     END_LEDS()
 
   //Control    
@@ -663,9 +671,12 @@ void setup() {
 
       END_MODE()
       BEGIN_MODE(Effects, 15)
-        ADD_EFFECT(EffectFire)
-        ADD_EFFECT(EffectMeteorRain<>)
+        //ADD_EFFECT(EffectFire)
+        //ADD_EFFECT(EffectMeteorRain<>)
         ADD_EFFECT(EffectPlasma)
+        ADD_EFFECT(EffectJuggle)
+        ADD_EFFECT_PARAM(EffectTwinkleFox, FuncGetPal_TwinkleFox)
+        ADD_EFFECT(EffectPacificOcean)
         //ADD_EFFECT(EffectConfetti)
         //ADD_EFFECT(EffectPaletteTransformFast) 
         //ADD_EFFECT(EffectBlur)

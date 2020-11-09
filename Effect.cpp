@@ -196,7 +196,7 @@ void EffectPaletteTransform::onStep(){
     updateColors();
 
     //Reset step
-    _ctx.step = getMaxStep();       
+    _ctx.step = getMaxStep(); 
   }
   
   

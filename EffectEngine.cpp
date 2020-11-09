@@ -12,7 +12,7 @@
 #define CUR_MODE _modes[_modeNum]  
 
 EffectEngine::EffectEngine(uint8_t flags){
-  _flags = flags;
+  _flags    = flags;
   
   _numModes = 0;
   _modeNum  = 0;
@@ -22,8 +22,6 @@ EffectEngine::EffectEngine(uint8_t flags){
 
   _millis          = 0;
   _millisToSaveCfg = 0;
-
-  _flags           = 0;
 
   //FastLed randmization seeding Random number initialization  
   random16_set_seed(analogRead(0)); 

@@ -21,6 +21,19 @@ DECLARE_GRADIENT_PALETTE( patriot_black_gp );
 DECLARE_GRADIENT_PALETTE( july4_2_gp );
 
 
+//Other usefull palettes
+extern const TProgmemRGBPalette16 RedGreenWhite_p FL_PROGMEM;
+extern const TProgmemRGBPalette16 Holly_p FL_PROGMEM;
+extern const TProgmemRGBPalette16 RedWhite_p FL_PROGMEM;
+extern const TProgmemRGBPalette16 BlueWhite_p FL_PROGMEM; 
+extern const TProgmemRGBPalette16 FairyLight_p FL_PROGMEM;
+extern const TProgmemRGBPalette16 Snow_p FL_PROGMEM;
+extern const TProgmemRGBPalette16 RetroC9_p FL_PROGMEM;
+extern const TProgmemRGBPalette16 Ice_p FL_PROGMEM;
+
+extern const TProgmemRGBPalette16 Pacifica_1_p FL_PROGMEM;
+extern const TProgmemRGBPalette16 Pacifica_2_p FL_PROGMEM;
+extern const TProgmemRGBPalette16 Pacifica_3_p FL_PROGMEM;
 
 
 #endif //_PALETTE_H
