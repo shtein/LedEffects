@@ -12,7 +12,6 @@ enum XYType{
 };
 
 
-
 /////////////////////
 //Base matrix template class
 template<const uint8_t W, const uint8_t H>

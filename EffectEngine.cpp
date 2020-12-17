@@ -28,7 +28,7 @@ EffectEngine::EffectEngine(uint8_t flags){
 }
 
 CRGB *EffectEngine::getLeds() const{
-  return _leds;
+  return (CRGB *)_leds;
 }
 
 EffectEngine::~EffectEngine(){

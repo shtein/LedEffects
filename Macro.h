@@ -67,13 +67,16 @@
 #define BLACK_MODE() \
   ee.addMode(NULL);
 
-#define ADD_EFFECT(ClassEffect) \
-  _CM ClassEffect EFFECT_NAME; \
+
+//Hack to enable ADD_EFFECT macro with and without parameters
+#define LPR (
+#define RPR )
+#define ARGS(a1, a2, a3, a4, a5, a6, a7, ...) a7
+#define EFFECT_ARGS(...) ARGS(, ## __VA_ARGS__, LPR, LPR, LPR, LPR, LPR, )  __VA_ARGS__  ARGS(, ## __VA_ARGS__, RPR, RPR, RPR, RPR, RPR, )
+
+#define ADD_EFFECT(ClassEffect, ...) \
+  _CM ClassEffect EFFECT_NAME EFFECT_ARGS(__VA_ARGS__); \
   ee.addEffect(&EFFECT_NAME); 
-  
-#define ADD_EFFECT_PARAM(ClassEffect, ...) \
-  _CM ClassEffect EFFECT_NAME(__VA_ARGS__); \
-  ee.addEffect(&EFFECT_NAME);
 
 #define ADD_STATIC_COLOR(hsv) \
   ADD_EFFECT_PARAM(EffectStatic, hsv);
