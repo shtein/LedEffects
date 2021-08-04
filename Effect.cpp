@@ -6,9 +6,8 @@
 #include "effectenginectx.h"
 #include "effect.h"
 
-#ifdef USE_MATRIX
 #include "Matrix.h"
-#endif
+
 
 
 /////////////////////////////////

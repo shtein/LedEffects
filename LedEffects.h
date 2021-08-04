@@ -31,12 +31,26 @@
   #ifndef MATRIX_TYPE
     #error "MATRIX_TYPE is not defined"
   #endif //MATRIX_TYPE
+#else
+  #ifdef MATRIX_WIDTH
+    #undef MATRIX_WIDTH
+  #endif
+  #define MATRIX_WIDTH MAX_LEDS
 
+  #ifdef MATRIX_HEIGHT
+    #undef MATRIX_HEGHT
+  #endif
+  #define MATRIX_HEIGHT 1
+
+  #ifdef MATRIX_TYPE
+    #undef MATRIX_TYPE
+  #endif
+  #define MATRIX_TYPE xyMatrixStraight
 #endif //USE_MATRIX
 
 #ifndef MAX_LEDS 
   #error "MAX_LEDS is not defined"
-#endif
+#endif //MAX_LEDS
 
 
 #endif //__LEDEFFECTS_H

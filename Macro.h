@@ -79,7 +79,7 @@
   ee.addEffect(&EFFECT_NAME); 
 
 #define ADD_STATIC_COLOR(hsv) \
-  ADD_EFFECT_PARAM(EffectStatic, hsv);
+  ADD_EFFECT(EffectStatic, hsv);
 
 
 #define BEGIN_LEDS() \

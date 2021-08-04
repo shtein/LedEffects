@@ -90,9 +90,6 @@ DEFINE_GRADIENT_PALETTE( es_autumn_03_gp ) {
   216,  36, 13,  1,
   255,  36, 13,  1};
   
-  
-
-  
                                       
 
 //Christmas
@@ -278,3 +275,47 @@ const TProgmemRGBPalette16 Pacifica_3_p FL_PROGMEM =
   0x000208, 0x00030E, 0x000514, 0x00061A, 0x000820, 0x000927, 0x000B2D, 0x000C33, 
   0x000E39, 0x001040, 0x001450, 0x001860, 0x001C70, 0x002080, 0x1040BF, 0x2060FF 
 };
+
+
+//Valentine's Day
+
+// Gradient palette "firstlove_gp", originally from
+// http://soliton.vm.bytemark.co.uk/pub/cpt-city/pj/7/tn/firstlove.png.index.html
+// converted for FastLED with gammas (2.6, 2.2, 2.5)
+// Size: 40 bytes of program space.
+
+DEFINE_GRADIENT_PALETTE( firstlove_gp ) {
+    0, 249, 63, 72,
+   35, 155, 81,192,
+   79, 249,108, 93,
+   99, 247, 33,100,
+  119, 247, 59, 80,
+  153, 188, 70,106,
+  186, 137, 26, 99,
+  211, 249,195,212,
+  242, 247, 33,100,
+  255, 247, 33,100 };
+
+// Gradient palette "roseedan_gp", originally from
+// http://soliton.vm.bytemark.co.uk/pub/cpt-city/pj/5/tn/roseedan.png.index.html
+// converted for FastLED with gammas (2.6, 2.2, 2.5)
+// Size: 20 bytes of program space.
+
+DEFINE_GRADIENT_PALETTE( roseedan_gp ) {
+    0, 220, 86, 88,
+   96, 247, 16, 10,
+  165, 255, 13, 79,
+  221, 252,104, 67,
+  255, 252,104, 67};
+
+// Gradient palette "passionata_gp", originally from
+// http://soliton.vm.bytemark.co.uk/pub/cpt-city/pj/classic/tn/passionata.png.index.html
+// converted for FastLED with gammas (2.6, 2.2, 2.5)
+// Size: 20 bytes of program space.
+
+DEFINE_GRADIENT_PALETTE( passionata_gp  ) {
+    0, 217,  4,102,
+   66, 217,  4, 61,
+  122, 217,  4,  5,
+  186, 161,  4,219,
+  255,  78,  4,219};

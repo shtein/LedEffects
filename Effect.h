@@ -2,9 +2,6 @@
 #define __EFFECT_H
 
 #include "Palette.h"
-#ifdef USE_MATRIX
-  #include "Matrix.h"
-#endif
 
 ///////////////////
 // Helpers
@@ -54,9 +51,6 @@ class Effect{
       int            step;        //current step
       CRGBPalette16  palCurrent;  //palette 1
       CRGBPalette16  palTarget;   //palette 2
-#ifdef USE_MATRIX      
-      XY             xy;          //Coordinate calcualtor for matrix 
-#endif //USE_MATRIX      
     };
 
     static EffectContext _ctx;
@@ -160,5 +154,6 @@ END_TRANSFORM_SCHEMA()
 It creates 
 void YourFunctionName(CRGBPalette16 &pal);
 */
+
 
 #endif //__EFFECT_H

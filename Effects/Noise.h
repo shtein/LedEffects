@@ -128,7 +128,7 @@ inline int EffectPlasma::getMaxStep() const{
 // Effect Confetti
 
 
-BEGIN_TRANSFORM_SCHEMA_RGB16_PALETTE(FuncGetPal_Confetti)
+BEGIN_TRANSFORM_SCHEMA_RGB16_PALETTE(Confetti)
   TRANSOFRM_PALETTE(OceanColors_p)
   TRANSOFRM_PALETTE(LavaColors_p)
   TRANSOFRM_PALETTE(ForestColors_p)
@@ -138,7 +138,7 @@ END_TRANSFORM_SCHEMA()
 
 class EffectConfetti: public EffectPaletteTransform{
   public:
-    EffectConfetti(FuncGetPalette_t getPal = &FuncGetPal_Confetti);
+    EffectConfetti(FuncGetPalette_t getPal = &Confetti);
     ~EffectConfetti();
 
   protected:
@@ -209,6 +209,15 @@ END_TRANSFORM_SCHEMA()
 //Patriot - US 4th of July
 BEGIN_TRANSFORM_SCHEMA_GRADIENT_PALETTE(July4th)
   TRANSOFRM_PALETTE(july4_2_gp)
+END_TRANSFORM_SCHEMA()
+
+
+///////////////////
+//Valentines day
+BEGIN_TRANSFORM_SCHEMA_GRADIENT_PALETTE(ValentinesDay)
+  TRANSOFRM_PALETTE(firstlove_gp)
+  TRANSOFRM_PALETTE(roseedan_gp)
+  TRANSOFRM_PALETTE(passionata_gp)
 END_TRANSFORM_SCHEMA()
 
 

@@ -16,6 +16,8 @@
 #include "Effect.h"
 #include "EffectSound.h"
 
+#include "Matrix.h"
+
 #include "Macro.h"
 #include "Pins.h"
 
@@ -35,6 +37,7 @@
 #include "Effects/Juggle.h"
 #include "Effects/TwinkleFox.h"
 #include "Effects/PacificOcean.h"
+#include "Effects/MatrixAnimation.h"
 #include "Effects/Sound.h"
 
 #if defined(__OUTAGE_LAMP_SETUP)
@@ -183,7 +186,7 @@ void setup() {
         ADD_EFFECT(EffectColorWipe)               
         ADD_EFFECT(EffectTheaterChaseRainbow)
         ADD_EFFECT(EffectJuggle)
-        ADD_EFFECT(EffectTwinkleFox, FuncGetPal_TwinkleFox)
+        ADD_EFFECT(EffectTwinkleFox, TwinkleFox)
       END_MODE()
       BEGIN_MODE(Static, 3)
         ADD_STATIC_COLOR(CHSV(HUE_BLUE, 0xFF, 0xFF))        
@@ -587,7 +590,7 @@ void setup() {
 #elif defined(__TAHOE_SETUP)
 
 ////////////////////////////////////////
-// WS2811 string, 12v 406 LEDs, remote with separate buttons for effect and mode change, one button for effect and mode change
+// WS2811 string, 12v 417 LEDs, remote with separate buttons for effect and mode change, one button for effect and mode change
 #pragma message "Compile Tahoe"
 
 void setup() {
@@ -597,33 +600,37 @@ void setup() {
   BEGIN_EFFECT_ENGINE(EFF_RANDOM_START_EFFECT)
     //Effects   
     BEGIN_EFFECTS()
-      BEGIN_MODE(Effects, 10)        
+      BEGIN_MODE(Effects, 8)        
         ADD_EFFECT(EffectRipple<10>)
-        ADD_EFFECT(EffectMeteorRain<>)   
         ADD_EFFECT(EffectPlasma)        
         ADD_EFFECT(EffectConfetti)
-        ADD_EFFECT(EffectBlur)
         ADD_EFFECT(EffectNoise)            
         ADD_EFFECT(EffectMoodBlobs)
         ADD_EFFECT(EffectJuggle)
-        ADD_EFFECT(EffectTwinkleFox, FuncGetPal_TwinkleFox)
+        ADD_EFFECT(EffectTwinkleFox, TwinkleFox)
         ADD_EFFECT(EffectPacificOcean)
       END_MODE()
       
-      BEGIN_MODE(Halloween, 3)      
-        ADD_EFFECT( EffectConfetti, &TransformAutunm )
-        ADD_EFFECT( EffectNoise, &TransformHalloween )
+      BEGIN_MODE(Halloween, 2)      
+        ADD_EFFECT(EffectConfetti, &TransformAutunm )
+        ADD_EFFECT(EffectNoise, &TransformHalloween )
       END_MODE()
       
       BEGIN_MODE(Chrsitmas, 3)      
-        ADD_EFFECT( EffectConfetti, &TransformChristmas)
-        ADD_EFFECT( EffectPlasma, &TransformChristmas )
-        ADD_EFFECT(EffectTwinkleFox, FuncGetPal_SnowAndIce)
+        ADD_EFFECT(EffectConfetti, &TransformChristmas)
+        ADD_EFFECT(EffectPlasma, &TransformChristmas )
+        ADD_EFFECT(EffectTwinkleFox, &SnowAndIce)
       END_MODE()
 
-      BEGIN_MODE(July4, 3)      
-        ADD_EFFECT( EffectConfetti, &July4th )
-        ADD_EFFECT( EffectNoise, &July4th )
+      BEGIN_MODE(Valentines, 3)      
+        ADD_EFFECT(EffectConfetti, &ValentinesDay )
+        ADD_EFFECT(EffectNoise, &ValentinesDay )
+        ADD_EFFECT(EffectTwinkleFox, &ValentinesDay)
+      END_MODE()
+
+      BEGIN_MODE(July4, 2)      
+        ADD_EFFECT(EffectConfetti, &July4th )
+        ADD_EFFECT(EffectNoise, &July4th )
       END_MODE()
     END_EFFECTS()
     
@@ -649,7 +656,110 @@ void setup() {
 }
 
 // __TAHOE_SETUP
+#elif defined(__SOUND_MATRIX_16x16)
 
+///////////////////////////////////////////////////
+// 16x16 Matrix, with MSGEQ07 
+#include <SoundCapture.h>
+
+#pragma message "Compile for 16x16 matrix with MSGEQ7 sound capture"
+
+void setup() {
+  DBG_INIT();
+  DBG_OUTLN("Led effect started - 16x16 sound matrix");  
+
+  INIT_SOUND_CAPTURE(SoundCaptureMSGEQ7, MSGEQ7_ANALOG_PIN, MSGEQ7_STROBE_PIN, MSGEQ7_RESET_PIN)    
+  
+  //Effect Engine
+  BEGIN_EFFECT_ENGINE(0) 
+    //Effects   
+    BEGIN_EFFECTS()
+      BEGIN_MODE(Sound, 3)            
+        ADD_EFFECT(EffectSoundRGB)
+        ADD_EFFECT(EffectSoundMatrixSymmetric)
+        ADD_EFFECT(EffectSoundMatrixColumn)
+      END_MODE()
+      BEGIN_MODE(Effects, 10)                
+        ADD_EFFECT(EffectJuggle)
+        ADD_EFFECT(EffectTwinkleFox, TwinkleFox)        
+        ADD_EFFECT(EffectPacificOcean)         
+      END_MODE()      
+    END_EFFECTS()
+    
+    //Leds
+    BEGIN_LEDS() 
+      ADD_STRIP(NEOPIXEL, LED_PIN)
+    END_LEDS()
+
+  //Control    
+ 
+    BEGIN_CONTROL_MAP()
+     
+      BEGIN_PUSH_BUTTON(MODE_PIN)    
+        PUSH_BUTTON_TO_CMD(EEMC_MODE, PB_CONTROL_PUSH_LONG)
+        PUSH_BUTTON_TO_CMD(EEMC_EFFECT, PB_CONTROL_CLICK_SHORT)      
+      END_PUSH_BUTTON() 
+
+      SW2POS_TO_CMD(EEMC_SOUND_LOG, 7)
+      SW2POS_TO_CMD(EEMC_SOUND_USE_MAX, 6)
+      SW2POS_TO_CMD(EEMC_SOUND_USE_MIN, 5)
+      POT_TO_CMD(EEMC_SOUND_LOW, SOUND_LOW_PIN, POT_NOISE_THRESHOLD, 100)
+      POT_TO_CMD(EEMC_SOUND_SENSITIVITY, SOUND_HIGH_PIN, POT_NOISE_THRESHOLD, 300)
+     
+
+    END_CONTROL_MAP()
+       
+  END_EFFECT_ENGINE() 
+}
+
+// __SOUND_MATRIX_16x16
+#elif defined(__FRAME_MATRIX_16x16)
+
+#pragma message "Compile for 16x16 matrix in a frame"
+
+void setup() {
+  DBG_INIT();
+  DBG_OUTLN("Led effect started - 16x16 matrix in frame");  
+
+  
+  //Effect Engine
+  BEGIN_EFFECT_ENGINE(0) 
+    //Effects   
+    BEGIN_EFFECTS()
+      BEGIN_MODE(Effects, 15)
+        ADD_EFFECT(EffectConfetti)
+        //ADD_EFFECT(EffectMeteorRain<5>)
+        ADD_EFFECT(EffectPlasma)
+        ADD_EFFECT(EffectTwinkleFox)
+        //ADD_EFFECT(EffectJuggle)
+        ADD_EFFECT(EffectPacificOcean)        
+        //ADD_EFFECT(EffectBlur)
+        ADD_EFFECT(EffectNoise)            
+        ADD_EFFECT(EffectMoodBlobs) 
+        ADD_EFFECT(EffectMatrixDrops<8>, TwinkleFox)
+        ADD_EFFECT(EffectMatrixCircles<2>)
+      END_MODE()
+    END_EFFECTS()
+    
+    //Leds
+    BEGIN_LEDS() 
+      ADD_STRIP(NEOPIXEL, LED_PIN)
+    END_LEDS()
+
+  //Control    
+ 
+    BEGIN_CONTROL_MAP()
+     
+      BEGIN_PUSH_BUTTON(MODE_PIN)    
+        PUSH_BUTTON_TO_CMD(EEMC_EFFECT, PB_CONTROL_CLICK_SHORT)      
+      END_PUSH_BUTTON() 
+      
+    END_CONTROL_MAP()
+       
+  END_EFFECT_ENGINE() 
+}
+
+//__FRAME_MATRIX_16x16
 #else 
 ////////////////////////////////////////
 // Everything else
@@ -661,33 +771,29 @@ void setup() {
   DBG_INIT();
   DBG_OUTLN("Led effect started - default");  
 
-  INIT_SOUND_CAPTURE(SoundCaptureMSGEQ7, MSGEQ7_ANALOG_PIN, MSGEQ7_STROBE_PIN, MSGEQ7_RESET_PIN)    
+  //INIT_SOUND_CAPTURE(SoundCaptureMSGEQ7, MSGEQ7_ANALOG_PIN, MSGEQ7_STROBE_PIN, MSGEQ7_RESET_PIN)    
   
   //Effect Engine
   BEGIN_EFFECT_ENGINE(0) 
     //Effects   
     BEGIN_EFFECTS()
-      BEGIN_MODE(Sound, 3)            
-        ADD_EFFECT(EffectSoundMatrixSymmetric)
-        ADD_EFFECT(EffectSoundMatrixColumn)
-
-      END_MODE()
+      //BEGIN_MODE(Sound, 3)            
+      //  ADD_EFFECT(EffectSoundMatrixSymmetric)
+       // ADD_EFFECT(EffectSoundMatrixColumn)
+      //END_MODE()
       BEGIN_MODE(Effects, 15)
-        //ADD_EFFECT(EffectFire)
-        //ADD_EFFECT(EffectMeteorRain<>)
+        ADD_EFFECT(EffectConfetti)
+        ADD_EFFECT(EffectMeteorRain<5>)
         ADD_EFFECT(EffectPlasma)
+        ADD_EFFECT(EffectTwinkleFox)
         ADD_EFFECT(EffectJuggle)
-        ADD_EFFECT(EffectTwinkleFox, FuncGetPal_SnowAndIce)
-        ADD_EFFECT(EffectTwinkleFox, FuncGetPal_TwinkleFox)
-        //ADD_EFFECT(EffectPacificOcean)
-        
-        //ADD_EFFECT(EffectConfetti)
-        //ADD_EFFECT(EffectPaletteTransformFast) 
-        //ADD_EFFECT(EffectBlur)
-        //ADD_EFFECT(EffectRainbowMove)
-        //ADD_EFFECT(EffectNoise)            
-        //ADD_EFFECT(EffectMoodBlobs) 
-        //ADD_EFFECT(EffectRainbow)
+        ADD_EFFECT(EffectPacificOcean)        
+        ADD_EFFECT(EffectBlur)
+        ADD_EFFECT(EffectNoise)            
+        ADD_EFFECT(EffectMoodBlobs) 
+        ADD_EFFECT(EffectMatrixDrops<8>, TwinkleFox)
+        ADD_EFFECT(EffectMatrixCircles<1>)
+        //ADD_EFFECT(EffectRipple<5>)   
         //ADD_EFFECT(EffectFadeInOut)
         //ADD_EFFECT(EffectRunningLights)           //Single color
         //ADD_EFFECT(EffectColorWipe)               //Not intersting
@@ -715,11 +821,11 @@ void setup() {
         PUSH_BUTTON_TO_CMD(EEMC_EFFECT, PB_CONTROL_CLICK_SHORT)      
       END_PUSH_BUTTON() 
 
-      SW2POS_TO_CMD(EEMC_SOUND_LOG, 7)
-      SW2POS_TO_CMD(EEMC_SOUND_USE_MAX, 6)
-      SW2POS_TO_CMD(EEMC_SOUND_USE_MIN, 5)
-      POT_TO_CMD(EEMC_SOUND_LOW, SOUND_LOW_PIN, POT_NOISE_THRESHOLD, 100)
-      POT_TO_CMD(EEMC_SOUND_SENSITIVITY, SOUND_HIGH_PIN, POT_NOISE_THRESHOLD, 300)
+      //SW2POS_TO_CMD(EEMC_SOUND_LOG, 7)
+      //SW2POS_TO_CMD(EEMC_SOUND_USE_MAX, 6)
+      //SW2POS_TO_CMD(EEMC_SOUND_USE_MIN, 5)
+      //POT_TO_CMD(EEMC_SOUND_LOW, SOUND_LOW_PIN, POT_NOISE_THRESHOLD, 100)
+      //POT_TO_CMD(EEMC_SOUND_SENSITIVITY, SOUND_HIGH_PIN, POT_NOISE_THRESHOLD, 300)
      
     
       //PUSH_BUTTON_SA_TO_CMD(EEMC_MODE, MODE_PIN)            //Mode

@@ -4,7 +4,6 @@
 #include <utils.h>
 #include <SoundCapture.h>
 
-#ifdef USE_MATRIX
 #include "Matrix.h"
 
 
@@ -31,10 +30,10 @@ inline EffectSoundMatrix::EffectSoundMatrix(){
 inline void EffectSoundMatrix::updateLeds(CRGB *leds, int numLeds, const band8_visual &data){
   //Number of sections
   //Last two sections are for tuning
-  XY *xy = &_ctx.xy;
+  XY xy;
 
-  int bandLeds = xy->height();
-  int bandRows = xy->width() / SC_MAX_BANDS;
+  int bandLeds = xy.height();
+  int bandRows = xy.width() / SC_MAX_BANDS;
 
   //Draw each band according to matrix configuration
   for(int i = 0; i < SC_MAX_BANDS; i++){
@@ -45,8 +44,8 @@ inline void EffectSoundMatrix::updateLeds(CRGB *leds, int numLeds, const band8_v
     //Bars
     for(int j = 0; j < bandRows; j++){  
       
-      int first = xy->xy(i * bandRows + j, 0);
-      int last  = xy->xy(i * bandRows + j, xy->height() - 1);
+      int first = xy.xy(i * bandRows + j, 0);
+      int last  = xy.xy(i * bandRows + j, xy.height() - 1);
       
       int index = first > last ? last : first;
 
@@ -144,6 +143,38 @@ inline void EffectSoundMatrixSymmetric::drawMatrixBar(CRGB *leds,
                    );  
 }
 
-#endif //USE_MATRIX
+
+/////////////////////////////////////////////////////
+// EffectSoundRGB
+
+class EffectSoundRGB: public EffectSound{
+  public:
+    void updateLeds(CRGB *leds, int numLeds, const band8_visual &data);
+  
+};
+
+
+void EffectSoundRGB::updateLeds(CRGB *leds, int numLeds, const band8_visual &data){
+  XYDraw draw(leds, numLeds);
+
+  
+  fadeToBlackBy(leds, numLeds, 64);    
+
+  //int16_t r = mapEx( max(data.scale(0), data.scale(1) ), 0, 255, 0, draw.width()/2 );
+  //int16_t r = mapEx( max(max(data.scale(2), data.scale(3)),  data.scale(4)), 0, 255, 0, draw.width()/2 );
+  int16_t r = mapEx( (data.scale(2) + data.scale(3) + data.scale(4)) / 3, 0, 255, 0, draw.width()/2 );
+  //int16_t r = mapEx( max(data.scale(5), data.scale(6) ), 0, 255, 0, draw.width()/2 );
+
+  draw.fillCircle(draw.width()/2, draw.height()/2, r, CRGB::Blue);
+  
+
+  //uint16_t h = draw.height() / 3;
+  //uint16_t w = draw.height() / 3;
+
+  
+
+}
+
+
 
 #endif//__SOUND_H

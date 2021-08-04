@@ -2,12 +2,33 @@
 #define __TWINKLE_FOX
 
 
+////////////////////////////////////
+// TwinkleFox palette transformations 
+
+BEGIN_TRANSFORM_SCHEMA_RGB16_PALETTE(TwinkleFox)
+  TRANSOFRM_PALETTE(RetroC9_p)
+  TRANSOFRM_PALETTE(BlueWhite_p)
+  TRANSOFRM_PALETTE(RainbowColors_p)
+  TRANSOFRM_PALETTE(FairyLight_p)
+  TRANSOFRM_PALETTE(RedGreenWhite_p)
+  TRANSOFRM_PALETTE(PartyColors_p)
+  TRANSOFRM_PALETTE(RedWhite_p)
+  TRANSOFRM_PALETTE(Snow_p)
+  TRANSOFRM_PALETTE(Holly_p)
+  TRANSOFRM_PALETTE(Ice_p)
+END_TRANSFORM_SCHEMA()
+
+BEGIN_TRANSFORM_SCHEMA_RGB16_PALETTE(SnowAndIce)
+  TRANSOFRM_PALETTE(BlueWhite_p)
+  TRANSOFRM_PALETTE(Snow_p)
+  TRANSOFRM_PALETTE(Ice_p)
+END_TRANSFORM_SCHEMA()
 
 ///////////////////////////////////////
 // EffectTwinkleFox
 class EffectTwinkleFox: public EffectPaletteTransform{
 public:
-  EffectTwinkleFox(FuncGetPalette_t getPal = &FuncGetPal_Default);
+  EffectTwinkleFox(FuncGetPalette_t getPal = &TwinkleFox);
   ~EffectTwinkleFox();
 
 protected:
@@ -146,24 +167,7 @@ CRGB EffectTwinkleFox::computeOneTwinkle( uint32_t ms, uint8_t salt)
 }
 
 
-BEGIN_TRANSFORM_SCHEMA_RGB16_PALETTE(FuncGetPal_TwinkleFox)
-  TRANSOFRM_PALETTE(RetroC9_p)
-  TRANSOFRM_PALETTE(BlueWhite_p)
-  TRANSOFRM_PALETTE(RainbowColors_p)
-  TRANSOFRM_PALETTE(FairyLight_p)
-  TRANSOFRM_PALETTE(RedGreenWhite_p)
-  TRANSOFRM_PALETTE(PartyColors_p)
-  TRANSOFRM_PALETTE(RedWhite_p)
-  TRANSOFRM_PALETTE(Snow_p)
-  TRANSOFRM_PALETTE(Holly_p)
-  TRANSOFRM_PALETTE(Ice_p)
-END_TRANSFORM_SCHEMA()
 
-BEGIN_TRANSFORM_SCHEMA_RGB16_PALETTE(FuncGetPal_SnowAndIce)
-  TRANSOFRM_PALETTE(BlueWhite_p)
-  TRANSOFRM_PALETTE(Snow_p)
-  TRANSOFRM_PALETTE(Ice_p)
-END_TRANSFORM_SCHEMA()
 
 
 

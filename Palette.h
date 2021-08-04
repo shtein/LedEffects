@@ -35,5 +35,8 @@ extern const TProgmemRGBPalette16 Pacifica_1_p FL_PROGMEM;
 extern const TProgmemRGBPalette16 Pacifica_2_p FL_PROGMEM;
 extern const TProgmemRGBPalette16 Pacifica_3_p FL_PROGMEM;
 
-
+//Valentines day
+DECLARE_GRADIENT_PALETTE(firstlove_gp); 
+DECLARE_GRADIENT_PALETTE(roseedan_gp); 
+DECLARE_GRADIENT_PALETTE(passionata_gp); 
 #endif //_PALETTE_H

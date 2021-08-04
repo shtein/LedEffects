@@ -66,7 +66,7 @@ class EffectEngine{
     uint8_t    _numModes:4;               //Total number of modes
     uint8_t    _modeNum:4;                //Current mode
 
-    EELEDS      _leds;                    //Leds
+    EELEDS     _leds;                    //Leds
     uint16_t   _numLeds:12;               //Max number of leds    
     uint16_t   _flags:4;                  //Flags 
    
