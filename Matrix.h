@@ -89,6 +89,10 @@ typedef XYMatrix<MATRIX_WIDTH, MATRIX_HEIGHT, MATRIX_TYPE> XY;          //Coordi
 
 #define XY_DRAW_ADD_COLORS 0x01
 
+//////////////////////////////
+// Mirror
+#define MIRROR(p, m) (2 * (m) - (p))
+
 class XYDraw: public XY{
 public:
   XYDraw(CRGB *leds, int16_t numLeds, uint8_t flags = 0);
@@ -107,8 +111,57 @@ public:
   void circle(int16_t xc, int16_t yc, int16_t r, const CRGB &col);
   void fillCircle(int16_t xc, int16_t yc, int16_t r, const CRGB &col);
   
-  void bar(int16_t x0, int16_t y0, int16_t x1, int16_t y1, const CRGB &col);
-  void fillBar(int16_t x0, int16_t y0, int16_t x1, int16_t y1, const CRGB &col);
+  void rectangle(int16_t x0, int16_t y0, int16_t x1, int16_t y1, const CRGB &col);
+  void fillRectangle(int16_t x0, int16_t y0, int16_t x1, int16_t y1, const CRGB &col);
+
+
+  
+  void mirrorRectangle(int16_t x0, int16_t y0,          //Left-top corner
+                      uint16_t width, uint16_t height,  //Width and height
+                      int16_t mx, int16_t my,           //Morror point
+                      int16_t shiftx = 0,               //Horizontal shift
+                      int16_t shifty = 0                //Vertical shift
+                      );
+  void mirrorRectangleHorizontally(int16_t x0, int16_t y0,         //Left-top corner
+                                   uint16_t width, uint16_t height, //Width and height
+                                   int16_t mx,                      //Mirror x coordinate
+                                   int16_t shiftx = 0,              //Horizontal shift
+                                   int16_t shifty = 0               //Vertical shift
+                                 );
+  void mirrorRectangleVertically(int16_t x0, int16_t y0,          //Left-top corner
+                                 uint16_t width, uint16_t height, //Width and height
+                                 int16_t my,                      //Reflection y-coordinate
+                                 int16_t shiftx = 0,              //Horizontal shift
+                                 int16_t shifty = 0               //Vertical shift
+                                );                          
+
+
+  void rightTriangle(int16_t x0, int16_t y0,   //Coordinates of right angle
+                     int16_t dx, int16_t dy,   //Vertical and horizontal cathetus
+                     const CRGB & col          //Color      
+                    );                                  
+  void mirrorRightTriangle( int16_t x0, int16_t y0,   //Coordinates of right angle
+                            int16_t dx, int16_t dy,   //Vertical and horizontal cathetus
+                            int16_t mx, int16_t my,   //Morror point
+                            int16_t shiftx = 0, 
+                            int16_t shifty = 0
+                          );                                
+void mirrorRightTriangleHorizontally( int16_t x0, int16_t y0,   //Coordinates of right angle
+                                      int16_t dx, int16_t dy,   //Vertical and horizontal cathetus
+                                      int16_t mx,   //Reflection x coordinate
+                                      int16_t shiftx = 0, 
+                                      int16_t shifty = 0
+                                    );                                                                                             
+void mirrorRightTriangleVertically( int16_t x0, int16_t y0,   //Coordinates of right angle
+                                    int16_t dx, int16_t dy,   //Vertical and horizontal cathetus
+                                    int16_t my,   //Reflection y coordinate
+                                    int16_t shiftx = 0, 
+                                    int16_t shifty = 0
+                                  ); 
+void mirrorRightTriangleButterfly(int16_t x0, int16_t y0,   //Coordinates of right angle
+                                    int16_t dx, int16_t dy,   //Vertical and horizontal cathetus
+                                    int16_t shiftx = 0, 
+                                    int16_t shifty = 0 );
 
 protected:
   CRGB   *_leds;      //leds array
@@ -116,6 +169,9 @@ protected:
   int16_t _numLeds;   //max leds
   uint8_t _flags;     //drawing options
 };
+
+
+
 
 
 #endif //__MATRIX_H

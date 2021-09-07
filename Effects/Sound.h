@@ -171,8 +171,6 @@ void EffectSoundRGB::updateLeds(CRGB *leds, int numLeds, const band8_visual &dat
   //uint16_t h = draw.height() / 3;
   //uint16_t w = draw.height() / 3;
 
-  
-
 }
 
 

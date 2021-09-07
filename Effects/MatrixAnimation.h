@@ -10,11 +10,25 @@ struct Pnt {
   inline Pnt() __attribute__((always_inline)) = default;
   inline Pnt(int8_t x0, int8_t y0) __attribute__((always_inline)): x(x0), y(y0)
   {
-  }
+  };
 
-  inline Pnt& operator= (const Pnt& rhs) __attribute__((always_inline)) = default;
+  inline Pnt& operator= (const Pnt& pnt) __attribute__((always_inline)) = default;
+
+  inline Pnt mirror(const Pnt &m) const __attribute__((always_inline)) {
+    return Pnt( MIRROR(x, m.x), MIRROR(y, m.y));
+  }
   
 };
+
+inline Pnt operator+ (const Pnt& pnt1, const Pnt& pnt2)  {
+  return Pnt(pnt1.x + pnt2.x, pnt1.y + pnt2.y);
+};
+
+inline Pnt operator-(const Pnt& pnt1, const Pnt& pnt2){
+  return Pnt(pnt1.x - pnt2.x, pnt1.y - pnt2.y);
+};
+
+
 
 
 ///////////////////////////////////////
@@ -173,6 +187,28 @@ protected:
 
 };
 
+
+template <class T> 
+class EffectMatrixKaleidoscope: public T{
+
+  protected:
+  inline void proceed(CRGB *leds, int numLeds){
+    T::proceed(leds, numLeds);
+    
+    XYDraw xy(leds, numLeds);
+
+    
+
+    xy.mirrorRightTriangleButterfly(0, xy.height() / 2 - 1, 
+                                    xy.width() / 2, -xy.height() / 2,
+                                    xy.width() / 2 - 1, -xy.height() / 2 + 1
+                                  );
+    xy.mirrorRectangleHorizontally(0, 0, xy.width()/2, xy.height()/2, xy.width()/2, xy.width() % 2 - 1);
+    xy.mirrorRectangleVertically(0, 0, xy.width(), xy.height() / 2, xy.height() / 2, 0, xy.height() % 2 - 1);
+
+  };
+
+};
 
 
 
