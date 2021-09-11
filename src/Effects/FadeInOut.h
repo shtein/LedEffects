@@ -11,7 +11,7 @@ class EffectFadeInOut: public EffectColor{
     ~EffectFadeInOut();
 
   protected:
-    void proceed(CRGB *leds, int numLeds); 
+    void proceed(CRGB *leds, uint16_t numLeds); 
     void reset();
 };
 
@@ -29,7 +29,7 @@ inline void EffectFadeInOut::reset(){
 
 #define FIO_STEP 5
 
-inline void EffectFadeInOut::proceed(CRGB *leds, int numLeds){
+inline void EffectFadeInOut::proceed(CRGB *leds, uint16_t numLeds){
   CHSV hsv = getHSV();
 
   //See if we need to change color

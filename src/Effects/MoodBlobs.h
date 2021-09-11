@@ -11,7 +11,7 @@ class EffectMoodBlobs: public Effect{
 
 protected:
     void reset();
-    void proceed(CRGB *leds, int numLeds); 
+    void proceed(CRGB *leds, uint16_t numLeds); 
 
 protected:
   byte _blobPhase;
@@ -32,9 +32,9 @@ void EffectMoodBlobs::reset(){
   _blobPhase = 0;
 }
 
-void EffectMoodBlobs::proceed(CRGB *leds, int numLeds){
+void EffectMoodBlobs::proceed(CRGB *leds, uint16_t numLeds){
 
-  for(int i = 0; i < numLeds; i++){
+  for(uint16_t i = 0; i < numLeds; i++){
     //Get base color
     CHSV hsv = CHSV(HUE_RED, 0xFF, 0xFF);
     

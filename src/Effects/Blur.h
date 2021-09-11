@@ -8,7 +8,7 @@ class EffectBlur: public Effect{
      EffectBlur(); 
     ~EffectBlur();
 
-    void proceed(CRGB *leds, int numLeds); 
+    void proceed(CRGB *leds, uint16_t numLeds); 
     void reset();
 };
 
@@ -23,7 +23,7 @@ inline EffectBlur::~EffectBlur(){
 inline void EffectBlur::reset(){
 }
 
-inline void EffectBlur::proceed(CRGB *leds, int numLeds){
+inline void EffectBlur::proceed(CRGB *leds, uint16_t numLeds){
   
   uint8_t blurAmount = dim8_raw( beatsin8(3, 64, 192) );       
   blur1d( leds, numLeds, blurAmount);                        

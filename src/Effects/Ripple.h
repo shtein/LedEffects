@@ -69,11 +69,10 @@ template <const int MAX_RIPPLES = 5>
 class EffectRipple: public Effect{
 public:
   EffectRipple();
-  ~EffectRipple();  
 
 protected:
   void reset();
-  void proceed(CRGB *leds, int numLeds);
+  void proceed(CRGB *leds, uint16_t numLeds);
 
 protected:
   Ripple _ripples[MAX_RIPPLES];
@@ -85,15 +84,11 @@ inline EffectRipple<MAX_RIPPLES>::EffectRipple(){
 }
 
 template <const int MAX_RIPPLES>
-inline EffectRipple<MAX_RIPPLES>::~EffectRipple(){
-}
-
-template <const int MAX_RIPPLES>
 inline void EffectRipple<MAX_RIPPLES>::reset(){
 }
 
 template <const int MAX_RIPPLES>
-inline void EffectRipple<MAX_RIPPLES>::proceed(CRGB *leds, int numLeds){
+inline void EffectRipple<MAX_RIPPLES>::proceed(CRGB *leds, uint16_t numLeds){
   
   //Fade current
   fadeToBlackBy(leds, numLeds, RIPPLE_FADE);  

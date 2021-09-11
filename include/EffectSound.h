@@ -148,17 +148,17 @@ class EffectSound: public Effect{
     
   protected:
     virtual void reset();
-    virtual void proceed(CRGB *leds, int numLeds);    
+    virtual void proceed(CRGB *leds, uint16_t numLeds);    
 
     virtual void updateLeds(CRGB *leds, 
-                            int numLeds, 
+                            uint16_t numLeds, 
                             const band8_visual &data);
 
     void getBands(band8_visual &output);
 
     //Primitives
     void drawBand(CRGB *leds,
-                  int numLeds,                  
+                  uint16_t numLeds,                  
                   int center,
                   uint8_t volume,
                   uint8_t colorIndexFirst,
@@ -166,14 +166,14 @@ class EffectSound: public Effect{
                 );
 
     void drawBandSymmetric(CRGB *leds,
-                           int numLeds,
+                           uint16_t numLeds,
                            uint8_t volume,
                            uint8_t colorIndexFirst,
                            uint8_t colorIndexLast
                          ); 
 
     void drawBoundary(CRGB *leds, 
-                      int numLeds, 
+                      uint16_t numLeds, 
                       uint8_t bottom,
                       uint8_t lower, 
                       uint8_t upper,

@@ -21,10 +21,10 @@ class Effect{
     virtual ~Effect();
 
     //Init
-    void init(CRGB *leds, int numLeds);
+    void init(CRGB *leds, uint16_t numLeds);
     
     //Process
-    void loop(CRGB *leds, int numLeds); 
+    void loop(CRGB *leds, uint16_t numLeds); 
 
     //Command processing
     virtual void onCmd(const struct CtrlQueueItem &itm);
@@ -36,13 +36,13 @@ class Effect{
 
   protected:
     virtual void reset() = 0;
-    virtual void proceed(CRGB *leds, int numLeds) = 0;
+    virtual void proceed(CRGB *leds, uint16_t numLeds) = 0;
   
     //Work with leds
     static void setPixel(CRGB &led, byte red, byte green, byte blue);
     static void setPixel(CRGB &led, const CRGB &color);
-    static void setAll(CRGB *leds, int numLeds, byte red, byte green, byte blue);
-    static void setAll(CRGB *leds, int numLeds, const CRGB &color);  
+    static void setAll(CRGB *leds, uint16_t numLeds, byte red, byte green, byte blue);
+    static void setAll(CRGB *leds, uint16_t numLeds, const CRGB &color);  
 
  protected:
     ///////////////////
@@ -100,7 +100,7 @@ class EffectPaletteTransform: public Effect{
     EffectPaletteTransform(FuncGetPalette_t getPal);
    ~EffectPaletteTransform();
 
-   virtual void proceed(CRGB *leds, int numLeds);
+   virtual void proceed(CRGB *leds, uint16_t numLeds);
    virtual void reset();
 
   protected:
@@ -108,7 +108,7 @@ class EffectPaletteTransform: public Effect{
     CRGB getCurrentPalColor(uint8_t index, uint8_t brightness = 255, TBlendType blendType = LINEARBLEND) const;
   
     virtual void updateColors();
-    virtual void updateLeds(CRGB *leds, int numLeds);
+    virtual void updateLeds(CRGB *leds, uint16_t numLeds);
     
     
     virtual bool isReadyToBlendPal() const;

@@ -170,7 +170,7 @@ void EffectSound::getBands(band8_visual &output){
   //DBG_OUTLN(" %d, %d / %d, %d / %d", output.lower, output.upper, output.min, output.max, output.sensitivity);     
 }
 
-void EffectSound::proceed(CRGB *leds, int numLeds){    
+void EffectSound::proceed(CRGB *leds, uint16_t numLeds){    
     
     //Retrieve data
     band8_visual output;    
@@ -214,7 +214,7 @@ void EffectSound::onCmd(const struct CtrlQueueItem &itm){
 }
 
 
-void EffectSound::updateLeds(CRGB *leds, int numLeds, const band8_visual &data){
+void EffectSound::updateLeds(CRGB *leds, uint16_t numLeds, const band8_visual &data){
 
   //Number of sections
   int bandLeds = numLeds / SC_MAX_BANDS;
@@ -238,7 +238,7 @@ void EffectSound::updateLeds(CRGB *leds, int numLeds, const band8_visual &data){
 #define SS_FADE_FACTOR_MAX 65
 
 void EffectSound::drawBand(CRGB *leds,
-                           int numLeds,
+                           uint16_t numLeds,
                            int center,
                            uint8_t volume, 
                            uint8_t colorIndexFirst,
@@ -283,7 +283,7 @@ void EffectSound::drawBand(CRGB *leds,
 }
 
 void EffectSound::drawBandSymmetric(CRGB *leds,
-                                    int numLeds,
+                                    uint16_t numLeds,
                                     uint8_t volume,
                                     uint8_t colorIndexFirst, 
                                     uint8_t colorIndexLast
@@ -306,7 +306,7 @@ void EffectSound::drawBandSymmetric(CRGB *leds,
 } 
 
 void EffectSound::drawBoundary(CRGB *leds, 
-                               int numLeds, 
+                               uint16_t numLeds, 
                                uint8_t bottom, 
                                uint8_t lower, 
                                uint8_t upper,

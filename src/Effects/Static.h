@@ -4,10 +4,9 @@
 class EffectStatic: public EffectColor{
   public:
     EffectStatic(const CHSV &hsv);
-    ~EffectStatic();
 
   protected:
-    void proceed(CRGB *leds, int numLeds); 
+    void proceed(CRGB *leds, uint16_t numLeds); 
     void reset();
 };
 
@@ -17,13 +16,10 @@ inline EffectStatic::EffectStatic(const CHSV &hsv):
   setSpeedDelay(100);
 }
 
-inline EffectStatic::~EffectStatic(){
-}
-
 inline void EffectStatic::reset(){
 }
 
-inline void EffectStatic::proceed(CRGB *leds, int numLeds){
+inline void EffectStatic::proceed(CRGB *leds, uint16_t numLeds){
   setAll(leds, numLeds, getColor());
 }
 

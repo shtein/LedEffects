@@ -7,7 +7,7 @@ class EffectJuggle: public Effect{
      EffectJuggle(); 
     ~EffectJuggle();
 
-    void proceed(CRGB *leds, int numLeds); 
+    void proceed(CRGB *leds, uint16_t numLeds); 
     void reset();
 };
 
@@ -18,7 +18,7 @@ inline EffectJuggle::EffectJuggle(){
 inline EffectJuggle::~EffectJuggle(){
 }
 
-inline void EffectJuggle::proceed(CRGB *leds, int numLeds){
+inline void EffectJuggle::proceed(CRGB *leds, uint16_t numLeds){
 
   fadeToBlackBy(leds, numLeds, 20);
 

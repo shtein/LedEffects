@@ -8,18 +8,18 @@ public:
 
 protected:
   void reset();
-  void proceed(CRGB *leds, int numLeds); 
+  void proceed(CRGB *leds, uint16_t numLeds); 
 
   void oneLayer(CRGB *leds, 
-                int numLeds, 
+                uint16_t numLeds, 
                 const CRGBPalette16 &pal, 
                 uint16_t cistart, 
                 uint16_t wavescale, 
                 uint8_t bri, 
                 uint16_t ioff 
                );
-  void addWhitecaps(CRGB *leds, int numLeds);
-  void deepenColors(CRGB *leds, int numLeds);
+  void addWhitecaps(CRGB *leds, uint16_t numLeds);
+  void deepenColors(CRGB *leds, uint16_t numLeds);
 
 protected:
   uint16_t _sCIStart1;
@@ -43,7 +43,7 @@ inline void EffectPacificOcean::reset(){
   _sCIStart4 = 0; 
 }
 
-inline void EffectPacificOcean::proceed(CRGB *leds, int numLeds){
+inline void EffectPacificOcean::proceed(CRGB *leds, uint16_t numLeds){
   // Increment the four "color index start" counters, one for each wave layer.
   // Each is incremented at a different speed, and the speeds vary over time.
   uint32_t deltams1     = (getSpeedDelay() * beatsin16(3, 179, 269)) / 256;
@@ -73,7 +73,7 @@ inline void EffectPacificOcean::proceed(CRGB *leds, int numLeds){
 
 
 inline void EffectPacificOcean::oneLayer( CRGB *leds, 
-                                          int numLeds, 
+                                          uint16_t numLeds, 
                                           const CRGBPalette16 &pal, 
                                           uint16_t cistart, 
                                           uint16_t wavescale, 
@@ -85,7 +85,7 @@ inline void EffectPacificOcean::oneLayer( CRGB *leds,
   uint16_t waveangle      = ioff;
   uint16_t wavescale_half = (wavescale / 2) + 20;
 
-  for( int i = 0; i < numLeds; i++) {
+  for( uint16_t i = 0; i < numLeds; i++) {
     waveangle += 250;
 
     uint16_t s16 = sin16( waveangle ) + 32768;
@@ -101,12 +101,12 @@ inline void EffectPacificOcean::oneLayer( CRGB *leds,
 }
 
 // Add extra 'white' to areas where the four layers of light have lined up brightly
-inline void EffectPacificOcean::addWhitecaps(CRGB *leds, int numLeds){
+inline void EffectPacificOcean::addWhitecaps(CRGB *leds, uint16_t numLeds){
 
   uint8_t basethreshold = beatsin8( 9, 55, 65);
   uint8_t wave          = beat8( 7 );
   
-  for( int i = 0; i < numLeds; i++) {
+  for( uint16_t i = 0; i < numLeds; i++) {
 
     uint8_t threshold = scale8( sin8( wave), 20) + basethreshold;
     wave += 7;
@@ -122,9 +122,9 @@ inline void EffectPacificOcean::addWhitecaps(CRGB *leds, int numLeds){
 }
 
 // Deepen the blues and greens
-inline void EffectPacificOcean::deepenColors(CRGB *leds, int numLeds){
+inline void EffectPacificOcean::deepenColors(CRGB *leds, uint16_t numLeds){
 
-  for( int i = 0; i < numLeds; i++) {
+  for(uint16_t i = 0; i < numLeds; i++) {
     leds[i].blue  = scale8( leds[i].blue,  145); 
     leds[i].green = scale8( leds[i].green, 200); 
     leds[i]      |= CRGB( 2, 5, 7);

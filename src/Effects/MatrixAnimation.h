@@ -24,7 +24,7 @@ inline Pnt operator+ (const Pnt& pnt1, const Pnt& pnt2)  {
   return Pnt(pnt1.x + pnt2.x, pnt1.y + pnt2.y);
 };
 
-inline Pnt operator-(const Pnt& pnt1, const Pnt& pnt2){
+inline Pnt operator- (const Pnt& pnt1, const Pnt& pnt2){
   return Pnt(pnt1.x - pnt2.x, pnt1.y - pnt2.y);
 };
 
@@ -47,7 +47,6 @@ struct Obj {
   }
 
   inline Obj& operator= (const Obj &)  __attribute__((always_inline)) = default;
-
 };
 
 
@@ -82,7 +81,7 @@ public:
   };
 
 protected:
-  inline void updateLeds(CRGB *leds, int numLeds) __attribute__((always_inline))
+  inline void updateLeds(CRGB *leds, uint16_t numLeds) __attribute__((always_inline))
   {
       //Fade all
     fadeToBlackBy(leds, numLeds, MATRIX_OBJECTS_FADE);  
@@ -124,7 +123,6 @@ protected:
 
 ////////////////////////////////////////
 // EffectMatrixCircles
-
 template <const int MAX_OBJECTS = 5>
 class EffectMatrixCircles: public EffectPaletteTransform{
 public:
@@ -143,7 +141,7 @@ public:
   
 
 protected:
-  inline void updateLeds(CRGB *leds, int numLeds) __attribute__((always_inline)){
+  inline void updateLeds(CRGB *leds, uint16_t numLeds) __attribute__((always_inline)){
     //Fade all
     fadeToBlackBy(leds, numLeds, MATRIX_OBJECTS_FADE );  
 
@@ -192,7 +190,7 @@ template <class T>
 class EffectMatrixKaleidoscope: public T{
 
   protected:
-  inline void proceed(CRGB *leds, int numLeds){
+  inline void proceed(CRGB *leds, uint16_t numLeds){
     T::proceed(leds, numLeds);
     
     XYDraw xy(leds, numLeds);

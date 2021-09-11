@@ -29,11 +29,10 @@ END_TRANSFORM_SCHEMA()
 class EffectTwinkleFox: public EffectPaletteTransform{
 public:
   EffectTwinkleFox(FuncGetPalette_t getPal = &TwinkleFox);
-  ~EffectTwinkleFox();
 
 protected:
   void reset();
-  void updateLeds(CRGB *leds, int numLeds);
+  void updateLeds(CRGB *leds, uint16_t numLeds);
 
   CRGB computeOneTwinkle( uint32_t ms, uint8_t salt);
 
@@ -44,16 +43,13 @@ private:
 inline EffectTwinkleFox::EffectTwinkleFox(FuncGetPalette_t getPal): EffectPaletteTransform(getPal){
 }
 
-inline EffectTwinkleFox::~EffectTwinkleFox(){
-}
-
 inline void EffectTwinkleFox::reset(){
   EffectPaletteTransform::reset();
 
   _bg = _ctx.palCurrent[0];
 }
 
-inline void EffectTwinkleFox::updateLeds(CRGB *leds, int numLeds){  
+inline void EffectTwinkleFox::updateLeds(CRGB *leds, uint16_t numLeds){  
   
   //Default background is black
   CRGB bg = CRGB::Black;
@@ -88,7 +84,7 @@ inline void EffectTwinkleFox::updateLeds(CRGB *leds, int numLeds){
   uint32_t clk   = millis();
 
   //Proceed with leds
-  for(int i = 0; i < numLeds; i++){
+  for(uint16_t i = 0; i < numLeds; i++){
 
     //Whatever this magic is
     rnd = (uint16_t)(rnd * 2053) + 1384; 

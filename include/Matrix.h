@@ -148,20 +148,20 @@ public:
                           );                                
 void mirrorRightTriangleHorizontally( int16_t x0, int16_t y0,   //Coordinates of right angle
                                       int16_t dx, int16_t dy,   //Vertical and horizontal cathetus
-                                      int16_t mx,   //Reflection x coordinate
+                                      int16_t mx,               //Reflection x coordinate
                                       int16_t shiftx = 0, 
                                       int16_t shifty = 0
                                     );                                                                                             
 void mirrorRightTriangleVertically( int16_t x0, int16_t y0,   //Coordinates of right angle
                                     int16_t dx, int16_t dy,   //Vertical and horizontal cathetus
-                                    int16_t my,   //Reflection y coordinate
+                                    int16_t my,               //Reflection y coordinate
                                     int16_t shiftx = 0, 
                                     int16_t shifty = 0
                                   ); 
 void mirrorRightTriangleButterfly(int16_t x0, int16_t y0,   //Coordinates of right angle
-                                    int16_t dx, int16_t dy,   //Vertical and horizontal cathetus
-                                    int16_t shiftx = 0, 
-                                    int16_t shifty = 0 );
+                                  int16_t dx, int16_t dy,   //Vertical and horizontal cathetus
+                                  int16_t shiftx = 0, 
+                                  int16_t shifty = 0 );
 
 protected:
   CRGB   *_leds;      //leds array

@@ -8,10 +8,9 @@
 class EffectRunningLights: public EffectColor{
   public:
     EffectRunningLights();
-    ~EffectRunningLights();
 
   protected:
-    void proceed(CRGB *leds, int numLeds); 
+    void proceed(CRGB *leds, uint16_t numLeds); 
     void reset();
 };
 
@@ -21,18 +20,15 @@ inline EffectRunningLights::EffectRunningLights(){
   setSpeedDelay(50);
 }
 
-inline EffectRunningLights::~EffectRunningLights(){
-}
-
 inline void EffectRunningLights::reset(){
   _ctx.step = 0;
 }
 
 
 #define RL_SIZE 6
-inline void EffectRunningLights::proceed(CRGB *leds, int numLeds){
+inline void EffectRunningLights::proceed(CRGB *leds, uint16_t numLeds){
   
-  for(int i = 0; i< numLeds; i++) {   
+  for(uint16_t i = 0; i < numLeds; i++) {   
     
     CHSV hsv = getHSV();
     hsv.v  = sin8( ((i + _ctx.step) % RL_SIZE) * 255 / (RL_SIZE - 1) );

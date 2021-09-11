@@ -88,7 +88,7 @@ public:
 
 protected:
   void reset();
-  void proceed(CRGB *leds, int numLeds);
+  void proceed(CRGB *leds, uint16_t numLeds);
 
 protected:
 
@@ -107,7 +107,7 @@ inline EffectMeteorRain<MAX_METEORS>::~EffectMeteorRain(){
 template <const int MAX_METEORS>
 inline void EffectMeteorRain<MAX_METEORS>::reset(){    
 
-  for(int16_t i = 0; i < MAX_METEORS; i++){
+  for(uint16_t i = 0; i < MAX_METEORS; i++){
     //Ret meteor position
     _meteors[i].setup(random8(METEOR_SPEED_MIN, METEOR_SPEED_MAX + 1), random8(METEOR_SIZE_MIN, METEOR_SIZE_MAX + 1));
   }
@@ -115,9 +115,9 @@ inline void EffectMeteorRain<MAX_METEORS>::reset(){
 
 
 template <const int MAX_METEORS>
-void EffectMeteorRain<MAX_METEORS>::proceed(CRGB *leds, int numLeds){
+void EffectMeteorRain<MAX_METEORS>::proceed(CRGB *leds, uint16_t numLeds){
   //Fade it all first
-  for(int16_t i = 0; i < numLeds; i++ ){
+  for(uint16_t i = 0; i < numLeds; i++ ){
     
     if(random(9) > 2) //Some randomization
       leds[i].fadeToBlackBy(64);
@@ -125,7 +125,7 @@ void EffectMeteorRain<MAX_METEORS>::proceed(CRGB *leds, int numLeds){
 
   //Proceed with meteors
   uint8_t done = 0;  
-  for(int16_t i = 0; i < MAX_METEORS; i++){
+  for(uint16_t i = 0; i < MAX_METEORS; i++){
 
     Meteor &meteor = _meteors[i];
     

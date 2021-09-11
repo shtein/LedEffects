@@ -13,7 +13,7 @@ class EffectRainbow: public Effect{
     //CRGB wheel(byte wheelPos) const;
   
     void reset();
-    void proceed(CRGB *leds, int numLeds); 
+    void proceed(CRGB *leds, uint16_t numLeds); 
 
   protected:
     uint8_t _hue;    
@@ -31,7 +31,7 @@ inline void EffectRainbow::reset(){
 }
 
 
-inline void EffectRainbow::proceed(CRGB *leds, int numLeds){
+inline void EffectRainbow::proceed(CRGB *leds, uint16_t numLeds){
 
   //Get current colors  
   uint8_t delta = numLeds >= 255 ? 1 : 255 / numLeds;
@@ -43,7 +43,7 @@ inline void EffectRainbow::proceed(CRGB *leds, int numLeds){
   //Set colors - same as fill_rainbow
   CHSV hsv(_hue, 0xFF, 0xFF);
   
-  for(int i = 0; i < numLeds; i++){ 
+  for(uint16_t i = 0; i < numLeds; i++){ 
     leds[i] = hsv;
     hsv.hue = (hsv.hue + delta) & 0xFF;
   }
@@ -58,7 +58,7 @@ class EffectTheaterChaseRainbow: public Effect{
     
   protected:
     void reset();
-    void proceed(CRGB *leds, int numLeds);  
+    void proceed(CRGB *leds, uint16_t numLeds);  
 
   protected:
     uint8_t _step;
@@ -75,10 +75,10 @@ inline void EffectTheaterChaseRainbow::reset(){
 }
 
 
-inline void EffectTheaterChaseRainbow::proceed(CRGB *leds, int numLeds){  
+inline void EffectTheaterChaseRainbow::proceed(CRGB *leds, uint16_t numLeds){  
   
   //Turn every third pixell off
-  for(int i = 0; i < numLeds; i = i + 3){
+  for(uint16_t i = 0; i < numLeds; i = i + 3){
       setPixel(leds[(i + _step) % numLeds], 0, 0, 0);          
   }
 
@@ -94,7 +94,7 @@ inline void EffectTheaterChaseRainbow::proceed(CRGB *leds, int numLeds){
 
   CHSV hsv = CHSV(_hue, 0xFF, 0xFF);
   //Turn every third pixell on
-  for(int i = 0; i < numLeds; i = i + 3){ 
+  for(uint16_t i = 0; i < numLeds; i = i + 3){ 
     leds[(i + _step ) % numLeds] = hsv;
     hsv.hue = (hsv.hue + delta) & 0xFF;
   }
@@ -107,10 +107,9 @@ inline void EffectTheaterChaseRainbow::proceed(CRGB *leds, int numLeds){
 class EffectRainbowMove: public Effect{
   public:
     EffectRainbowMove();
-    ~EffectRainbowMove();
 
   protected:
-    void proceed(CRGB *leds, int numLeds); 
+    void proceed(CRGB *leds, uint16_t numLeds); 
     void reset();
 };
 
@@ -119,14 +118,11 @@ inline EffectRainbowMove::EffectRainbowMove(){
   setSpeedDelay(50);
 }
 
-inline EffectRainbowMove::~EffectRainbowMove(){
-}
-
 
 inline void EffectRainbowMove::reset(){
 }
 
-void EffectRainbowMove::proceed(CRGB *leds, int numLeds){
+void EffectRainbowMove::proceed(CRGB *leds, uint16_t numLeds){
   uint8_t beatA = beatsin8(17, 0, 255);                        
   uint8_t beatB = beatsin8(13, 0, 255);
   

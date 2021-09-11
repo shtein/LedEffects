@@ -22,7 +22,7 @@ Effect::Effect(){
 Effect::~Effect(){
 }
 
-void Effect::init(CRGB *leds, int numLeds){  
+void Effect::init(CRGB *leds, uint16_t numLeds){  
 
   //Black all leds
   setAll(leds, numLeds, CRGB::Black);
@@ -34,7 +34,7 @@ void Effect::init(CRGB *leds, int numLeds){
 void Effect::reset(){
 }
 
-void Effect::loop(CRGB *leds, int numLeds){    
+void Effect::loop(CRGB *leds, uint16_t numLeds){    
   proceed(leds, numLeds);
 }
 
@@ -71,11 +71,11 @@ void Effect::setPixel(CRGB &led, const CRGB &color) {
    led = color;
 }
 
-void Effect::setAll(CRGB *leds, int numLeds, const CRGB &color) {
+void Effect::setAll(CRGB *leds, uint16_t numLeds, const CRGB &color) {
   fill_solid(leds, numLeds, color);
 }
 
-void Effect::setAll(CRGB *leds, int numLeds, byte red, byte green, byte blue) {  
+void Effect::setAll(CRGB *leds, uint16_t numLeds, byte red, byte green, byte blue) {  
   fill_solid(leds, numLeds, CRGB (red, green, blue));
 }
 
@@ -180,7 +180,7 @@ void EffectPaletteTransform::updateColors(){
     _getPal(_ctx.palTarget);
 }
 
-void EffectPaletteTransform::updateLeds(CRGB *leds, int numLeds){  
+void EffectPaletteTransform::updateLeds(CRGB *leds, uint16_t numLeds){  
   //Default implementation
   for(int i = 0; i < numLeds; i++){     
     leds[i] = getCurrentPalColor(0);
@@ -208,7 +208,7 @@ void EffectPaletteTransform::onStep(){
   _ctx.step--;
 }
 
-void EffectPaletteTransform::proceed(CRGB *leds, int numLeds){
+void EffectPaletteTransform::proceed(CRGB *leds, uint16_t numLeds){
   //Process step
   onStep();
   
