@@ -1,6 +1,8 @@
 #ifndef __MATRIX_H
 #define __MATRIX_H
 
+#include "MatrixUtils.h"
+
 //////////////////////////////////////////////////////////////
 //Matrix 
 
@@ -89,9 +91,6 @@ typedef XYMatrix<MATRIX_WIDTH, MATRIX_HEIGHT, MATRIX_TYPE> XY;          //Coordi
 
 #define XY_DRAW_ADD_COLORS 0x01
 
-//////////////////////////////
-// Mirror
-#define MIRROR(p, m) (2 * (m) - (p))
 
 class XYDraw: public XY{
 public:

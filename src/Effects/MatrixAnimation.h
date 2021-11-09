@@ -1,63 +1,18 @@
 #ifndef __MATRIX_ANIMATION_H
 #define __MATRIX_ANIMATION_H
 
-///////////////////////////////////////
-// Point
-struct Pnt {
-  int8_t x;
-  int8_t y;
-
-  inline Pnt() __attribute__((always_inline)) = default;
-  inline Pnt(int8_t x0, int8_t y0) __attribute__((always_inline)): x(x0), y(y0)
-  {
-  };
-
-  inline Pnt& operator= (const Pnt& pnt) __attribute__((always_inline)) = default;
-
-  inline Pnt mirror(const Pnt &m) const __attribute__((always_inline)) {
-    return Pnt( MIRROR(x, m.x), MIRROR(y, m.y));
-  }
-  
-};
-
-inline Pnt operator+ (const Pnt& pnt1, const Pnt& pnt2)  {
-  return Pnt(pnt1.x + pnt2.x, pnt1.y + pnt2.y);
-};
-
-inline Pnt operator- (const Pnt& pnt1, const Pnt& pnt2){
-  return Pnt(pnt1.x - pnt2.x, pnt1.y - pnt2.y);
-};
-
-
-
-
-///////////////////////////////////////
-// Object
-struct Obj {
-  Pnt pos;
-  Pnt vel;
-
-  inline Obj()  __attribute__((always_inline)) = default;
-  inline Obj (const Pnt &pos0, const Pnt &vel0)  __attribute__((always_inline)): 
-    pos(pos0), vel(vel0){
-  }
-  inline Obj (int8_t x0, int8_t y0, int8_t vx0, int8_t vy0)  __attribute__((always_inline)):
-    pos(x0, y0), vel(vx0, vy0)
-  {
-  }
-
-  inline Obj& operator= (const Obj &)  __attribute__((always_inline)) = default;
-};
 
 
 ///////////////////////////////////////
 // Move linear routine
-void moveLinear(Obj &obj, uint8_t t){
+template<typename T>
+void moveLinear(Obj<T> &obj, uint8_t t){
 
   //Change position, speed does not change
   obj.pos.x += t * obj.vel.x;
   obj.pos.y += t * obj.vel.y;
 }
+
 
 
 #define MATRIX_OBJECTS_FADE 128
@@ -74,8 +29,8 @@ public:
     setSpeedDelay(80);
 
     for(int i = 0; i < MAX_OBJECTS; i++){
-      _drops[i].obj.pos = Pnt(127, 127);
-      _drops[i].obj.vel = Pnt(0, 1);
+      _drops[i].obj.pos = Pnt8_t(127, 127);
+      _drops[i].obj.vel = Pnt8_t(0, 1);
     }
    
   };
@@ -90,8 +45,8 @@ protected:
 
     //Proceed with objects
     for(int i = 0; i < MAX_OBJECTS; i++){
-      Drop &drop = _drops[i];
-      Pnt  &pos  = drop.obj.pos;
+      Drop  &drop  = _drops[i];
+      Pnt8_t &pos  = drop.obj.pos;
 
 
       //Is over
@@ -115,8 +70,8 @@ protected:
 
 protected:
   struct Drop{
-    uint8_t colorIndex;
-    Obj     obj;
+    uint8_t         colorIndex;
+    Obj8_t          obj;
   } _drops[MAX_OBJECTS];
 };
 
@@ -132,8 +87,8 @@ public:
       setSpeedDelay(80);
 
       for(int i = 0; i < MAX_OBJECTS; i++){
-        _circles[i].obj.pos = Pnt(127, 127);
-        _circles[i].obj.vel = Pnt(1, 1);
+        _circles[i].obj.pos = Pnt8_t(127, 127);
+        _circles[i].obj.vel = Pnt8_t(1, 1);
         _circles[i].radius  = 127;
     }   
 
@@ -150,8 +105,8 @@ protected:
     //Proceed with objects
     for(int i = 0; i < MAX_OBJECTS; i++){
       
-      Circle &circle = _circles[i];
-      Pnt    &pos    = circle.obj.pos;
+      Circle &circle  = _circles[i];
+      Pnt8_t &pos     = circle.obj.pos;
 
 
       //Time is over
@@ -180,7 +135,7 @@ protected:
   struct Circle{
     uint8_t colorIndex;
     uint8_t radius;
-    Obj     obj;    
+    Obj8_t  obj;    
   } _circles[MAX_OBJECTS];
 
 };
@@ -208,6 +163,55 @@ class EffectMatrixKaleidoscope: public T{
 
 };
 
+///////////////////////////////////////////////
+//EffectMatrixBounsingDots
+
+class EffectMatrixBounsingDots: public Effect{
+public:
+  inline EffectMatrixBounsingDots() __attribute__((always_inline)) {
+    setSpeedDelay(20);    
+  };
+
+
+protected:
+  void reset(){
+    _obj.pos = Pnt16_t(0, 0);
+    _obj.vel = Pnt16_t(123, 176);
+  };
+
+  void proceed(CRGB *leds, uint16_t numLeds){
+
+    fadeToBlackBy(leds, numLeds, MATRIX_OBJECTS_FADE/4 );
+
+    XYDraw xy(leds, numLeds);
+
+    
+    if(_obj.movesAwayLeft(0)){
+      _obj.vel.x = -_obj.vel.x;
+    }
+
+    if(_obj.movesAwayRight((int16_t)xy.width() << 8)){
+      _obj.vel.x = -_obj.vel.x;
+    }
+
+    if(_obj.movesAwayUp(0)){
+      _obj.vel.y = -_obj.vel.y;    
+    }
+
+    if(_obj.movesAwayDown((int16_t)xy.height() << 8)){
+      _obj.vel.y = -_obj.vel.y;      
+    }
+
+    //xy(_obj.pos.x >> 8, _obj.pos.y >> 8) = CRGB::Black;
+
+    moveLinear(_obj, 1);
+
+    xy(_obj.pos.x >> 8, _obj.pos.y >> 8) = CRGB::Blue;
+  };
+
+protected:
+  Obj16_t _obj;
+};
 
 
 #endif //__MATRIX_ANIMATION_H

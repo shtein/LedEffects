@@ -17,7 +17,7 @@ protected:
   void updateLeds(CRGB *leds, uint16_t numLeds, const band8_visual &data);
   virtual void drawMatrixBar(CRGB *leds, 
                              uint16_t numLeds,
-                             int center, 
+                             uint16_t center, 
                              uint8_t volume,                                         
                              uint8_t colorIndexFirst, 
                              uint8_t colorIndexLast
@@ -90,7 +90,7 @@ class EffectSoundMatrixColumn: public EffectSoundMatrix{
   protected:
     void drawMatrixBar(CRGB *leds, 
                        uint16_t numLeds,  
-                       int center,
+                       uint16_t center,
                        uint8_t volume,                                         
                        uint8_t colorIndexFirst, 
                        uint8_t colorIndexLast
@@ -99,7 +99,7 @@ class EffectSoundMatrixColumn: public EffectSoundMatrix{
 
 inline void EffectSoundMatrixColumn::drawMatrixBar( CRGB *leds, 
                                                     uint16_t numLeds,
-                                                    int center, 
+                                                    uint16_t center, 
                                                     uint8_t volume,                                         
                                                     uint8_t colorIndexFirst, 
                                                     uint8_t colorIndexLast 
@@ -119,7 +119,7 @@ class EffectSoundMatrixSymmetric: public EffectSoundMatrix{
   protected:
     void drawMatrixBar(CRGB *leds, 
                        uint16_t numLeds,
-                       int center, 
+                       uint16_t center, 
                        uint8_t volume,                                         
                        uint8_t colorIndexFirst, 
                        uint8_t colorIndexLast
@@ -129,7 +129,7 @@ class EffectSoundMatrixSymmetric: public EffectSoundMatrix{
 
 inline void EffectSoundMatrixSymmetric::drawMatrixBar(CRGB *leds,
                                                       uint16_t numLeds,
-                                                      int /*center*/,
+                                                      uint16_t /*center*/,
                                                       uint8_t volume,                                         
                                                       uint8_t colorIndexFirst, 
                                                       uint8_t colorIndexLast 

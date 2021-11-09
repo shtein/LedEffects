@@ -182,7 +182,7 @@ void EffectPaletteTransform::updateColors(){
 
 void EffectPaletteTransform::updateLeds(CRGB *leds, uint16_t numLeds){  
   //Default implementation
-  for(int i = 0; i < numLeds; i++){     
+  for(uint16_t i = 0; i < numLeds; i++){     
     leds[i] = getCurrentPalColor(0);
   }
 }

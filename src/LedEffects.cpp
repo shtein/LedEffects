@@ -177,16 +177,17 @@ void setup() {
         ADD_EFFECT(EffectPlasma)
         ADD_EFFECT(EffectConfetti)
         ADD_EFFECT(EffectBlur)
+        ADD_EFFECT(EffectTheaterChaseRainbow)
         ADD_EFFECT(EffectRainbowMove)
         ADD_EFFECT(EffectNoise)            
         ADD_EFFECT(EffectMoodBlobs) 
         ADD_EFFECT(EffectRainbow)
         ADD_EFFECT(EffectFadeInOut)
         ADD_EFFECT(EffectRunningLights)           
-        ADD_EFFECT(EffectColorWipe)               
-        ADD_EFFECT(EffectTheaterChaseRainbow)
         ADD_EFFECT(EffectJuggle)
         ADD_EFFECT(EffectTwinkleFox, TwinkleFox)
+        ADD_EFFECT(EffectPacificOcean)
+
       END_MODE()
       BEGIN_MODE(Static, 3)
         ADD_STATIC_COLOR(CHSV(HUE_BLUE, 0xFF, 0xFF))        
@@ -198,7 +199,7 @@ void setup() {
     
     //Leds
     BEGIN_LEDS()
-      ADD_STRIP(WS2811, LED_PIN)
+      ADD_STRIP(WS2811, LED_PIN, BRG)
     END_LEDS()
 
   //Control    
@@ -417,7 +418,7 @@ void setup() {
         ADD_EFFECT( EffectConfetti, &TransformChristmas )
         ADD_EFFECT( EffectPlasma, &TransformChristmas )
         ADD_EFFECT( EffectNoise, &TransformChristmas )
-        ADD_EFFECT(EffectTwinkleFox, FuncGetPal_SnowAndIce)
+        ADD_EFFECT(EffectTwinkleFox, &SnowAndIce)
       END_MODE() 
       BEGIN_MODE(Halloween, 3)      
         ADD_EFFECT( EffectConfetti, &TransformHalloween )
@@ -495,7 +496,9 @@ void setup() {
         ADD_EFFECT(EffectRainbowMove)
         ADD_EFFECT(EffectNoise)            
         ADD_EFFECT(EffectMoodBlobs) 
-        ADD_EFFECT(EffectRainbow)        
+        ADD_EFFECT(EffectRainbow) 
+        ADD_EFFECT(EffectTwinkleFox)       
+        ADD_EFFECT(EffectPacificOcean)       
       END_MODE()
       BEGIN_MODE(OldEffects, 15)
         ADD_EFFECT(EffectFadeInOut)
@@ -727,6 +730,7 @@ void setup() {
     //Effects   
     BEGIN_EFFECTS()
       BEGIN_MODE(Effects, 15)
+        ADD_EFFECT(EffectMatrixBounsingDots)
         ADD_EFFECT(EffectMatrixKaleidoscope<EffectConfetti>)
         ADD_EFFECT(EffectMatrixKaleidoscope<EffectTwinkleFox>)
         ADD_EFFECT(EffectMatrixKaleidoscope<EffectMoodBlobs >)

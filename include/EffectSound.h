@@ -159,7 +159,7 @@ class EffectSound: public Effect{
     //Primitives
     void drawBand(CRGB *leds,
                   uint16_t numLeds,                  
-                  int center,
+                  uint16_t center,
                   uint8_t volume,
                   uint8_t colorIndexFirst,
                   uint8_t colorIndexLast

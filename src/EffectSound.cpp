@@ -210,7 +210,7 @@ void EffectSound::onCmd(const struct CtrlQueueItem &itm){
     default:
       Effect::onCmd(itm);
     break;
-  }    
+  }   
 }
 
 
@@ -239,7 +239,7 @@ void EffectSound::updateLeds(CRGB *leds, uint16_t numLeds, const band8_visual &d
 
 void EffectSound::drawBand(CRGB *leds,
                            uint16_t numLeds,
-                           int center,
+                           uint16_t center,
                            uint8_t volume, 
                            uint8_t colorIndexFirst,
                            uint8_t colorIndexLast
@@ -259,7 +259,7 @@ void EffectSound::drawBand(CRGB *leds,
   uint8_t colorInc   = center == 0 ? 0 : (colorIndexLast - colorIndexFirst) / center;
   uint8_t fadeFactor = (SS_FADE_FACTOR_MAX - SS_FADE_FACTOR_MIN) / ( center + 1 );
   
-  for(int i = 0; i < center; i++){    
+  for(uint16_t i = 0; i < center; i++){    
     if(volume > firstStep + step * (center - i - 1))
       leds[i] = ColorFromPalette(_ctx.palCurrent, colorIndexLast - i * colorInc, 255, NOBLEND);
     else
@@ -272,7 +272,7 @@ void EffectSound::drawBand(CRGB *leds,
   colorInc   = numLeds - center - 1 == 0 ? 0 : (colorIndexLast - colorIndexFirst) / (numLeds - center - 1);
   fadeFactor = (SS_FADE_FACTOR_MAX - SS_FADE_FACTOR_MIN) /  (numLeds - center);
   
-  for(int i = center + 1; i < numLeds; i++){     
+  for(uint16_t i = center + 1; i < numLeds; i++){     
   
     if(volume > firstStep + step * (i - center - 1))
       leds[i] = ColorFromPalette(_ctx.palCurrent, colorIndexFirst + i * colorInc, 255, NOBLEND);
@@ -301,7 +301,7 @@ void EffectSound::drawBandSymmetric(CRGB *leds,
 
   //Copy the rest
   int offs =  1 - numLeds % 2;
-  for(int i = 0;  i < numLeds / 2; i++)
+  for(uint16_t i = 0;  i < numLeds / 2; i++)
       first[-i - offs] = first[i];
 } 
 

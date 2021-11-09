@@ -1,10 +1,6 @@
 #ifndef __LEDEFFECTS_H
 #define __LEDEFFECTS_H
 
-//#define CHECK_MEM
-//#define __OUTAGE_LAMP_SETUP
-//#define __SASHA_SETUP
-
 
 
 //To enable debug log via serail or IR Remote when compile in Arduino IDE, use arduinolib.h 
