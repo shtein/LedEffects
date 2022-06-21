@@ -223,8 +223,11 @@ void EffectSound::updateLeds(CRGB *leds, uint16_t numLeds, const band8_visual &d
  for(int i = 0; i < SC_MAX_BANDS; i++){
   drawBand(leds + i * bandLeds, 
            bandLeds, 
-           i % 2 == 0 ? bandLeds - 2 : 1,
-           //bandLeds / 2,
+           //i % 2 == 0 ? bandLeds - 2 : 1,
+           //bandLeds - 2,
+           //1,
+           bandLeds / 2,
+           //0,
            data.scale(i),            
            map(i, 0, SC_MAX_BANDS, 0, 255 ),
            map(i + 1, 0, SC_MAX_BANDS, 0, 255 )
@@ -268,8 +271,8 @@ void EffectSound::drawBand(CRGB *leds,
 
   
   //Draw top
-  step       = numLeds - center - 1 == 0 ? 0 : (255 - firstStep) / (numLeds - center - 1);
-  colorInc   = numLeds - center - 1 == 0 ? 0 : (colorIndexLast - colorIndexFirst) / (numLeds - center - 1);
+  step       = numLeds - center + 1 == 0 ? 0 : (255 - firstStep) / (numLeds - center + 1);
+  colorInc   = numLeds - center + 1 == 0 ? 0 : (colorIndexLast - colorIndexFirst) / (numLeds - center + 1);
   fadeFactor = (SS_FADE_FACTOR_MAX - SS_FADE_FACTOR_MIN) /  (numLeds - center);
   
   for(uint16_t i = center + 1; i < numLeds; i++){     

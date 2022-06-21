@@ -32,7 +32,7 @@
 #include "Effects/Blur.h"
 #include "Effects/EmergencyLights.h"
 #include "Effects/Fire.h"
-#include "Effects/Meteor.h"
+#include "Effects/Meteor.h"  
 #include "Effects/Ripple.h"
 #include "Effects/Juggle.h"
 #include "Effects/TwinkleFox.h"
@@ -217,6 +217,65 @@ void setup() {
 
 //__SASHA_SETUP
 
+
+
+#elif defined(__UDALOV_SETUP)
+////////////////////////////////////////
+// WS2811 string, 200 LEDs, 1 push buttone, 1 Potentiometer
+#pragma message "Compile for Udalov"
+
+void setup() {
+  DBG_INIT();
+  DBG_OUTLN("Led effect started - christmas tree");  
+  //Effect Engine
+  BEGIN_EFFECT_ENGINE(0) 
+    
+    //Effects   
+    BEGIN_EFFECTS()
+      BEGIN_MODE(Christmas, 4)   
+        ADD_EFFECT( EffectConfetti, &TransformChristmas )
+        ADD_EFFECT( EffectPlasma, &TransformChristmas )
+        ADD_EFFECT( EffectNoise, &TransformChristmas )
+        ADD_EFFECT(EffectTwinkleFox, &SnowAndIce)
+      END_MODE() 
+      BEGIN_MODE(Halloween, 3)      
+        ADD_EFFECT( EffectConfetti, &TransformHalloween )
+        ADD_EFFECT( EffectPlasma, &TransformAutunm )
+        ADD_EFFECT( EffectNoise, &TransformHalloween )
+      END_MODE()
+      BEGIN_MODE(Other, 10)        
+        ADD_EFFECT(EffectRipple<>)   
+        ADD_EFFECT(EffectMeteorRain<>)
+        ADD_EFFECT(EffectPlasma)
+        ADD_EFFECT(EffectConfetti)        
+        ADD_EFFECT(EffectBlur)
+        ADD_EFFECT(EffectRainbowMove)
+        ADD_EFFECT(EffectNoise)            
+        ADD_EFFECT(EffectMoodBlobs) 
+        ADD_EFFECT(EffectTwinkleFox)
+      END_MODE()    
+    END_EFFECTS()
+    
+    //Leds
+    BEGIN_LEDS() 
+      ADD_STRIP(WS2811, LED_PIN, RGB)  
+    END_LEDS()
+
+  //Control    
+    BEGIN_CONTROL_MAP()
+      BEGIN_PUSH_BUTTON(MODE_PIN)    
+        PUSH_BUTTON_TO_CMD(EEMC_MODE, PB_CONTROL_PUSH_LONG)
+        PUSH_BUTTON_TO_CMD(EEMC_EFFECT, PB_CONTROL_CLICK_SHORT)      
+     END_PUSH_BUTTON()
+     POT_TO_CMD(EEMC_NUMLEDS, NUMLEDS_PIN, POT_NOISE_THRESHOLD, 100, 900)
+    END_CONTROL_MAP()
+       
+  END_EFFECT_ENGINE() 
+}
+
+
+// __UDALOV
+
 #elif defined( __DAVID_SETUP)
 ////////////////////////////////////////
 // WS2811 strip, 50 LEDs, 1 push button
@@ -366,6 +425,7 @@ void setup() {
         ADD_EFFECT(EffectNoise)            
         ADD_EFFECT(EffectMoodBlobs) 
       END_MODE()
+
       
       BEGIN_MODE(Halloween, 3)      
         ADD_EFFECT( EffectConfetti, &TransformHalloween )
@@ -378,14 +438,20 @@ void setup() {
         ADD_EFFECT( EffectPlasma, &TransformChristmas )
         ADD_EFFECT( EffectNoise, &TransformChristmas )
       END_MODE()
-    
+
+      BEGIN_MODE(Ukraine, 3)      
+        ADD_EFFECT(EffectConfetti, &UkraineFlag )
+        ADD_EFFECT(EffectNoise, &UkraineFlag )
+        ADD_EFFECT(EffectTwinkleFox, &UkraineFlag )
+      END_MODE()  
+
       
     END_EFFECTS()
     
     //Leds
     BEGIN_LEDS()
       ADD_STRIP(NEOPIXEL, LED_PIN)
-      ADD_STRIP(NEOPIXEL, LED_PIN2)   //Second strip for deck
+      ADD_STRIP(NEOPIXEL, LED_PIN4)   //Second strip for deck, use LED_PIN4 becasue LED_PIN2 connector rusted
     END_LEDS()
 
   //Control    
@@ -395,7 +461,7 @@ void setup() {
         PUSH_BUTTON_TO_CMD(EEMC_EFFECT, PB_CONTROL_CLICK_SHORT)      
       END_PUSH_BUTTON()
     END_CONTROL_MAP()
-       
+
   END_EFFECT_ENGINE() 
 }
 
@@ -602,6 +668,7 @@ void setup() {
   //Effect Engine
   BEGIN_EFFECT_ENGINE(EFF_RANDOM_START_EFFECT)
     //Effects   
+
     BEGIN_EFFECTS()
       BEGIN_MODE(Effects, 8)        
         ADD_EFFECT(EffectRipple<10>)
@@ -635,6 +702,13 @@ void setup() {
         ADD_EFFECT(EffectConfetti, &July4th )
         ADD_EFFECT(EffectNoise, &July4th )
       END_MODE()
+
+      BEGIN_MODE(Ukraine, 2)      
+        ADD_EFFECT(EffectConfetti, &UkraineFlag )
+        ADD_EFFECT(EffectNoise, &UkraineFlag )
+        ADD_EFFECT(EffectTwinkleFox, &UkraineFlag )
+      END_MODE()
+      
     END_EFFECTS()
     
     //Leds
@@ -658,7 +732,63 @@ void setup() {
   END_EFFECT_ENGINE() 
 }
 
-// __TAHOE_SETUP
+#elif defined(__MEDIA_ROOM_SETUP)
+
+///////////////////////////////////////////////////
+// 16x16 Matrix, with MSGEQ07 
+#include <SoundCapture.h>
+
+#pragma message "Compile for media room"
+
+void setup() {
+  DBG_INIT();
+  DBG_OUTLN("Led effect started - 16x16 sound matrix");  
+
+  INIT_SOUND_CAPTURE(SoundCaptureMSGEQ7, MSGEQ7_ANALOG_PIN, MSGEQ7_STROBE_PIN, MSGEQ7_RESET_PIN)    
+  
+  //Effect Engine
+  BEGIN_EFFECT_ENGINE(0) 
+    //Effects   
+    BEGIN_EFFECTS()
+      BEGIN_MODE(Sound, 2)
+        ADD_EFFECT(EffectSound)
+      END_MODE()
+      BEGIN_MODE(Effects, 10)                
+        ADD_STATIC_COLOR(CHSV(HUE_RED, 0xFF, 0xFF))
+        ADD_STATIC_COLOR(CHSV(HUE_GREEN, 0xFF, 0xFF))
+        ADD_STATIC_COLOR(CHSV(HUE_BLUE, 0xFF, 0xFF))
+        ADD_EFFECT(EffectJuggle)
+        ADD_EFFECT(EffectTwinkleFox, TwinkleFox)        
+        ADD_EFFECT(EffectPacificOcean)         
+      END_MODE()      
+    END_EFFECTS()
+    
+    //Leds
+    BEGIN_LEDS() 
+      ADD_STRIP(NEOPIXEL, LED_PIN)
+    END_LEDS()
+
+  //Control    
+ 
+    BEGIN_CONTROL_MAP()
+     
+      BEGIN_PUSH_BUTTON(MODE_PIN)    
+        PUSH_BUTTON_TO_CMD(EEMC_MODE, PB_CONTROL_PUSH_LONG)
+        PUSH_BUTTON_TO_CMD(EEMC_EFFECT, PB_CONTROL_CLICK_SHORT)      
+      END_PUSH_BUTTON() 
+
+      SW2POS_TO_CMD(EEMC_SOUND_LOG, 7)
+      SW2POS_TO_CMD(EEMC_SOUND_USE_MAX, 6)
+      SW2POS_TO_CMD(EEMC_SOUND_USE_MIN, 5)
+      POT_TO_CMD(EEMC_SOUND_LOW, SOUND_LOW_PIN, POT_NOISE_THRESHOLD, 100)
+      POT_TO_CMD(EEMC_SOUND_SENSITIVITY, SOUND_HIGH_PIN, POT_NOISE_THRESHOLD, 300)
+     
+
+    END_CONTROL_MAP()
+       
+  END_EFFECT_ENGINE() 
+}
+
 #elif defined(__SOUND_MATRIX_16x16)
 
 ///////////////////////////////////////////////////

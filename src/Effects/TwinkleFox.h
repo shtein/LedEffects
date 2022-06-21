@@ -34,7 +34,7 @@ protected:
   void reset();
   void updateLeds(CRGB *leds, uint16_t numLeds);
 
-  CRGB computeOneTwinkle( uint32_t ms, uint8_t salt);
+  CRGB computeOneTwinkle( uint32_t ms, uint8_t salt) const;
 
 private:
   CRGB _bg;   //Last remembered background color
@@ -137,7 +137,7 @@ inline void coolLikeIncandescent( CRGB& c, uint8_t phase){
 #define TWINKLE_SPEED   4
 #define TWINKLE_DENSITY 5
 
-CRGB EffectTwinkleFox::computeOneTwinkle( uint32_t ms, uint8_t salt)
+inline CRGB EffectTwinkleFox::computeOneTwinkle( uint32_t ms, uint8_t salt) const
 {
   //Another magic here
   uint16_t ticks       = ms >> (8 - TWINKLE_SPEED);
