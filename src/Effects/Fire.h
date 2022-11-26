@@ -4,24 +4,13 @@
 /////////////////////////////////////////
 // Effect Fire
 class EffectFire: public Effect{
-  public:
-    EffectFire();
-    ~EffectFire();
-  
-    void proceed(CRGB *leds, uint16_t numLeds); 
-    void reset();
+protected:
+  void proceed(CRGB *leds, uint16_t numLeds); 
+  void reset();
 };
 
-
-inline EffectFire::EffectFire(){ 
-
-  setSpeedDelay(20);
-}
-
-inline EffectFire::~EffectFire(){
-}
-
 inline void EffectFire::reset(){  
+  setSpeedDelay(20);
 }
 
 #define FIRE_X_SCALE 20 

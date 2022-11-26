@@ -7,7 +7,7 @@
 //Matrix 
 
 //Types of matrixes
-enum XYType{
+enum XYType {
   xyMatrixSerpent = 0,
   xyMatrixStraight,
 };
@@ -15,7 +15,7 @@ enum XYType{
 
 /////////////////////
 //Base matrix template class
-template<const uint8_t W, const uint8_t H>
+template<const uint16_t W, const uint16_t H>
 class XYMatrixBase{  
   public:  
 
@@ -32,7 +32,7 @@ class XYMatrixBase{
 
 ///////////////////////
 // Matrix template for matrix type, still abstract
-template <const uint8_t W, const uint8_t H, XYType T>
+template <const uint16_t W, const uint16_t H,  const XYType T>
 class XYMatrix: public XYMatrixBase<W, H>{  
 };
 
@@ -50,7 +50,7 @@ class XYMatrix: public XYMatrixBase<W, H>{
 //                        |
 //    19 < 18 < 17 < 16 < 15
 
-template <const uint8_t W, const uint8_t H>
+template <const uint16_t W, const uint16_t H>
 class XYMatrix<W, H, xyMatrixSerpent>: public XYMatrixBase<W, H>{  
   public:
     int16_t xy(int x, int y) const { return (x & 0x01) ? x * H + H - 1 - y :  x * H + y; } 
@@ -74,7 +74,7 @@ class XYMatrix<W, H, xyMatrixSerpent>: public XYMatrixBase<W, H>{
 //     |
 //    15 > 16 > 17 > 18 > 19
 
-template <const uint8_t W, const uint8_t H>
+template <const uint16_t W, const uint16_t H>
 class XYMatrix<W, H, xyMatrixStraight>: public XYMatrixBase<W, H>{  
   public:
     int16_t xy(int x, int y) const { return  x * H + y; } 

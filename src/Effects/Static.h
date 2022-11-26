@@ -1,26 +1,19 @@
 #ifndef __STATIC_H
 #define __STATIC_H
 
+template<const uint8_t hue, const uint8_t sat = 0xFF, const uint8_t val = 0xFF>
 class EffectStatic: public EffectColor{
-  public:
-    EffectStatic(const CHSV &hsv);
-
   protected:
-    void proceed(CRGB *leds, uint16_t numLeds); 
-    void reset();
+  
+    void proceed(CRGB *leds, uint16_t numLeds){
+      setAll(leds, numLeds, getColor());
+    }
+
+    void reset(){
+      setSpeedDelay(100);
+      setHSV(CHSV(hue, sat, val));
+    }
 };
 
-inline EffectStatic::EffectStatic(const CHSV &hsv):
-  EffectColor(hsv){
-
-  setSpeedDelay(100);
-}
-
-inline void EffectStatic::reset(){
-}
-
-inline void EffectStatic::proceed(CRGB *leds, uint16_t numLeds){
-  setAll(leds, numLeds, getColor());
-}
 
 #endif //__STATIC_H

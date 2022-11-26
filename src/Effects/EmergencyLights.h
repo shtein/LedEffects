@@ -5,24 +5,15 @@
 // Emergency lighs
 
 class EffectEmergencyLights: public Effect{
-  public:
-    EffectEmergencyLights();
-   ~EffectEmergencyLights();
-
+protected:
     void proceed(CRGB *leds, uint16_t numLeds); 
     void reset();
 };
 
 
-inline EffectEmergencyLights::EffectEmergencyLights(){  
-  setSpeedDelay(50); 
-}
-
-inline EffectEmergencyLights::~EffectEmergencyLights(){  
-}
-
 inline void EffectEmergencyLights::reset(){
   _ctx.step = 0;
+  setSpeedDelay(50); 
 }
 
 #define EL_BLINKS         5               //Number of ons and offs

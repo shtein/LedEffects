@@ -143,8 +143,7 @@ class EffectSound: public Effect{
 
     static void initSoundCapture(SoundCapture *sc);
     
-    virtual void idle();
-    virtual void onCmd(const struct CtrlQueueItem &itm);
+    virtual bool onCmd(struct CtrlQueueItemEx &itm);
     
   protected:
     virtual void reset();

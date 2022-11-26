@@ -67,8 +67,6 @@ inline uint8_t Ripple::getColorIndex() const{
 
 template <const int MAX_RIPPLES = 5>
 class EffectRipple: public Effect{
-public:
-  EffectRipple();
 
 protected:
   void reset();
@@ -78,13 +76,10 @@ protected:
   Ripple _ripples[MAX_RIPPLES];
 };
 
-template <const int MAX_RIPPLES>
-inline EffectRipple<MAX_RIPPLES>::EffectRipple(){
-  setSpeedDelay(80);
-}
 
 template <const int MAX_RIPPLES>
 inline void EffectRipple<MAX_RIPPLES>::reset(){
+  setSpeedDelay(80);
 }
 
 template <const int MAX_RIPPLES>

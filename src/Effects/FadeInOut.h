@@ -6,25 +6,16 @@
 
 
 class EffectFadeInOut: public EffectColor{
-  public:
-    EffectFadeInOut();
-    ~EffectFadeInOut();
-
   protected:
     void proceed(CRGB *leds, uint16_t numLeds); 
     void reset();
 };
 
 
-inline EffectFadeInOut::EffectFadeInOut(){
-  setSpeedDelay(50); 
-}
-
-inline EffectFadeInOut::~EffectFadeInOut(){
-}
 
 inline void EffectFadeInOut::reset(){   
   setRandomColor();
+  setSpeedDelay(50); 
 }
 
 #define FIO_STEP 5

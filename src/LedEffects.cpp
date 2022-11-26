@@ -9,6 +9,7 @@
 
 #include <AnalogInput.h>
 #include <Controls.h>
+#include <CtrlSerial.h>
 #include <SoundCapture.h>
 
 #include "EffectEngine.h"
@@ -120,9 +121,9 @@ void setup() {
         ADD_EFFECT(EffectTheaterChaseRainbow) 
       END_MODE()
       BEGIN_MODE(Static, 3)
-        ADD_STATIC_COLOR(CHSV(HUE_BLUE, 0xFF, 0xFF))        
-        ADD_STATIC_COLOR(CHSV(HUE_PURPLE, 0xFF, 0xFF))
-        ADD_STATIC_COLOR(CHSV(HUE_ORANGE, 0xFF, 0xFF))
+        ADD_STATIC_COLOR(HUE_BLUE)        
+        ADD_STATIC_COLOR(HUE_PURPLE)
+        ADD_STATIC_COLOR(HUE_ORANGE)
       END_MODE()
       BLACK_MODE()
     END_EFFECTS()
@@ -190,9 +191,9 @@ void setup() {
 
       END_MODE()
       BEGIN_MODE(Static, 3)
-        ADD_STATIC_COLOR(CHSV(HUE_BLUE, 0xFF, 0xFF))        
-        ADD_STATIC_COLOR(CHSV(HUE_PURPLE, 0xFF, 0xFF))
-        ADD_STATIC_COLOR(CHSV(HUE_ORANGE, 0xFF, 0xFF))
+        ADD_STATIC_COLOR(HUE_BLUE)        
+        ADD_STATIC_COLOR(HUE_PURPLE)
+        ADD_STATIC_COLOR(HUE_ORANGE)
       END_MODE()
       BLACK_MODE()
     END_EFFECTS()
@@ -226,7 +227,7 @@ void setup() {
 
 void setup() {
   DBG_INIT();
-  DBG_OUTLN("Led effect started - christmas tree");  
+  DBG_OUTLN("Led effect started - Udalov");  
   //Effect Engine
   BEGIN_EFFECT_ENGINE(0) 
     
@@ -373,9 +374,9 @@ void setup() {
         ADD_EFFECT(EffectTheaterChaseRainbow) 
       END_MODE()
       BEGIN_MODE(Static, 3)
-        ADD_STATIC_COLOR(CHSV(HUE_RED, 0xFF, 0xFF))
-        ADD_STATIC_COLOR(CHSV(HUE_GREEN, 0xFF, 0xFF))
-        ADD_STATIC_COLOR(CHSV(HUE_BLUE, 0xFF, 0xFF))
+        ADD_STATIC_COLOR(HUE_RED)
+        ADD_STATIC_COLOR(HUE_GREEN)
+        ADD_STATIC_COLOR(HUE_BLUE)
       END_MODE()
       BLACK_MODE()
     END_EFFECTS()
@@ -409,6 +410,8 @@ void setup() {
 #pragma message "Compile for deck"
 
 void setup() {
+
+
   DBG_INIT();
   DBG_OUTLN("Led effect started -- deck");  
   //Effect Engine
@@ -451,7 +454,7 @@ void setup() {
     //Leds
     BEGIN_LEDS()
       ADD_STRIP(NEOPIXEL, LED_PIN)
-      ADD_STRIP(NEOPIXEL, LED_PIN4)   //Second strip for deck, use LED_PIN4 becasue LED_PIN2 connector rusted
+      ADD_STRIP(NEOPIXEL, LED_PIN2)
     END_LEDS()
 
   //Control    
@@ -680,12 +683,12 @@ void setup() {
         ADD_EFFECT(EffectTwinkleFox, TwinkleFox)
         ADD_EFFECT(EffectPacificOcean)
       END_MODE()
-      
+
       BEGIN_MODE(Halloween, 2)      
         ADD_EFFECT(EffectConfetti, &TransformAutunm )
         ADD_EFFECT(EffectNoise, &TransformHalloween )
       END_MODE()
-      
+
       BEGIN_MODE(Chrsitmas, 3)      
         ADD_EFFECT(EffectConfetti, &TransformChristmas)
         ADD_EFFECT(EffectPlasma, &TransformChristmas )
@@ -708,7 +711,7 @@ void setup() {
         ADD_EFFECT(EffectNoise, &UkraineFlag )
         ADD_EFFECT(EffectTwinkleFox, &UkraineFlag )
       END_MODE()
-      
+
     END_EFFECTS()
     
     //Leds
@@ -725,7 +728,9 @@ void setup() {
       END_PUSH_BUTTON()
 
       PUSH_BUTTON_SA_TO_CMD(EEMC_MODE, MODE_PIN3)
-      PUSH_BUTTON_SA_TO_CMD(EEMC_EFFECT, EFFECT_PIN)
+      PUSH_BUTTON_SA_TO_CMD(EEMC_EFFECT, EFFECT_PIN)      
+
+      //SERIAL_INPUT()
       
     END_CONTROL_MAP()
        
@@ -753,10 +758,7 @@ void setup() {
       BEGIN_MODE(Sound, 2)
         ADD_EFFECT(EffectSound)
       END_MODE()
-      BEGIN_MODE(Effects, 10)                
-        ADD_STATIC_COLOR(CHSV(HUE_RED, 0xFF, 0xFF))
-        ADD_STATIC_COLOR(CHSV(HUE_GREEN, 0xFF, 0xFF))
-        ADD_STATIC_COLOR(CHSV(HUE_BLUE, 0xFF, 0xFF))
+      BEGIN_MODE(Effects, 10)                        
         ADD_EFFECT(EffectJuggle)
         ADD_EFFECT(EffectTwinkleFox, TwinkleFox)        
         ADD_EFFECT(EffectPacificOcean)         
@@ -901,7 +903,7 @@ void setup() {
 #else 
 ////////////////////////////////////////
 // Everything else
-#include <SoundCapture.h>
+//#include <SoundCapture.h>
 
 #pragma message "Compile for default"
 
@@ -937,11 +939,9 @@ void setup() {
         //ADD_EFFECT(EffectColorWipe)               //Not intersting
         //ADD_EFFECT(EffectTheaterChaseRainbow) 
       END_MODE()
-      //BEGIN_MODE(Static, 3)
-        //ADD_STATIC_COLOR(CHSV(HUE_RED, 0xFF, 0xFF))
-        //ADD_STATIC_COLOR(CHSV(HUE_GREEN, 0xFF, 0xFF))
-        //ADD_STATIC_COLOR(CHSV(HUE_BLUE, 0xFF, 0xFF))
-      //END_MODE()
+      BEGIN_MODE(Static, 3)
+        ADD_STATIC_COLOR(HUE_RED)
+      END_MODE()
       //BLACK_MODE()
     END_EFFECTS()
     
@@ -958,6 +958,8 @@ void setup() {
         PUSH_BUTTON_TO_CMD(EEMC_MODE, PB_CONTROL_PUSH_LONG)
         PUSH_BUTTON_TO_CMD(EEMC_EFFECT, PB_CONTROL_CLICK_SHORT)      
       END_PUSH_BUTTON() 
+
+      SERIAL_INPUT()
 
       //SW2POS_TO_CMD(EEMC_SOUND_LOG, 7)
       //SW2POS_TO_CMD(EEMC_SOUND_USE_MAX, 6)

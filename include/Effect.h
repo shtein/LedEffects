@@ -2,6 +2,7 @@
 #define __EFFECT_H
 
 #include "Palette.h"
+#include "EffectEngineCtx.h"
 
 ///////////////////
 // Helpers
@@ -13,7 +14,7 @@
 
 class CRGB;
 class CHSV;
-class CtrlQueueItem;
+class EEPROMCfg;
 
 class Effect{
   public:
@@ -26,17 +27,20 @@ class Effect{
     //Process
     void loop(CRGB *leds, uint16_t numLeds); 
 
+    //Read/Write condig
+    virtual bool config(EEPROMCfg &cfg, bool read);
+
     //Command processing
-    virtual void onCmd(const struct CtrlQueueItem &itm);
-    virtual void idle();
+    virtual bool onCmd(struct CtrlQueueItemEx &itm);
    
     //Speed delay
-    void setSpeedDelay(uint16_t speedDelay);
-    uint16_t  getSpeedDelay() const;    
+    void setSpeedDelay(uint8_t speedDelay);
+    uint8_t  getSpeedDelay() const;    
 
   protected:
     virtual void reset() = 0;
     virtual void proceed(CRGB *leds, uint16_t numLeds) = 0;
+
   
     //Work with leds
     static void setPixel(CRGB &led, byte red, byte green, byte blue);
@@ -51,13 +55,18 @@ class Effect{
       int            step;        //current step
       CRGBPalette16  palCurrent;  //palette 1
       CRGBPalette16  palTarget;   //palette 2
+      uint8_t        speedDelay;  //speed
+      union{
+        CHSV     hsv;
+        CRGB     rgb;
+        uint8_t  byte;
+        uint16_t word;
+        int8_t   ch;
+        int16_t  value;
+      };
     };
 
-    static EffectContext _ctx;
-   
- private:      
-   //Speed
-   uint8_t  _speedDelay; //byte, i.e. range is 0 - 255, that maps to range from SPEED_DELAY_MIN to SPEED_DELAY_MAX by setSpeedDelay and getSpeedDelay
+    static EffectContext _ctx;  
 };
 
 
@@ -66,12 +75,15 @@ class Effect{
 
 class EffectColor: public Effect{
   public:
-    EffectColor(const CHSV &hsv = CHSV(HUE_RED, 0xFF, 0xFF));
+    EffectColor();
     ~EffectColor();
 
   //Command processing
-    virtual void onCmd(const struct CtrlQueueItem &itm);
-        
+    virtual bool onCmd(struct CtrlQueueItemEx &itm);
+
+    //Read/Write condig
+    bool config(EEPROMCfg &cfg, bool read);
+
   protected:  
   //Color control
     
@@ -79,9 +91,6 @@ class EffectColor: public Effect{
     void setHSV(const CHSV &hsv);
     CRGB getColor() const;
     void setRandomColor();
-
-  private:
-   CHSV _hsv;
 };
 
 /////////////////////////////////////////

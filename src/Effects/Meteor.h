@@ -82,10 +82,6 @@ inline CHSV Meteor::getHSV() const{
 
 template <const int MAX_METEORS = 2>
 class EffectMeteorRain: public Effect{
-public:
-  EffectMeteorRain();
- ~EffectMeteorRain();
-
 protected:
   void reset();
   void proceed(CRGB *leds, uint16_t numLeds);
@@ -95,14 +91,6 @@ protected:
   Meteor _meteors[MAX_METEORS];
 };
 
-template <const int MAX_METEORS>
-inline EffectMeteorRain<MAX_METEORS>::EffectMeteorRain(){
-  setSpeedDelay(50);
-}
-
-template <const int MAX_METEORS>
-inline EffectMeteorRain<MAX_METEORS>::~EffectMeteorRain(){
-}
 
 template <const int MAX_METEORS>
 inline void EffectMeteorRain<MAX_METEORS>::reset(){    
@@ -111,6 +99,8 @@ inline void EffectMeteorRain<MAX_METEORS>::reset(){
     //Ret meteor position
     _meteors[i].setup(random8(METEOR_SPEED_MIN, METEOR_SPEED_MAX + 1), random8(METEOR_SIZE_MIN, METEOR_SIZE_MAX + 1));
   }
+
+  setSpeedDelay(50);
 }
 
 

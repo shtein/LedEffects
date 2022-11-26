@@ -5,31 +5,21 @@
 #define BLOB_SIZE  10
 
 class EffectMoodBlobs: public Effect{
-  public:
-    EffectMoodBlobs();
-    ~EffectMoodBlobs();
-
 protected:
     void reset();
     void proceed(CRGB *leds, uint16_t numLeds); 
-
-protected:
-  byte _blobPhase;
 };
 
 
-inline EffectMoodBlobs::EffectMoodBlobs(){
-  setSpeedDelay(100);
-  _blobPhase  = 0;
-}
+#define BLOB_PHASE _ctx.byte
 
-inline EffectMoodBlobs::~EffectMoodBlobs(){
-}
 
 
 void EffectMoodBlobs::reset(){
   _ctx.step  = 0;
-  _blobPhase = 0;
+  BLOB_PHASE = 0;
+  
+  setSpeedDelay(100);
 }
 
 void EffectMoodBlobs::proceed(CRGB *leds, uint16_t numLeds){
@@ -39,7 +29,7 @@ void EffectMoodBlobs::proceed(CRGB *leds, uint16_t numLeds){
     CHSV hsv = CHSV(HUE_RED, 0xFF, 0xFF);
     
     //Calculate color value
-    int val = (int)sin8(-_blobPhase + (i % BLOB_SIZE) * 255 / BLOB_SIZE) - 128;    
+    int val = (int)sin8(-BLOB_PHASE + (i % BLOB_SIZE) * 255 / BLOB_SIZE) - 128;    
     //Everything below x axis is 0
     hsv.value = val < 0 ? 0 : val * 2; 
 
@@ -53,7 +43,7 @@ void EffectMoodBlobs::proceed(CRGB *leds, uint16_t numLeds){
   }
 
   //Increment blob phase
-  _blobPhase += 2;
+  BLOB_PHASE += 2;
 
   //Increment color rotation step
   _ctx.step = (_ctx.step + 1) % ( numLeds * 2 );

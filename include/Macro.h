@@ -12,9 +12,9 @@
 
 ///////////////////////////////////////
 //Macros for temp variable names
-#define TOKEN_CONCAT(x, y) x ## y
-#define TOKEN_CONCAT2(x, y) TOKEN_CONCAT(x, y)
-#define VAR_NAME(prefix) TOKEN_CONCAT2(prefix, __LINE__)
+#define TOKEN_CONCAT_(x, y) x ## y
+#define TOKEN_CONCAT(x, y) TOKEN_CONCAT_(x, y)
+#define VAR_NAME(prefix) TOKEN_CONCAT(prefix, __LINE__)
 
 #define EFFECT_ARR_NAME VAR_NAME(efcts)
 
@@ -38,18 +38,33 @@
 #define MIC_CTRL VAR_NAME(ecmic)
 
 #define SW2POS_NAME VAR_NAME(sw2p)
-#define SW2POS_CTRL VAR_NAME(exsw2p)
+#define SW2POS_CTRL VAR_NAME(ecsw2p)
 
+#define SER_NAME VAR_NAME(ser)
+#define SER_CTRL VAR_NAME(serec)
+
+//Notifications
+#ifdef NTF_ENABLED
+  #define _NTF_INIT() _CM NtfSet ntf;      
+  #define _NTF_ADD(a) ntf.addNtf(a); 
+  #define _CTRLQITEM_INIT() _CM struct CtrlQueueItemEx itm(ntf); 
+#else
+  #define _NTF_INIT()
+  #define _NTF_ADD(a)
+  #define _CTRLQITEM_INIT() _CM struct CtrlQueueItemEx itm; 
+#endif
 
 //Effect Engine
 #define BEGIN_EFFECT_ENGINE(flags) \
   _CM EffectEngine ee(flags); \
   _CM CtrlPanel cp; \
+  _NTF_INIT(); \
+  _CTRLQITEM_INIT();
+
 
 #define END_EFFECT_ENGINE()  \
   ee.init(); \
-  _CM CtrlQueueItem itm; \
-  for( ;; ){\
+  for( ;; ){ \
      cp.loop(itm); \
      ee.loop(itm); \
   }
@@ -78,8 +93,8 @@
   _CM ClassEffect EFFECT_NAME EFFECT_ARGS(__VA_ARGS__); \
   ee.addEffect(&EFFECT_NAME); 
 
-#define ADD_STATIC_COLOR(hsv) \
-  ADD_EFFECT(EffectStatic, hsv);
+#define ADD_STATIC_COLOR(hue) \
+  ADD_EFFECT(EffectStatic<hue>);
 
 
 #define BEGIN_LEDS() \
@@ -138,6 +153,8 @@
   _CM CtrlItemRotEnc ROT_CTRL(cmd, &ROT_NAME); \
   cp.addControl(&ROT_CTRL);
 
+#ifdef USE_IR_REMOTE
+
 #define BEGIN_REMOTE(pin) \
   _CM IRRemoteRecv IR_NAME(pin); \
   ai = &IR_NAME;
@@ -154,6 +171,14 @@
   cp.addControl(&IR_CTRL_UP); \
   _CM CtrlItemIRBtn IR_CTRL_DOWN(cmd, (IRRemoteRecv *)ai, code2, false, repeat); \
   cp.addControl(&IR_CTRL_DOWN);
+
+#endif //USE_IR_REMOTE
+
+#define SERIAL_INPUT() \
+  _CM SerialInput     SER_NAME; \
+  _CM CtrlItemSerial  SER_CTRL(&SER_NAME, parseSerialInput); \
+  cp.addControl(&SER_CTRL); \
+  _NTF_ADD(&SER_CTRL);
 
 
 #endif //__MACRO_H  

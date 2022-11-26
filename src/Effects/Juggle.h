@@ -3,20 +3,11 @@
 
 
 class EffectJuggle: public Effect{
-  public:
-     EffectJuggle(); 
-    ~EffectJuggle();
-
-    void proceed(CRGB *leds, uint16_t numLeds); 
-    void reset();
+protected:
+  void proceed(CRGB *leds, uint16_t numLeds); 
+  void reset();
 };
 
-inline EffectJuggle::EffectJuggle(){
-  setSpeedDelay(20);
-}
-
-inline EffectJuggle::~EffectJuggle(){
-}
 
 inline void EffectJuggle::proceed(CRGB *leds, uint16_t numLeds){
 
@@ -30,6 +21,7 @@ inline void EffectJuggle::proceed(CRGB *leds, uint16_t numLeds){
 }
 
 inline void EffectJuggle::reset(){  
+  setSpeedDelay(20);
 }
 
 

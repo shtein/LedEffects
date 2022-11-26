@@ -6,12 +6,38 @@
 ///////////////////////////////////////
 // Move linear routine
 template<typename T>
+void moveLinear(Obj<T> &obj, int16_t t){
+
+  //Change position, speed does not change
+  obj.pos.x += t * obj.vel.x;
+  obj.pos.y += t * obj.vel.y;
+}
+
+////////////////////////////////////////
+// Move gravity to the bottom routine
+
+#define G_CONST 20
+
+template<typename T>
+void moveGravity(Obj<T> &obj, int16_t t){  
+
+  obj.pos.x =                       obj.vel.x * t + obj.pos.x;
+  obj.pos.y = t * t * G_CONST / 2 + obj.vel.y * t + obj.pos.y;
+
+  obj.vel.y +=  G_CONST * t;
+  
+}
+
+///////////////////////////////////////
+// Move linear routine
+template<typename T>
 void moveLinear(Obj<T> &obj, uint8_t t){
 
   //Change position, speed does not change
   obj.pos.x += t * obj.vel.x;
   obj.pos.y += t * obj.vel.y;
 }
+
 
 
 
@@ -24,18 +50,23 @@ template <const int MAX_OBJECTS = 5>
 class EffectMatrixDrops: public EffectPaletteTransform{
 public:
   inline EffectMatrixDrops(FuncGetPalette_t getPal = &FuncGetPal_Default) __attribute__((always_inline)):
-    EffectPaletteTransform(getPal) {
+    EffectPaletteTransform(getPal) {    
 
-    setSpeedDelay(80);
+   
+  };
+
+protected:
+  void reset(){
+    EffectPaletteTransform::reset();
 
     for(int i = 0; i < MAX_OBJECTS; i++){
       _drops[i].obj.pos = Pnt8_t(127, 127);
       _drops[i].obj.vel = Pnt8_t(0, 1);
     }
-   
-  };
 
-protected:
+    setSpeedDelay(80);
+  }
+
   inline void updateLeds(CRGB *leds, uint16_t numLeds) __attribute__((always_inline))
   {
       //Fade all
@@ -82,20 +113,24 @@ template <const int MAX_OBJECTS = 5>
 class EffectMatrixCircles: public EffectPaletteTransform{
 public:
   inline EffectMatrixCircles(FuncGetPalette_t getPal = &FuncGetPal_Default) __attribute__((always_inline)):
-    EffectPaletteTransform(getPal) {
+    EffectPaletteTransform(getPal) { 
+  }
+  
 
-      setSpeedDelay(80);
+protected:
+  void reset(){
+    EffectPaletteTransform::reset();
 
-      for(int i = 0; i < MAX_OBJECTS; i++){
+    for(int i = 0; i < MAX_OBJECTS; i++){
         _circles[i].obj.pos = Pnt8_t(127, 127);
         _circles[i].obj.vel = Pnt8_t(1, 1);
         _circles[i].radius  = 127;
     }   
 
+    setSpeedDelay(80);
   }
-  
 
-protected:
+  
   inline void updateLeds(CRGB *leds, uint16_t numLeds) __attribute__((always_inline)){
     //Fade all
     fadeToBlackBy(leds, numLeds, MATRIX_OBJECTS_FADE );  
@@ -144,7 +179,7 @@ protected:
 template <class T> 
 class EffectMatrixKaleidoscope: public T{
 
-  protected:
+protected:
   inline void proceed(CRGB *leds, uint16_t numLeds){
     T::proceed(leds, numLeds);
     
@@ -168,15 +203,15 @@ class EffectMatrixKaleidoscope: public T{
 
 class EffectMatrixBounsingDots: public Effect{
 public:
-  inline EffectMatrixBounsingDots() __attribute__((always_inline)) {
-    setSpeedDelay(20);    
+  inline EffectMatrixBounsingDots() __attribute__((always_inline)) {      
   };
 
 
 protected:
   void reset(){
-    _obj.pos = Pnt16_t(0, 0);
-    _obj.vel = Pnt16_t(123, 176);
+    _obj.pos = Pnt32_t(0, 0);
+    _obj.vel = Pnt32_t(1000, 0);
+    setSpeedDelay(20);  
   };
 
   void proceed(CRGB *leds, uint16_t numLeds){
@@ -185,12 +220,14 @@ protected:
 
     XYDraw xy(leds, numLeds);
 
+    //DBG_OUTLN("%ld %ld", _obj.pos.x >> 16, _obj.pos.y >> 16);
+
     
     if(_obj.movesAwayLeft(0)){
       _obj.vel.x = -_obj.vel.x;
     }
 
-    if(_obj.movesAwayRight((int16_t)xy.width() << 8)){
+    if(_obj.movesAwayRight((int32_t)xy.width() << 16)){
       _obj.vel.x = -_obj.vel.x;
     }
 
@@ -198,19 +235,20 @@ protected:
       _obj.vel.y = -_obj.vel.y;    
     }
 
-    if(_obj.movesAwayDown((int16_t)xy.height() << 8)){
+    if(_obj.movesAwayDown((int32_t)xy.height() << 16)){
       _obj.vel.y = -_obj.vel.y;      
     }
 
     //xy(_obj.pos.x >> 8, _obj.pos.y >> 8) = CRGB::Black;
 
-    moveLinear(_obj, 1);
+    moveGravity(_obj, 20);
+    //moveLinear(_obj, 20);
 
-    xy(_obj.pos.x >> 8, _obj.pos.y >> 8) = CRGB::Blue;
+    xy(_obj.pos.x >> 16, _obj.pos.y >> 16) = CRGB::Blue;
   };
 
 protected:
-  Obj16_t _obj;
+  Obj32_t _obj;
 };
 
 

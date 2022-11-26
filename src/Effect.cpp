@@ -2,6 +2,7 @@
 
 #include <Fastled.h>
 #include <Controls.h>
+#include <EEPROMCfg.h>
 
 #include "effectenginectx.h"
 #include "effect.h"
@@ -16,7 +17,6 @@
 Effect::EffectContext Effect::_ctx;
 
 Effect::Effect(){
-  _speedDelay = 25;
 }
 
 Effect::~Effect(){
@@ -31,34 +31,38 @@ void Effect::init(CRGB *leds, uint16_t numLeds){
   reset();
 }
 
-void Effect::reset(){
-}
 
 void Effect::loop(CRGB *leds, uint16_t numLeds){    
   proceed(leds, numLeds);
 }
 
-void Effect::onCmd(const struct CtrlQueueItem &itm){
-  
+bool Effect::onCmd(struct CtrlQueueItemEx &itm){
+
   switch(itm.cmd){    
     case EEMC_SPEED:
       setSpeedDelay(itm.data.translate(getSpeedDelay(), SPEED_DELAY_MIN, SPEED_DELAY_MAX));
+#ifdef NTF_ENABLED
+    { itm.ntf.put_F(NULL, EECmdResponse<EEResp_EffectSpeed> {itm.cmd, {getSpeedDelay()}}); }
+#endif      
     break;
+#ifdef NTF_ENABLED
+    case EEMC_GET_SPEED:
+    { itm.ntf.put_F(NULL, EECmdResponse<EEResp_EffectSpeed> {itm.cmd, {getSpeedDelay()}}); }
+    break;
+#endif      
+    default:
+    return false;
   }    
+
+  return true;
 }
 
-void Effect::idle(){
+void Effect::setSpeedDelay(uint8_t speedDelay){  
+  _ctx.speedDelay = speedDelay < SPEED_DELAY_MIN ? SPEED_DELAY_MIN : speedDelay > SPEED_DELAY_MAX ? SPEED_DELAY_MAX : speedDelay;
 }
 
-
-void Effect::setSpeedDelay(uint16_t speedDelay){
-  //Scale down
-  _speedDelay = (uint8_t)map(speedDelay, SPEED_DELAY_MIN, SPEED_DELAY_MAX, 0, 255);
-}
-
-uint16_t Effect::getSpeedDelay() const{
-  //Scale Up
-  return (uint16_t)map(_speedDelay, 0, 255, SPEED_DELAY_MIN, SPEED_DELAY_MAX);
+uint8_t Effect::getSpeedDelay() const{  
+  return _ctx.speedDelay;
 }
 
 void Effect::setPixel(CRGB &led,  byte red, byte green, byte blue) {
@@ -79,25 +83,47 @@ void Effect::setAll(CRGB *leds, uint16_t numLeds, byte red, byte green, byte blu
   fill_solid(leds, numLeds, CRGB (red, green, blue));
 }
 
+bool Effect::config(EEPROMCfg &cfg, bool read){
+  if(read){
+    //Version, speed  
+    uint8_t version;
+    uint8_t speedDelay;
+
+    cfg >> version >> speedDelay;
+
+    //Check if version is correct 
+    if(version != EE_VERSION)
+      return false;
+
+    //Set speed delay
+    setSpeedDelay(speedDelay);
+  }
+  else{
+    //Write version and speed
+    cfg << (uint8_t)EE_VERSION << getSpeedDelay();
+  }
+
+  return true; 
+}
+
 //////////////////////////////////////
 // EffectColor
-EffectColor::EffectColor(const CHSV &hsv){
-  _hsv = hsv;
+EffectColor::EffectColor(){
 }
 
 EffectColor::~EffectColor(){  
 }
 
 const CHSV &EffectColor::getHSV() const{
-  return _hsv;
+  return _ctx.hsv;
 }
 
 void EffectColor::setHSV(const CHSV &hsv){
-  _hsv   = hsv;
+  _ctx.hsv   = hsv;
 }
 
 CRGB EffectColor::getColor() const{
-  return _hsv;
+  return _ctx.hsv;
 }
     
 void EffectColor::setRandomColor(){
@@ -105,9 +131,11 @@ void EffectColor::setRandomColor(){
 }
 
 
-void EffectColor::onCmd(const struct CtrlQueueItem &itm){
+bool EffectColor::onCmd(struct CtrlQueueItemEx &itm){  
   switch(itm.cmd){
-    case EEMC_COLOR_HUE:case EEMC_COLOR_SAT: case EEMC_COLOR_VAL: {
+    case EEMC_COLOR_HUE: 
+    case EEMC_COLOR_SAT: 
+    case EEMC_COLOR_VAL: {
       //Get effect color
       CHSV hsv = getHSV();
 
@@ -115,15 +143,46 @@ void EffectColor::onCmd(const struct CtrlQueueItem &itm){
       hsv.raw[itm.cmd - EEMC_COLOR_HUE] = (uint8_t)itm.data.translate( (int)hsv.raw[itm.cmd - EEMC_COLOR_HUE], 0, 255);
   
       //Set effect color
-      setHSV(hsv);   
+      setHSV(hsv);       
+
+#ifdef NTF_ENABLED
+      itm.ntf.put_F(NULL, EECmdResponse<EEResp_Color>{ itm.cmd, { { getHSV() } }});       
+#endif
     }   
     break;
-    default:
-      Effect::onCmd(itm);
+#ifdef NTF_ENABLED
+    case EEMC_GET_COLOR_HSV:
+      {itm.ntf.put_F(NULL, EECmdResponse<EEResp_Color>{ itm.cmd, { { getHSV() } }}); }
     break;
+#endif
+    default:
+    return Effect::onCmd(itm);    
   }    
   
+  return true;
 }
+
+
+bool EffectColor::config(EEPROMCfg &cfg, bool read){
+  
+  if(!Effect::config(cfg, read))
+      return false;
+
+  if(read){    
+    //Read color
+    CHSV hsv;
+    cfg >> hsv;
+
+    setHSV(hsv);
+  }
+  else{
+  //Write color
+    cfg << getHSV();
+  }
+
+  return true;
+}
+
 
 
 //////////////////////////////////////
@@ -138,8 +197,7 @@ void FuncGetPal_Default(CRGBPalette16 &pal){
 }
 
 
-EffectPaletteTransform::EffectPaletteTransform(FuncGetPalette_t getPal){
-  setSpeedDelay(25);  
+EffectPaletteTransform::EffectPaletteTransform(FuncGetPalette_t getPal){  
   _getPal = getPal;
 }
 
@@ -159,6 +217,9 @@ void EffectPaletteTransform::reset(){
 
   //Reset step
   _ctx.step = getMaxStep();
+
+  //Speed
+  setSpeedDelay(25);  
 }
 
 int EffectPaletteTransform::getMaxStep() const{
@@ -197,7 +258,6 @@ void EffectPaletteTransform::onStep(){
     //Reset step
     _ctx.step = getMaxStep(); 
   }
-  
   
   //Proceed with palette transtion
   if(isReadyToBlendPal()){

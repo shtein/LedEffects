@@ -36,14 +36,19 @@ class EffectNoise: public EffectPaletteTransform{
 
   protected:
     void updateLeds(CRGB *leds, uint16_t numLeds);   
-     
-  protected:
-    int _dist;
+    void reset();
 };
 
-inline EffectNoise::EffectNoise(FuncGetPalette_t getPal): EffectPaletteTransform(getPal){
+#define NOISE_DIST _ctx.value
+
+inline EffectNoise::EffectNoise(FuncGetPalette_t getPal): EffectPaletteTransform(getPal){ 
+}
+
+inline void EffectNoise::reset(){
+  EffectPaletteTransform::reset();
+
   //Init distortion
-  _dist = random16(millis());
+  NOISE_DIST = random16(millis());
 }
 
 #define XSCALE          30
@@ -53,12 +58,12 @@ inline void EffectNoise::updateLeds(CRGB *leds, uint16_t numLeds){
   
   //Do default actions
   for(uint16_t i = 0; i < numLeds; i++){       
-    leds[i]  = getCurrentPalColor((uint8_t)( inoise8(i * XSCALE, _dist + i * YSCALE) % 255 ));
+    leds[i]  = getCurrentPalColor((uint8_t)( inoise8(i * XSCALE, NOISE_DIST + i * YSCALE) % 255 ));
   }
 
   
   //Prepare for the next move
-  _dist += beatsin8(10, 1, 4);                                               
+  NOISE_DIST += beatsin8(10, 1, 4);                                               
 }
 
 
@@ -82,9 +87,14 @@ class EffectPlasma: public EffectPaletteTransform{
   protected:
     void updateLeds(CRGB *leds, uint16_t numLeds);
     int getMaxStep() const;
+    void reset();
 };
 
-inline EffectPlasma::EffectPlasma(FuncGetPalette_t getPal): EffectPaletteTransform(getPal){
+inline EffectPlasma::EffectPlasma(FuncGetPalette_t getPal): EffectPaletteTransform(getPal){  
+}
+
+inline void EffectPlasma::reset(){
+  EffectPaletteTransform::reset();
   setSpeedDelay(50);  
 }
 
@@ -125,12 +135,17 @@ class EffectConfetti: public EffectPaletteTransform{
 
   protected:
     void updateLeds(CRGB *leds, uint16_t numLeds);
+    void reset();
 
     int getMaxStep() const;    
 };
 
 
-inline EffectConfetti::EffectConfetti(FuncGetPalette_t getPal): EffectPaletteTransform(getPal) {
+inline EffectConfetti::EffectConfetti(FuncGetPalette_t getPal): EffectPaletteTransform(getPal) {  
+}
+
+inline void EffectConfetti::reset(){
+  EffectPaletteTransform::reset();
   setSpeedDelay(20);
 }
 

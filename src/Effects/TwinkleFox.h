@@ -35,9 +35,6 @@ protected:
   void updateLeds(CRGB *leds, uint16_t numLeds);
 
   CRGB computeOneTwinkle( uint32_t ms, uint8_t salt) const;
-
-private:
-  CRGB _bg;   //Last remembered background color
 };
 
 inline EffectTwinkleFox::EffectTwinkleFox(FuncGetPalette_t getPal): EffectPaletteTransform(getPal){
@@ -46,7 +43,7 @@ inline EffectTwinkleFox::EffectTwinkleFox(FuncGetPalette_t getPal): EffectPalett
 inline void EffectTwinkleFox::reset(){
   EffectPaletteTransform::reset();
 
-  _bg = _ctx.palCurrent[0];
+  _ctx.rgb = _ctx.palCurrent[0]; //background
 }
 
 inline void EffectTwinkleFox::updateLeds(CRGB *leds, uint16_t numLeds){  
@@ -74,9 +71,9 @@ inline void EffectTwinkleFox::updateLeds(CRGB *leds, uint16_t numLeds){
     }       
   }
   
-  if(_bg != bg){
-    bg  = blend(_bg, bg, 35);
-    _bg = bg;
+  if(_ctx.rgb != bg){
+    bg  = blend(_ctx.rgb, bg, 35);
+    _ctx.rgb = bg;
   }  
 
   //Init pseudo random elements

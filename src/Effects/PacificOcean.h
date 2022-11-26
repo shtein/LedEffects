@@ -2,10 +2,6 @@
 #define __PACIFIC_OCEAN_H
 
 class EffectPacificOcean: public Effect{
-public:
-  EffectPacificOcean();
-  ~EffectPacificOcean();
-
 protected:
   void reset();
   void proceed(CRGB *leds, uint16_t numLeds); 
@@ -28,19 +24,14 @@ protected:
   uint16_t _sCIStart4;  
 }; 
 
-inline EffectPacificOcean::EffectPacificOcean(){
-  setSpeedDelay(20);
-}
-
-inline EffectPacificOcean::~EffectPacificOcean(){
-}
-
 
 inline void EffectPacificOcean::reset(){
   _sCIStart1 = 0;
   _sCIStart2 = 0;
   _sCIStart3 = 0;
   _sCIStart4 = 0; 
+
+  setSpeedDelay(20);
 }
 
 inline void EffectPacificOcean::proceed(CRGB *leds, uint16_t numLeds){

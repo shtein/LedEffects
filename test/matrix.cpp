@@ -7,7 +7,7 @@ const char *strMsgVert = "Move away %s check fails -- vertical: %d, position: %d
 
 void testObjMoveAwayLeft(){    
 
-  Obj obj;  
+  Obj<int8_t> obj;  
   const uint8_t vert = 5;
   char msg[128];
 
@@ -33,7 +33,7 @@ void testObjMoveAwayLeft(){
 
 void testObjMoveAwayRight(){    
 
-  Obj obj;  
+  Obj<int8_t> obj;  
   const uint8_t vert = 5;
   char msg[128];
 
@@ -58,7 +58,7 @@ void testObjMoveAwayRight(){
 
 void testObjMoveAwayUp(){    
 
-  Obj obj;  
+  Obj<int8_t> obj;  
   const uint8_t horiz = 5;
   char msg[128];
 
@@ -83,7 +83,7 @@ void testObjMoveAwayUp(){
 
 void testObjMoveAwayDown(){    
 
-  Obj obj;  
+  Obj<int8_t> obj;  
   const uint8_t horiz = 5;
   char msg[128];
 

@@ -6,22 +6,15 @@
 
 
 class EffectRunningLights: public EffectColor{
-  public:
-    EffectRunningLights();
-
   protected:
     void proceed(CRGB *leds, uint16_t numLeds); 
     void reset();
 };
 
-
-inline EffectRunningLights::EffectRunningLights(){
-  setHSV(CHSV(HUE_RED, 0xFF, 0xFF));
-  setSpeedDelay(50);
-}
-
 inline void EffectRunningLights::reset(){
+  setHSV(CHSV(HUE_RED, 0xFF, 0xFF));
   _ctx.step = 0;
+  setSpeedDelay(50);
 }
 
 

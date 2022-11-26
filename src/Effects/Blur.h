@@ -5,22 +5,14 @@
 // class EffectBlur
 class EffectBlur: public Effect{
   public:
-     EffectBlur(); 
-    ~EffectBlur();
-
     void proceed(CRGB *leds, uint16_t numLeds); 
     void reset();
 };
 
 
-inline EffectBlur::EffectBlur(){
-  setSpeedDelay(25);
-}
-
-inline EffectBlur::~EffectBlur(){
-}
 
 inline void EffectBlur::reset(){
+  setSpeedDelay(25);
 }
 
 inline void EffectBlur::proceed(CRGB *leds, uint16_t numLeds){

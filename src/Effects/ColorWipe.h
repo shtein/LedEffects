@@ -4,29 +4,16 @@
 //////////////////////////////
 // Color Wipe Effect
 class EffectColorWipe: public EffectColor{
-  public:
-    EffectColorWipe();
-    ~EffectColorWipe();
-
   protected:
     void proceed(CRGB *leds, uint16_t numLeds); 
     void reset();
   
 };
 
-
-inline EffectColorWipe::EffectColorWipe(){
-  _ctx.step = 0;
-  setSpeedDelay(25);
-}
-
-
-inline EffectColorWipe::~EffectColorWipe(){
-}
-
 void EffectColorWipe::reset(){
   _ctx.step = 0;
   setRandomColor();
+  setSpeedDelay(25);
 }
  
 inline void EffectColorWipe::proceed(CRGB *leds, uint16_t numLeds){

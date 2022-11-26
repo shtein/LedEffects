@@ -16,7 +16,8 @@ struct Pnt {
     x = 0;
     y = 0;
   };
-  inline Pnt(int8_t x0, int8_t y0) __attribute__((always_inline)): x(x0), y(y0)
+  
+  inline Pnt(T x0, T y0) __attribute__((always_inline)): x(x0), y(y0)
   {
   };
 

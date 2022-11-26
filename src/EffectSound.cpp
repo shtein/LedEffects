@@ -107,8 +107,7 @@ uint8_t EffectSound::_flags       = SC_MAP_ABOVE_NOISE | SC_MAP_SENSITIVITY | SC
 Stats EffectSound::_stats;
 
 
-EffectSound::EffectSound(){
-  setSpeedDelay(10);
+EffectSound::EffectSound(){  
 }
 
 EffectSound::~EffectSound(){
@@ -141,6 +140,9 @@ void EffectSound::reset(){
     
     //Do default action
     Effect::reset();
+
+    //Speed
+    setSpeedDelay(10);
 }
 
 
@@ -180,37 +182,37 @@ void EffectSound::proceed(CRGB *leds, uint16_t numLeds){
     updateLeds(leds, numLeds, output);  
 }
 
-
- void EffectSound::idle(){   
-    //Call idle
-    _sc->idle();
-}
-
-
-void EffectSound::onCmd(const struct CtrlQueueItem &itm){  
+bool EffectSound::onCmd(struct CtrlQueueItemEx &itm){  
   switch(itm.cmd){    
     case EEMC_SOUND_LOW:
       _lower = itm.data.translate(_lower, SOUND_LOWER_MIN, SOUND_UPPER_MAX);
     break;
+
     case EEMC_SOUND_HIGH:
       _upper = itm.data.translate(_upper, SOUND_LOWER_MIN, SOUND_UPPER_MAX);
     break;
+
     case EEMC_SOUND_SENSITIVITY:
       _sensitivity = itm.data.translate(_sensitivity, SOUND_LOWER_MIN, SOUND_UPPER_MAX);
     break;
+
     case EEMC_SOUND_LOG:
       _flags = itm.data.value == 0 ? _flags & ~SC_MAP_LOG : _flags | SC_MAP_LOG; 
     break;
+
     case EEMC_SOUND_USE_MAX:
       _flags = itm.data.value == 0 ? _flags & ~SC_MAP_USE_MAX : _flags | SC_MAP_USE_MAX; 
     break;
+
     case EEMC_SOUND_USE_MIN:
       _flags = itm.data.value == 0 ? _flags & ~SC_MAP_USE_MIN : _flags | SC_MAP_USE_MIN; 
     break;
+
     default:
-      Effect::onCmd(itm);
-    break;
+    return Effect::onCmd(itm);
   }   
+
+  return true;
 }
 
 

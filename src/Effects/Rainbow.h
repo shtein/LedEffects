@@ -5,29 +5,17 @@
 // Rainbow effect 
 
 class EffectRainbow: public Effect{
-  public:
-    EffectRainbow();
-    ~EffectRainbow();
-
   protected:
     //CRGB wheel(byte wheelPos) const;
   
     void reset();
     void proceed(CRGB *leds, uint16_t numLeds); 
-
-  protected:
-    uint8_t _hue;    
 };
 
-inline EffectRainbow::EffectRainbow(){
-  setSpeedDelay(75);
-}
-
-inline EffectRainbow::~EffectRainbow(){
-}
 
 inline void EffectRainbow::reset(){  
-  _hue = 0;
+  _ctx.hsv = CHSV(0, 0xFF, 0xFF);
+  setSpeedDelay(75);
 }
 
 
@@ -37,11 +25,11 @@ inline void EffectRainbow::proceed(CRGB *leds, uint16_t numLeds){
   uint8_t delta = numLeds >= 255 ? 1 : 255 / numLeds;
 
   //Move forward and save
-  _hue = (_hue + delta) & 0xFF;
+  _ctx.hsv.hue = (_ctx.hsv.hue + delta) & 0xFF;
   
   
   //Set colors - same as fill_rainbow
-  CHSV hsv(_hue, 0xFF, 0xFF);
+  CHSV hsv = _ctx.hsv;
   
   for(uint16_t i = 0; i < numLeds; i++){ 
     leds[i] = hsv;
@@ -52,26 +40,17 @@ inline void EffectRainbow::proceed(CRGB *leds, uint16_t numLeds){
 
 /////////////////////////////////////
 // Theater Chase Rainbow Effect
-class EffectTheaterChaseRainbow: public Effect{
-  public:
-    EffectTheaterChaseRainbow();
-    
+class EffectTheaterChaseRainbow: public Effect{  
   protected:
     void reset();
     void proceed(CRGB *leds, uint16_t numLeds);  
-
-  protected:
-    uint8_t _step;
-    uint8_t _hue;
 };
 
-inline EffectTheaterChaseRainbow::EffectTheaterChaseRainbow(){
-  setSpeedDelay(100);  
-}
-
 inline void EffectTheaterChaseRainbow::reset(){
-  _step = 0;  
-  _hue  = 0;
+  _ctx.step = 0;  
+  _ctx.hsv = CHSV(0, 0xFF, 0xFF);
+
+  setSpeedDelay(100);  
 }
 
 
@@ -79,23 +58,23 @@ inline void EffectTheaterChaseRainbow::proceed(CRGB *leds, uint16_t numLeds){
   
   //Turn every third pixell off
   for(uint16_t i = 0; i < numLeds; i = i + 3){
-      setPixel(leds[(i + _step) % numLeds], 0, 0, 0);          
+      setPixel(leds[(i + _ctx.step) % numLeds], 0, 0, 0);          
   }
 
   uint8_t delta = numLeds >= 255 ? 1 : 255 / numLeds;
   
   //Move forward
-  _step  = (_step + 1) % 3;
-  if (_step  == 0){ // Next cycle    
+  _ctx.step  = (_ctx.step + 1) % 3;
+  if (_ctx.step  == 0){ // Next cycle    
     
     //Move to the next color
-    _hue = (_hue + delta) & 0xFF;
+    _ctx.hsv.hue = (_ctx.hsv.hue + delta) & 0xFF;
   }
 
-  CHSV hsv = CHSV(_hue, 0xFF, 0xFF);
+  CHSV hsv = _ctx.hsv;
   //Turn every third pixell on
   for(uint16_t i = 0; i < numLeds; i = i + 3){ 
-    leds[(i + _step ) % numLeds] = hsv;
+    leds[(i + _ctx.step ) % numLeds] = hsv;
     hsv.hue = (hsv.hue + delta) & 0xFF;
   }
 }
@@ -105,21 +84,14 @@ inline void EffectTheaterChaseRainbow::proceed(CRGB *leds, uint16_t numLeds){
 // EffectRainbowMove
 
 class EffectRainbowMove: public Effect{
-  public:
-    EffectRainbowMove();
-
   protected:
     void proceed(CRGB *leds, uint16_t numLeds); 
     void reset();
 };
 
 
-inline EffectRainbowMove::EffectRainbowMove(){
-  setSpeedDelay(50);
-}
-
-
 inline void EffectRainbowMove::reset(){
+  setSpeedDelay(50);
 }
 
 void EffectRainbowMove::proceed(CRGB *leds, uint16_t numLeds){
