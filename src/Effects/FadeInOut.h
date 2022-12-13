@@ -37,7 +37,7 @@ inline void EffectFadeInOut::proceed(CRGB *leds, uint16_t numLeds){
   hsv.value = triwave8(hsv.value);
   
   //Change color
-  setAll(leds, numLeds, hsv );
+  fill_solid(leds, numLeds, hsv);  
 }
 
 

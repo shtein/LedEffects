@@ -83,12 +83,9 @@ void EffectEngine::init() {
   setMode(_modeNum);
 
   //Light LEDs
-  showStrip();
-}
-
-void EffectEngine::showStrip() {
   FastLED.show();
 }
+
 
 
 void EffectEngine::setMode(uint8_t mode){
@@ -282,7 +279,7 @@ void EffectEngine::loop(struct CtrlQueueItemEx &itm){
   
   //Updates leds and set timer to save configuration
   if(updateLeds){
-     showStrip();            
+     FastLED.show();
   }
 
   //See if we need to safe config
@@ -403,9 +400,9 @@ BEGIN_PARSE_ROUTINE(parseSerialInput)
     BEGIN_GROUP_TOKEN("color|c") //set hsv 
       TOKEN_IS_TEXT("get|g|", EEMC_GET_COLOR_HSV)
       BEGIN_GROUP_TOKEN("set|s") //set hsv    
-        TOKEN_IS_PAIR("hue|h", EEMC_COLOR_HUE, CTF_VAL_ABS)         //hue
-        TOKEN_IS_PAIR("saturation|s", EEMC_COLOR_SAT, CTF_VAL_ABS)  //saturation
-        TOKEN_IS_PAIR("value|v", EEMC_COLOR_VAL, CTF_VAL_ABS)       //value
+        TOKEN_IS_PAIR("hue|h", EEMC_COLOR_HUE, CTF_VAL_ABS)  //hue
+        TOKEN_IS_PAIR("sat|s", EEMC_COLOR_SAT, CTF_VAL_ABS)  //saturation
+        TOKEN_IS_PAIR("val|v", EEMC_COLOR_VAL, CTF_VAL_ABS)  //value
       END_GROUP_TOKEN()
     END_GROUP_TOKEN()    
   END_GROUP_TOKEN() //effect

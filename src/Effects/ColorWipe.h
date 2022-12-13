@@ -17,7 +17,7 @@ void EffectColorWipe::reset(){
 }
  
 inline void EffectColorWipe::proceed(CRGB *leds, uint16_t numLeds){
-  setPixel(leds[_ctx.step % numLeds], getColor());
+  leds[_ctx.step % numLeds] =  getColor();
 
   _ctx.step++;
   

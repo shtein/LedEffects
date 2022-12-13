@@ -321,7 +321,7 @@ void EffectSound::drawBoundary(CRGB *leds,
                               ){
 
   if(eraseBackground)
-    setAll(leds, numLeds, CRGB::Black);
+    fill_solid(leds, numLeds, CRGB::Black);    
 
   leds[mapEx(lower, 0, 255, bottom, numLeds - 1 - bottom)] += clrLower;
   leds[mapEx(upper, 0, 255, bottom, numLeds - 1 - bottom)] += clrUpper;    

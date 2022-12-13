@@ -537,23 +537,26 @@ void setup() {
 
 void setup() {
   DBG_INIT();
-  DBG_OUTLN("Led effect started - window");  
+  //DBG_OUTLN("Led effect started - window");  
   //Effect Engine
   BEGIN_EFFECT_ENGINE(0) 
     
     //Effects   
     BEGIN_EFFECTS()
+
       BEGIN_MODE(Themes, 15)        
         ADD_EFFECT( EffectConfetti, &TransformAutunm )
-        ADD_EFFECT( EffectPlasma, &TransformAutunm )
+        ADD_EFFECT( EffectPlasma, &TransformAutunm)
         ADD_EFFECT( EffectNoise, &TransformAutunm )
         ADD_EFFECT( EffectConfetti, &TransformHalloween )
         ADD_EFFECT( EffectPlasma, &TransformHalloween )
-        ADD_EFFECT( EffectNoise, &TransformHalloween )
-        ADD_EFFECT( EffectConfetti, &TransformChristmas )
-        ADD_EFFECT( EffectPlasma, &TransformChristmas )
+        ADD_EFFECT( EffectNoise, &TransformHalloween)
+        ADD_EFFECT( EffectConfetti, &TransformChristmas)
+        ADD_EFFECT( EffectPlasma, &TransformChristmas)
         ADD_EFFECT( EffectNoise, &TransformChristmas )
       END_MODE()      
+  
+
       BEGIN_MODE(Effects, 15)
         ADD_EFFECT(EffectRipple<>)
         ADD_EFFECT(EffectFire)
@@ -561,20 +564,24 @@ void setup() {
         ADD_EFFECT(EffectPlasma)
         ADD_EFFECT(EffectConfetti)
         ADD_EFFECT(EffectPaletteTransformFast) 
-        ADD_EFFECT(EffectBlur)
-        ADD_EFFECT(EffectRainbowMove)
+        ADD_EFFECT(EffectBlur)        
         ADD_EFFECT(EffectNoise)            
         ADD_EFFECT(EffectMoodBlobs) 
         ADD_EFFECT(EffectRainbow) 
         ADD_EFFECT(EffectTwinkleFox)       
-        ADD_EFFECT(EffectPacificOcean)       
+        ADD_EFFECT(EffectPacificOcean) 
+        ADD_EFFECT(EffectJuggle)
+        ADD_EFFECT(EffectEmergencyLights)
       END_MODE()
+/*
       BEGIN_MODE(OldEffects, 15)
         ADD_EFFECT(EffectFadeInOut)
         ADD_EFFECT(EffectRunningLights)           //Single color
-        ADD_EFFECT(EffectColorWipe)               //Not intersting
-        ADD_EFFECT(EffectTheaterChaseRainbow) 
+        //ADD_EFFECT(EffectColorWipe)               //Not intersting
+        //ADD_EFFECT(EffectTheaterChaseRainbow) 
+        //ADD_EFFECT(EffectRainbowMove)
       END_MODE()
+*/
     END_EFFECTS()
     
     //Leds
@@ -588,6 +595,13 @@ void setup() {
         PUSH_BUTTON_TO_CMD(EEMC_MODE, PB_CONTROL_PUSH_LONG)
         PUSH_BUTTON_TO_CMD(EEMC_EFFECT, PB_CONTROL_CLICK_SHORT)      
       END_PUSH_BUTTON()
+      
+      SERIAL_INPUT()
+
+      //POT_TO_CMD(EEMC_SOUND_LOW, SOUND_LOW_PIN, POT_NOISE_THRESHOLD, 100)
+      //POT_TO_CMD(EEMC_SOUND_SENSITIVITY, SOUND_HIGH_PIN, POT_NOISE_THRESHOLD, 300)
+     
+
     END_CONTROL_MAP()
        
   END_EFFECT_ENGINE() 
@@ -850,11 +864,11 @@ void setup() {
 // __SOUND_MATRIX_16x16
 #elif defined(__FRAME_MATRIX_16x16)
 
-#pragma message "Compile for 16x16 matrix in a frame"
+#pragma message "Compile for 16x16 matrix"
 
 void setup() {
   DBG_INIT();
-  DBG_OUTLN("Led effect started - 16x16 matrix in frame");  
+  DBG_OUTLN("Led effect started - 16x16 matrix");  
 
   
   //Effect Engine
@@ -867,14 +881,8 @@ void setup() {
         ADD_EFFECT(EffectMatrixKaleidoscope<EffectTwinkleFox>)
         ADD_EFFECT(EffectMatrixKaleidoscope<EffectMoodBlobs >)
         ADD_EFFECT(EffectMatrixKaleidoscope<EffectPlasma >)
-        //ADD_EFFECT(EffectConfetti)
-        //ADD_EFFECT(EffectMeteorRain<5>)
-        //ADD_EFFECT(EffectPlasma)
         ADD_EFFECT(EffectTwinkleFox)
-        //ADD_EFFECT(EffectJuggle)
         ADD_EFFECT(EffectPacificOcean)        
-        //ADD_EFFECT(EffectBlur)
-        //ADD_EFFECT(EffectNoise)            
         ADD_EFFECT(EffectMoodBlobs) 
         ADD_EFFECT(EffectMatrixDrops<8>, TwinkleFox)
         ADD_EFFECT(EffectMatrixCircles<2>)

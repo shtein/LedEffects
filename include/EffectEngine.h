@@ -29,8 +29,7 @@ class EffectEngine{
     CRGB *getLeds() const;
     
   protected:
-    void showStrip();    
-
+    
     //Command handling
     bool onCmd(struct CtrlQueueItemEx &itm);
 

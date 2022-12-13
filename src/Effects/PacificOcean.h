@@ -18,19 +18,17 @@ protected:
   void deepenColors(CRGB *leds, uint16_t numLeds);
 
 protected:
-  uint16_t _sCIStart1;
-  uint16_t _sCIStart2;
-  uint16_t _sCIStart3;
-  uint16_t _sCIStart4;  
 }; 
+
+//Reuse _ctx.palCurrent for local data members
+#define SCIStart ((uint16_t *)_ctx.palCurrent.entries)
 
 
 inline void EffectPacificOcean::reset(){
-  _sCIStart1 = 0;
-  _sCIStart2 = 0;
-  _sCIStart3 = 0;
-  _sCIStart4 = 0; 
-
+  for(size_t i = 0; i < 4; i++){
+    SCIStart[i] = 0;
+  }
+  
   setSpeedDelay(20);
 }
 
@@ -41,19 +39,19 @@ inline void EffectPacificOcean::proceed(CRGB *leds, uint16_t numLeds){
   uint32_t deltams2     = (getSpeedDelay() * beatsin16(4, 179, 269)) / 256;
   uint32_t deltams21    = (deltams1 + deltams2) / 2;
 
-  _sCIStart1 += (deltams1 * beatsin88(1011, 10, 13));
-  _sCIStart2 -= (deltams21 * beatsin88(777, 8, 11));
-  _sCIStart3 -= (deltams1 * beatsin88(501, 5, 7));
-  _sCIStart4 -= (deltams2 * beatsin88(257, 4, 6));
+  SCIStart[0] += (deltams1 * beatsin88(1011, 10, 13));
+  SCIStart[1] -= (deltams21 * beatsin88(777, 8, 11));
+  SCIStart[2]-= (deltams1 * beatsin88(501, 5, 7));
+  SCIStart[3] -= (deltams2 * beatsin88(257, 4, 6));
 
   // Clear out the LED array to a dim background blue-green
   fill_solid( leds, numLeds, CRGB( 2, 6, 10));
 
   // Render each of four layers, with different scales and speeds, that vary over time
-  oneLayer( leds, numLeds, Pacifica_1_p, _sCIStart1, beatsin16( 3, 11 * 256, 14 * 256), beatsin8( 10, 70, 130), 0 - beat16( 301) );
-  oneLayer( leds, numLeds, Pacifica_2_p, _sCIStart2, beatsin16( 4,  6 * 256,  9 * 256), beatsin8( 17, 40,  80), beat16( 401) );
-  oneLayer( leds, numLeds, Pacifica_3_p, _sCIStart3, 6 * 256, beatsin8( 9, 10,38), 0 - beat16(503));
-  oneLayer( leds, numLeds, Pacifica_3_p, _sCIStart4, 5 * 256, beatsin8( 8, 10,28), beat16(601));
+  oneLayer( leds, numLeds, Pacifica_1_p, SCIStart[0], beatsin16( 3, 11 * 256, 14 * 256), beatsin8( 10, 70, 130), 0 - beat16( 301) );
+  oneLayer( leds, numLeds, Pacifica_2_p, SCIStart[1], beatsin16( 4,  6 * 256,  9 * 256), beatsin8( 17, 40,  80), beat16( 401) );
+  oneLayer( leds, numLeds, Pacifica_3_p, SCIStart[2], 6 * 256, beatsin8( 9, 10,38), 0 - beat16(503));
+  oneLayer( leds, numLeds, Pacifica_3_p, SCIStart[3], 5 * 256, beatsin8( 8, 10,28), beat16(601));
 
   // Add brighter 'whitecaps' where the waves lines up more
   addWhitecaps(leds, numLeds);

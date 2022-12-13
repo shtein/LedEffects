@@ -22,7 +22,7 @@ inline void EffectEmergencyLights::reset(){
 inline void EffectEmergencyLights::proceed(CRGB *leds, uint16_t numLeds){ 
 
   //Black all
-  setAll(leds, numLeds, 0, 0, 0);
+  fill_solid(leds, numLeds, CRGB::Black);
 
   uint16_t bounds[][2] = { { 0, numLeds/2 }, 
                            { 1, numLeds/2 }, 

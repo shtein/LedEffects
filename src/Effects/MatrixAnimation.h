@@ -43,6 +43,8 @@ void moveLinear(Obj<T> &obj, uint8_t t){
 
 #define MATRIX_OBJECTS_FADE 128
 
+
+
 ////////////////////////////////////////
 // EffectMatrixDrops
 
@@ -51,8 +53,6 @@ class EffectMatrixDrops: public EffectPaletteTransform{
 public:
   inline EffectMatrixDrops(FuncGetPalette_t getPal = &FuncGetPal_Default) __attribute__((always_inline)):
     EffectPaletteTransform(getPal) {    
-
-   
   };
 
 protected:
@@ -67,8 +67,10 @@ protected:
     setSpeedDelay(80);
   }
 
-  inline void updateLeds(CRGB *leds, uint16_t numLeds) __attribute__((always_inline))
+  inline void proceed(CRGB *leds, uint16_t numLeds) __attribute__((always_inline))
   {
+    EffectPaletteTransform::proceed(leds, numLeds);
+
       //Fade all
     fadeToBlackBy(leds, numLeds, MATRIX_OBJECTS_FADE);  
 
@@ -131,7 +133,9 @@ protected:
   }
 
   
-  inline void updateLeds(CRGB *leds, uint16_t numLeds) __attribute__((always_inline)){
+  inline void proceed(CRGB *leds, uint16_t numLeds) __attribute__((always_inline)){
+    EffectPaletteTransform::proceed(leds, numLeds);
+
     //Fade all
     fadeToBlackBy(leds, numLeds, MATRIX_OBJECTS_FADE );  
 
@@ -172,7 +176,6 @@ protected:
     uint8_t radius;
     Obj8_t  obj;    
   } _circles[MAX_OBJECTS];
-
 };
 
 
@@ -193,7 +196,6 @@ protected:
                                   );
     xy.mirrorRectangleHorizontally(0, 0, xy.width()/2, xy.height()/2, xy.width()/2, xy.width() % 2 - 1);
     xy.mirrorRectangleVertically(0, 0, xy.width(), xy.height() / 2, xy.height() / 2, 0, xy.height() % 2 - 1);
-
   };
 
 };

@@ -128,13 +128,13 @@
   ai = NULL;  
 
 #define PUSH_BUTTON_TO_CMD(cmd, ...) \
-  _CM CtrlItemPb BTN_CTRL(cmd, (PushButton *)ai, __VA_ARGS__); \
+  _CM CtrlItemPb<__VA_ARGS__> BTN_CTRL(cmd, (PushButton *)ai); \
   cp.addControl(&BTN_CTRL);
 
 
 #define PUSH_BUTTON_SA_TO_CMD(cmd, pin, ...) \
   BEGIN_PUSH_BUTTON(pin); \
-  PUSH_BUTTON_TO_CMD(cmd, PB_CONTROL_CLICK, ## __VA_ARGS__); \
+  PUSH_BUTTON_TO_CMD(cmd, PB_CONTROL_CLICK, ##__VA_ARGS__); \
   END_PUSH_BUTTON()
 
 #define SW2POS_TO_CMD(cmd, pin) \
@@ -145,7 +145,7 @@
 
 #define POT_TO_CMD(cmd, pin, ...) \
   _CM AnalogInput POT_NAME(pin); \
-  _CM CtrlItemPtmtr POT_CTRL(cmd, &POT_NAME, ## __VA_ARGS__); \
+  _CM CtrlItemPtmtr<__VA_ARGS__> POT_CTRL(cmd, &POT_NAME); \
   cp.addControl(&POT_CTRL);
 
 #define ROTENC_TO_CMD(cmd, pinData, pinClock) \
@@ -176,7 +176,7 @@
 
 #define SERIAL_INPUT() \
   _CM SerialInput     SER_NAME; \
-  _CM CtrlItemSerial  SER_CTRL(&SER_NAME, parseSerialInput); \
+  _CM CtrlItemSerial<parseSerialInput> SER_CTRL(&SER_NAME); \
   cp.addControl(&SER_CTRL); \
   _NTF_ADD(&SER_CTRL);
 

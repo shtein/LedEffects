@@ -58,7 +58,7 @@ inline void EffectTheaterChaseRainbow::proceed(CRGB *leds, uint16_t numLeds){
   
   //Turn every third pixell off
   for(uint16_t i = 0; i < numLeds; i = i + 3){
-      setPixel(leds[(i + _ctx.step) % numLeds], 0, 0, 0);          
+      leds[(i + _ctx.step) % numLeds] = CRGB::Black;          
   }
 
   uint8_t delta = numLeds >= 255 ? 1 : 255 / numLeds;

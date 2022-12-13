@@ -40,35 +40,29 @@ class Effect{
   protected:
     virtual void reset() = 0;
     virtual void proceed(CRGB *leds, uint16_t numLeds) = 0;
-
   
-    //Work with leds
-    static void setPixel(CRGB &led, byte red, byte green, byte blue);
-    static void setPixel(CRGB &led, const CRGB &color);
-    static void setAll(CRGB *leds, uint16_t numLeds, byte red, byte green, byte blue);
-    static void setAll(CRGB *leds, uint16_t numLeds, const CRGB &color);  
-
- protected:
+  protected:
     ///////////////////
     //Structure to support real-time processing elements to save some memory
     struct EffectContext { 
-      int            step;        //current step
-      CRGBPalette16  palCurrent;  //palette 1
-      CRGBPalette16  palTarget;   //palette 2
       uint8_t        speedDelay;  //speed
-      union{
+      int            step;        //current step
+
+      CRGBPalette16  palCurrent;  //palette 1
+      CRGBPalette16  palTarget;   //palette 2      
+
+      union{                      //Reusable data items
         CHSV     hsv;
         CRGB     rgb;
         uint8_t  byte;
-        uint16_t word;
         int8_t   ch;
-        int16_t  value;
+        uint16_t word;
+        int16_t  value;       
       };
     };
-
+  
     static EffectContext _ctx;  
 };
-
 
 /////////////////////////////////////////
 // Single Color Effect
@@ -98,36 +92,30 @@ class EffectColor: public Effect{
 #define MAX_PAL_CHANGES 24
 #define CHANGE_PAL_STEP 500
 
+
 //Palette change routine
 typedef void (*FuncGetPalette_t) (CRGBPalette16 &);
 
 //Default palette change routine
 void FuncGetPal_Default(CRGBPalette16 &pal);
 
-class EffectPaletteTransform: public Effect{
-  public: 
+class EffectPaletteTransform: public Effect{  
+  public:
     EffectPaletteTransform(FuncGetPalette_t getPal);
-   ~EffectPaletteTransform();
 
-   virtual void proceed(CRGB *leds, uint16_t numLeds);
-   virtual void reset();
+  protected:  
+    virtual void proceed(CRGB *leds, uint16_t numLeds);
+    virtual void reset();    
+     
+    virtual int getMaxStep() const;
+
+    CRGB getCurrentPalColor(uint8_t index, uint8_t brightness = 255, TBlendType blendType = LINEARBLEND) const;    
 
   protected:
-    void onStep();
-    CRGB getCurrentPalColor(uint8_t index, uint8_t brightness = 255, TBlendType blendType = LINEARBLEND) const;
-  
-    virtual void updateColors();
-    virtual void updateLeds(CRGB *leds, uint16_t numLeds);
-    
-    
-    virtual bool isReadyToBlendPal() const;
-    virtual bool isReadyToChangePal() const;
-
-    virtual int getMaxStep() const;
-    
-  protected:    
-    FuncGetPalette_t     _getPal;
+    FuncGetPalette_t _getPal;
 };
+
+
 
 
 //////////////////////////////////////////////////////

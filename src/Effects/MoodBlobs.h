@@ -39,7 +39,7 @@ void EffectMoodBlobs::proceed(CRGB *leds, uint16_t numLeds){
     hsv.hue += hue; 
    
     //Set color
-    setPixel(leds[i] , hsv);
+    leds[i]  = hsv;
   }
 
   //Increment blob phase

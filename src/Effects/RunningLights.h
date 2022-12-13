@@ -25,7 +25,7 @@ inline void EffectRunningLights::proceed(CRGB *leds, uint16_t numLeds){
     
     CHSV hsv = getHSV();
     hsv.v  = sin8( ((i + _ctx.step) % RL_SIZE) * 255 / (RL_SIZE - 1) );
-    setPixel(leds[i], hsv);
+    leds[i] =  hsv;
   }  
   
   _ctx.step = (_ctx.step + 1) % RL_SIZE;
