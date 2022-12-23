@@ -45,13 +45,29 @@ void putNtfObject(NtfBase &resp, const EECmdResponse<T> &r){
   resp.put_F(F("data"), r.data);
 }
 
+
 //Mode/Effect list
+
+struct EEResp_Effect{
+  uint8_t index;
+  const __FlashStringHelper *effectName;
+};
+
+inline void putNtfObject(NtfBase &resp, const EEResp_Effect &data){  
+  resp.put_F(F("effectIndex"), data.index);
+  resp.put_F(F("effectName"), data.effectName);
+}
+
 struct EEResp_Mode{
-  uint8_t numEffects; //Number of effects
+  uint8_t numEffects;                             //Number of effects
+  const __FlashStringHelper *modeName;            //Name of the mode 
+  struct EEResp_Effect      effects[MAX_EFFECTS]; //Max effects
 }; 
 
 inline void putNtfObject(NtfBase &resp, const EEResp_Mode &data){
-   resp.put_F(F("effectcount"), data.numEffects);
+  resp.put_F(F("modeName"), data.modeName);
+  resp.put_F(F("effectCount"), data.numEffects);   
+  resp.put_F(F("effects"), data.effects, data.numEffects);
 }
 
 struct EEResp_ModeList{
@@ -60,7 +76,7 @@ struct EEResp_ModeList{
 };
 
 inline void putNtfObject(NtfBase &resp, const EEResp_ModeList &data){
-   resp.put_F(F("modecount"), data.numModes);
+   resp.put_F(F("modeCount"), data.numModes);
    resp.put_F(F("modes"), data.modes, data.numModes);
 }
 

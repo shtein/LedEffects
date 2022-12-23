@@ -33,17 +33,20 @@ CRGB *EffectEngine::getLeds() const{
 EffectEngine::~EffectEngine(){
 }
 
-void EffectEngine::addMode(Effect **effects){
+void EffectEngine::addMode(const __FlashStringHelper *modeName, EFFECT_EFFECT *effects){
   if(_numModes == MAX_MODES)
     return;
 
-  _modes[_numModes].effects    = effects;
+  _modes[_numModes].effects   = effects;
+#ifdef NTF_ENABLED  
+  _modes[_numModes].modeName  = modeName; 
+#endif  
 
   //Next mode
   _numModes ++;
 }
 
-void EffectEngine::addEffect(Effect *effect){
+void EffectEngine::addEffect(const __FlashStringHelper *effectName, Effect *effect){
   if(!effect)
     return;
 
@@ -51,10 +54,14 @@ void EffectEngine::addEffect(Effect *effect){
     return;
 
   EFFECT_MODE *mode = & _modes[_numModes - 1]; 
-
+  
   //Only add effect if there is where to add
   if(mode->effects){
-    mode->effects[mode->numEffects] = effect;
+    mode->effects[mode->numEffects].effect     = effect;
+#ifdef NTF_ENABLED
+    mode->effects[mode->numEffects].effectName = effectName;
+#endif    
+
     mode->numEffects ++;
   }
 } 
@@ -72,7 +79,7 @@ void EffectEngine::init() {
   //Check startup flags
   if(_flags & EFF_RANDOM_START_MODE){
     _modeNum           = random8(_numModes); //random mode
-    CUR_MODE.effectNum = 0;                  //first effect
+    CUR_MODE.effectNum = 0;                  //first effect  
   }
 
   if(_flags & EFF_RANDOM_START_EFFECT){
@@ -125,7 +132,7 @@ Effect *EffectEngine::getEffect() const{
   if(!CUR_MODE.effects)
     return NULL;
 
-  return CUR_MODE.effects[CUR_MODE.effectNum]; 
+  return CUR_MODE.effects[CUR_MODE.effectNum].effect; 
 }
 
 //////////////////////////////
@@ -217,6 +224,12 @@ bool EffectEngine::onCmd(struct CtrlQueueItemEx &itm){
         resp.data.numModes = _numModes;
         for(size_t i = 0; i < _numModes; i++){
           resp.data.modes[i].numEffects = _modes[i].numEffects;
+          resp.data.modes[i].modeName   = _modes[i].modeName;
+
+          for(size_t j = 0; j < _modes[i].numEffects; j++){
+            resp.data.modes[i].effects[j].index = j;          
+            resp.data.modes[i].effects[j].effectName = _modes[i].effects[j].effectName;
+          }
         }
         
         itm.ntf.put_F(NULL, resp);

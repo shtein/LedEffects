@@ -138,9 +138,6 @@ void EffectSound::reset(){
     //Remember pallette
     _ctx.palCurrent = sound_bands_gp;
     
-    //Do default action
-    Effect::reset();
-
     //Speed
     setSpeedDelay(10);
 }

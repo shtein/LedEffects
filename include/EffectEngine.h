@@ -12,6 +12,21 @@ class Effect;
 
 typedef CRGB EELEDS[MAX_LEDS];
 
+struct EFFECT_EFFECT{
+  Effect                    *effect;      //Effect
+#ifdef NTF_ENABLED  
+  const __FlashStringHelper *effectName;  //Name of the effect
+#endif  
+};
+
+struct EFFECT_MODE{
+      EFFECT_EFFECT             *effects;               //Effects
+      uint8_t                    numEffects:4;          //Total number of effects
+      uint8_t                    effectNum:4;           //Index of the current or last effect from _effects
+#ifdef NTF_ENABLED      
+      const __FlashStringHelper *modeName;              //Name of the mode
+#endif      
+    }; 
 
 /////////////////////////////////
 // EffectEngine
@@ -21,8 +36,8 @@ class EffectEngine{
     ~EffectEngine();
 
     void init();
-    void addMode(Effect **effects); //add mode
-    void addEffect(Effect *effect); //add effect to current mode
+    void addMode(const __FlashStringHelper *modeName, EFFECT_EFFECT *effects); //add mode
+    void addEffect(const __FlashStringHelper *effectName, Effect *effect); //add effect to current mode
     
     void loop(struct CtrlQueueItemEx &itm);   
 
@@ -55,11 +70,7 @@ class EffectEngine{
   
   protected:
     //Effects for modes
-    struct EFFECT_MODE{
-      Effect     **effects;  //Effects
-      uint8_t      numEffects:4;          //Total number of effects
-      uint8_t      effectNum:4;           //Index of the current or last effect from _effects
-    } _modes[MAX_MODES]; 
+    EFFECT_MODE _modes[MAX_MODES]; 
 
     uint8_t    _numModes:4;               //Total number of modes
     uint8_t    _modeNum:4;                //Current mode

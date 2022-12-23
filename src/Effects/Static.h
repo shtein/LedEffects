@@ -6,7 +6,7 @@ class EffectStatic: public EffectColor{
   protected:
   
     void proceed(CRGB *leds, uint16_t numLeds){
-      setAll(leds, numLeds, getColor());
+      fill_solid(leds, numLeds, getColor());
     }
 
     void reset(){

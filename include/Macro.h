@@ -1,6 +1,8 @@
 #ifndef __MACRO_H
 #define __MACRO_H
 
+#include <utils.h>
+
 ///////////////////////////////
 //Memory check during compilation
 #ifdef CHECK_MEM 
@@ -12,12 +14,9 @@
 
 ///////////////////////////////////////
 //Macros for temp variable names
-#define TOKEN_CONCAT_(x, y) x ## y
-#define TOKEN_CONCAT(x, y) TOKEN_CONCAT_(x, y)
 #define VAR_NAME(prefix) TOKEN_CONCAT(prefix, __LINE__)
 
-#define EFFECT_ARR_NAME VAR_NAME(efcts)
-
+#define MODE_NAME VAR_NAME(md)
 #define EFFECT_NAME VAR_NAME(efct)
 
 #define BTN VAR_NAME(btn) 
@@ -42,16 +41,18 @@
 
 #define SER_NAME VAR_NAME(ser)
 #define SER_CTRL VAR_NAME(serec)
-
+  
 //Notifications
 #ifdef NTF_ENABLED
   #define _NTF_INIT() _CM NtfSet ntf;      
   #define _NTF_ADD(a) ntf.addNtf(a); 
   #define _CTRLQITEM_INIT() _CM struct CtrlQueueItemEx itm(ntf); 
+  #define _OBJ_NAME(name) F(name)
 #else
   #define _NTF_INIT()
   #define _NTF_ADD(a)
   #define _CTRLQITEM_INIT() _CM struct CtrlQueueItemEx itm; 
+  #define _OBJ_NAME(name) NULL
 #endif
 
 //Effect Engine
@@ -74,13 +75,13 @@
 #define END_EFFECTS()
 
 #define BEGIN_MODE(modeName, maxEffects) \
-  _CM Effect *modeName[maxEffects]; \
-  ee.addMode(modeName);
+  _CM EFFECT_EFFECT MODE_NAME[maxEffects]; \
+  ee.addMode(_OBJ_NAME(#modeName), MODE_NAME);
   
 #define END_MODE()
 
 #define BLACK_MODE() \
-  ee.addMode(NULL);
+  ee.addMode(_OBJ_NAME(Off), NULL);
 
 
 //Hack to enable ADD_EFFECT macro with and without parameters
@@ -89,12 +90,12 @@
 #define ARGS(a1, a2, a3, a4, a5, a6, a7, ...) a7
 #define EFFECT_ARGS(...) ARGS(, ## __VA_ARGS__, LPR, LPR, LPR, LPR, LPR, )  __VA_ARGS__  ARGS(, ## __VA_ARGS__, RPR, RPR, RPR, RPR, RPR, )
 
-#define ADD_EFFECT(ClassEffect, ...) \
+#define ADD_EFFECT(effectName, ClassEffect, ...) \
   _CM ClassEffect EFFECT_NAME EFFECT_ARGS(__VA_ARGS__); \
-  ee.addEffect(&EFFECT_NAME); 
+  ee.addEffect(_OBJ_NAME(#effectName), &EFFECT_NAME); 
 
 #define ADD_STATIC_COLOR(hue) \
-  ADD_EFFECT(EffectStatic<hue>);
+  ADD_EFFECT(Static color, EffectStatic<hue>);
 
 
 #define BEGIN_LEDS() \
@@ -163,13 +164,13 @@
   ai = NULL;
 
 #define RMT_BUTTON_TO_CMD(cmd, code) \
-  _CM CtrlItemIRBtn IR_CTRL(cmd, (IRRemoteRecv *)ai, code); \
+  _CM CtrlItemIRBtn<code> IR_CTRL(cmd, (IRRemoteRecv *)ai); \
   cp.addControl(&IR_CTRL);
 
 #define RMT_BUTTON_PAIR_TO_CMD(cmd, code1, code2, repeat) \
-  _CM CtrlItemIRBtn IR_CTRL_UP(cmd, (IRRemoteRecv *)ai, code1, true, repeat); \
+  _CM CtrlItemIRBtn<code1, true, repeat> IR_CTRL_UP(cmd, (IRRemoteRecv *)ai); \
   cp.addControl(&IR_CTRL_UP); \
-  _CM CtrlItemIRBtn IR_CTRL_DOWN(cmd, (IRRemoteRecv *)ai, code2, false, repeat); \
+  _CM CtrlItemIRBtn<code2, false, repeat> IR_CTRL_DOWN(cmd, (IRRemoteRecv *)ai); \
   cp.addControl(&IR_CTRL_DOWN);
 
 #endif //USE_IR_REMOTE

@@ -28,22 +28,8 @@ void moveGravity(Obj<T> &obj, int16_t t){
   
 }
 
-///////////////////////////////////////
-// Move linear routine
-template<typename T>
-void moveLinear(Obj<T> &obj, uint8_t t){
-
-  //Change position, speed does not change
-  obj.pos.x += t * obj.vel.x;
-  obj.pos.y += t * obj.vel.y;
-}
-
-
-
 
 #define MATRIX_OBJECTS_FADE 128
-
-
 
 ////////////////////////////////////////
 // EffectMatrixDrops
