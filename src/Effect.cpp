@@ -7,10 +7,6 @@
 #include "effectenginectx.h"
 #include "effect.h"
 
-#include "Matrix.h"
-
-
-
 /////////////////////////////////
 // Effect
 
@@ -38,21 +34,31 @@ void Effect::loop(CRGB *leds, uint16_t numLeds){
 
 bool Effect::onCmd(struct CtrlQueueItemEx &itm){
 
+  //Process command
   switch(itm.cmd){    
     case EEMC_SPEED:
       setSpeedDelay(itm.data.translate(getSpeedDelay(), SPEED_DELAY_MIN, SPEED_DELAY_MAX));
-#ifdef NTF_ENABLED
-    { itm.ntf.put_F(NULL, EECmdResponse<EEResp_EffectSpeed> {itm.cmd, {getSpeedDelay()}}); }
-#endif      
     break;
-#ifdef NTF_ENABLED
+
+#ifdef NTF_ENABLED  
+    //All get commands
     case EEMC_GET_SPEED:
-    { itm.ntf.put_F(NULL, EECmdResponse<EEResp_EffectSpeed> {itm.cmd, {getSpeedDelay()}}); }
     break;
-#endif      
+#endif     
+
     default:
     return false;
+  } 
+
+  //Notifications
+#ifdef NTF_ENABLED  
+  switch(itm.cmd){    
+    case EEMC_SPEED:      
+    case EEMC_GET_SPEED:
+      { itm.ntf.put_F(NULL, EECmdResponse<EEResp_EffectSpeed> {itm.cmd, { getSpeedDelay() }}); }
+    break;
   }    
+#endif         
 
   return true;
 }
@@ -115,6 +121,7 @@ void EffectColor::setRandomColor(){
 
 
 bool EffectColor::onCmd(struct CtrlQueueItemEx &itm){  
+//Process command  
   switch(itm.cmd){
     case EEMC_COLOR_HUE: 
     case EEMC_COLOR_SAT: 
@@ -127,21 +134,31 @@ bool EffectColor::onCmd(struct CtrlQueueItemEx &itm){
   
       //Set effect color
       setHSV(hsv);       
-
-#ifdef NTF_ENABLED
-      itm.ntf.put_F(NULL, EECmdResponse<EEResp_Color>{ itm.cmd, { { getHSV() } }});       
-#endif
     }   
     break;
+
 #ifdef NTF_ENABLED
+  //All get commands
     case EEMC_GET_COLOR_HSV:
-      {itm.ntf.put_F(NULL, EECmdResponse<EEResp_Color>{ itm.cmd, { { getHSV() } }}); }
     break;
 #endif
+
     default:
     return Effect::onCmd(itm);    
   }    
-  
+
+#ifdef NTF_ENABLED
+//Notification
+  switch(itm.cmd){
+    case EEMC_COLOR_HUE: 
+    case EEMC_COLOR_SAT: 
+    case EEMC_COLOR_VAL: 
+    case EEMC_GET_COLOR_HSV:
+      { itm.ntf.put_F(NULL, EECmdResponse<EEResp_Color>{ itm.cmd, { { getHSV() } }}); }   
+    break;
+  }    
+#endif
+
   return true;
 }
 

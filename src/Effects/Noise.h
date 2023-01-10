@@ -130,17 +130,17 @@ class EffectConfetti: public EffectPaletteTransform{
   protected:
     void proceed(CRGB *leds, uint16_t numLeds){  
       EffectPaletteTransform::proceed(leds, numLeds);
-        //Fade all
-        fadeToBlackBy(leds, numLeds, 8);                     
+      //Fade all
+      fadeToBlackBy(leds, numLeds, 8);                     
 
-        //Once per each LEDS_MAX leds
-        int cnt = numLeds / LEDS_MAX + 1;
-        for(int i = 0; i < cnt; i++){
-          uint16_t ledIndex = random16(cnt * LEDS_MAX);
+      //Once per each LEDS_MAX leds
+      int cnt = numLeds / LEDS_MAX + 1;
+      for(int i = 0; i < cnt; i++){
+        uint16_t ledIndex = random16(cnt * LEDS_MAX);
 
         if(ledIndex < numLeds)
           leds[ledIndex] = getCurrentPalColor(random8());
-        } 
+      } 
 
     }
 

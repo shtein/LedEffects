@@ -5,8 +5,6 @@
 
 #include "LedEffects.h"
 
-#include <FastLED.h>
-
 #include <AnalogInput.h>
 #include <Controls.h>
 #include <CtrlSerial.h>
@@ -62,8 +60,7 @@
 
 void setup() {
   DBG_INIT();
-  DBG_OUTLN("Led effect started - default");  
-
+  DBG_OUTLN("Led effect started - test");  
   //INIT_SOUND_CAPTURE(SoundCaptureMSGEQ7, MSGEQ7_ANALOG_PIN, MSGEQ7_STROBE_PIN, MSGEQ7_RESET_PIN)    
   
   //Effect Engine
@@ -74,41 +71,40 @@ void setup() {
       //  ADD_EFFECT(EffectSoundMatrixSymmetric)
        // ADD_EFFECT(EffectSoundMatrixColumn)
       //END_MODE()
-      BEGIN_MODE(Effects, 15)
-        ADD_EFFECT(Confetti, EffectConfetti)
-        ADD_EFFECT(Meteor rain, EffectMeteorRain<5>)
-        ADD_EFFECT(Plazma, EffectPlasma)
-        ADD_EFFECT(Twinkle fox, EffectTwinkleFox)
-        ADD_EFFECT(Juggle, EffectJuggle)
-        ADD_EFFECT(Pacific Ocean, EffectPacificOcean)        
-        ADD_EFFECT(Blur, EffectBlur)
-        ADD_EFFECT(Noice, EffectNoise)            
-        ADD_EFFECT(Mood blobs, EffectMoodBlobs) 
-        ADD_EFFECT(Matrix drops, EffectMatrixDrops<8>, TwinkleFox)
-        ADD_EFFECT(Matrix circles, EffectMatrixCircles<1>)
-        
-        //ADD_EFFECT(EffectRipple<5>)   
-        //ADD_EFFECT(EffectFadeInOut)
-        //ADD_EFFECT(EffectRunningLights)           //Single color
-        //ADD_EFFECT(EffectColorWipe)               //Not intersting
-        //ADD_EFFECT(EffectTheaterChaseRainbow) 
+      
+      BEGIN_MODE("Effects", 15)
+        ADD_EFFECT("Twinkle fox", EffectTwinkleFox)
+        ADD_EFFECT("Confetti", EffectConfetti)
+        ADD_EFFECT("Meteor rain", EffectMeteorRain<5>)
+        ADD_EFFECT("Plazma", EffectPlasma)        
+        ADD_EFFECT("Juggle", EffectJuggle)
+        ADD_EFFECT("Pacific Ocean", EffectPacificOcean)        
+        ADD_EFFECT("Blur", EffectBlur)
+        ADD_EFFECT("Noise", EffectNoise)            
+        ADD_EFFECT("Mood blobs", EffectMoodBlobs)         
+        ADD_EFFECT("Ripple", EffectRipple<5>)   
+        ADD_EFFECT("Fade in out", EffectFadeInOut)
+        ADD_EFFECT("Running lights", EffectRunningLights)       //Single color
+        ADD_EFFECT("Color wipe", EffectColorWipe)               //Not intersting
+        ADD_EFFECT("Theater rainbow", EffectTheaterChaseRainbow) 
       END_MODE()
-      BEGIN_MODE(Static, 10)    
-        ADD_STATIC_COLOR(HUE_RED)
+      
+      BEGIN_MODE("Static", 1)    
+        ADD_STATIC_COLOR("Static Color", HUE_BLUE)
       END_MODE()
+      
       //BLACK_MODE()
     END_EFFECTS()
     
     //Leds
-    BEGIN_LEDS() 
-      ADD_STRIP(NEOPIXEL, LED_PIN)
+    BEGIN_LEDS()       
+      ADD_STRIP(NEOPIXEL, 2)
     END_LEDS()
 
   //Control    
  
-    BEGIN_CONTROL_MAP()
-     
-      BEGIN_PUSH_BUTTON(MODE_PIN)    
+    BEGIN_CONTROL_MAP()         
+      BEGIN_PUSH_BUTTON(0)    
         PUSH_BUTTON_TO_CMD(EEMC_MODE, PB_CONTROL_PUSH_LONG)
         PUSH_BUTTON_TO_CMD(EEMC_EFFECT, PB_CONTROL_CLICK_SHORT)      
       END_PUSH_BUTTON() 
@@ -146,6 +142,7 @@ void setup() {
     END_CONTROL_MAP()
        
   END_EFFECT_ENGINE() 
+
 }
 #endif
 

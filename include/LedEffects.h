@@ -48,5 +48,11 @@
   #error "MAX_LEDS is not defined"
 #endif //MAX_LEDS
 
+#if defined(ESP8266) || defined(ESP32)
+//#define FASTLED_INTERRUPT_RETRY_COUNT 1
+#define FASTLED_ALLOW_INTERRUPTS 0
+#endif 
+
+#include <Fastled.h>
 
 #endif //__LEDEFFECTS_H

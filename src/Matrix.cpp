@@ -1,6 +1,5 @@
 #include "LEdEffects.h"
 
-#include <FastLED.h>
 #include "Matrix.h"
 
 

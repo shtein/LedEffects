@@ -1,8 +1,9 @@
 #include "LedEffects.h"
-#include <Fastled.h>
 #include <Controls.h>
 #include <CtrlSerial.h>
+
 #include <EEPROMCfg.h>
+
 
 #include "Effect.h"
 #include "EffectEngine.h"
@@ -188,37 +189,50 @@ bool EffectEngine::onCmd(struct CtrlQueueItemEx &itm){
   switch(itm.cmd){
     case EEMC_MODE:            
       onModeChange(itm.data);
-#ifdef NTF_ENABLED     
-      { itm.ntf.put_F(NULL, EECmdResponse<EEResp_ModeEffect> {itm.cmd, {_modeNum, CUR_MODE.effectNum}}); }
-#endif                   
     break;
 
     case EEMC_EFFECT:    
       onEffectChange(itm.data);    
-#ifdef NTF_ENABLED     
-      { itm.ntf.put_F(NULL, EECmdResponse<EEResp_ModeEffect> {itm.cmd, {_modeNum, CUR_MODE.effectNum}}); }
-#endif                   
     break;
 
     case EEMC_NUMLEDS:
       onNumLedsChange(itm.data);    
-#ifdef NTF_ENABLED               
-      { itm.ntf.put_F(NULL, EECmdResponse<EEResp_NumLeds>{ itm.cmd, { MAX_LEDS, (uint16_t)_numLeds }}); }
-#endif      
     break;
 
 #ifdef NTF_ENABLED
-    //Error and Get commands
+    //All get commands to process with NTF
     case EEMC_GET_MODE:
-      { itm.ntf.put_F(NULL, EECmdResponse<EEResp_ModeEffect> {itm.cmd, {_modeNum, CUR_MODE.effectNum}}); }
-    break;
     case EEMC_GET_EFFECT:
+    case EEMC_GET_NUMLEDS:
+    case EEMC_GET_MODE_LIST:
+    break;
+#endif
+    
+    default: //Processed by current effect
+      Effect *curEffect = getEffect();      
+      if(curEffect){
+         processed = curEffect->onCmd(itm);
+      }
+    break;
+  };
+
+//Notifications
+#ifdef NTF_ENABLED
+// Process unhandled error
+  switch(itm.cmd){
+    case EEMC_MODE:            
+    case EEMC_GET_MODE:
+    case EEMC_EFFECT:  
+    case EEMC_GET_EFFECT:  
       { itm.ntf.put_F(NULL, EECmdResponse<EEResp_ModeEffect> {itm.cmd, {_modeNum, CUR_MODE.effectNum}}); }
     break;
-    case EEMC_GET_NUMLEDS:
-      { itm.ntf.put_F(NULL, EECmdResponse<EEResp_NumLeds>{ itm.cmd, { MAX_LEDS, (uint16_t)_numLeds }} ); }
+
+    case EEMC_NUMLEDS:    
+    case EEMC_GET_NUMLEDS:       
+      { itm.ntf.put_F(NULL, EECmdResponse<EEResp_NumLeds>{ itm.cmd, { MAX_LEDS, (uint16_t)_numLeds }}); }
     break;
-    case EEMC_GET_MODE_LIST:{
+    
+    case EEMC_GET_MODE_LIST: {
         EECmdResponse<EEResp_ModeList> resp;
         resp.cmd           = itm.cmd;
         resp.data.numModes = _numModes;
@@ -238,21 +252,12 @@ bool EffectEngine::onCmd(struct CtrlQueueItemEx &itm){
     case EEMC_ERROR:
       { itm.ntf.put_F(NULL, EECmdResponse<>{ itm.cmd, EEER_INVALID } ); }
     break;
-
-#endif    
-
-    default: //Processed by current effect
-      Effect *curEffect = getEffect();      
-      if(curEffect){
-         processed = curEffect->onCmd(itm);
+    default:{
+      if(!processed){
+         itm.ntf.put_F(NULL, EECmdResponse<>{ itm.cmd, EEER_UNHANDLED } );
       }
+    }
     break;
-  };
-
-#ifdef NTF_ENABLED
-// Process unhandled error
-  if(!processed){
-    { itm.ntf.put_F(NULL, EECmdResponse<>{ itm.cmd, EEER_UNHANDLED } ); }
   }
 #endif
 
@@ -260,7 +265,7 @@ bool EffectEngine::onCmd(struct CtrlQueueItemEx &itm){
 }
 
 void EffectEngine::loop(struct CtrlQueueItemEx &itm){
-  
+ 
   //Process command if there is command    
   if(itm.cmd != EEMC_NONE){
     onCmd(itm);  
@@ -304,6 +309,7 @@ void EffectEngine::loop(struct CtrlQueueItemEx &itm){
     writeConfig();
     configCurEffect(false);  
   }
+ 
 }
 
 ////////////////////////

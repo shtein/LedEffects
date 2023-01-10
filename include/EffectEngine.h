@@ -5,6 +5,7 @@
 
 class CtrlQueueItemEx;
 class Effect;
+class EEPROMCfg;
 
 //Engine flags
 #define EFF_RANDOM_START_MODE     0x01
