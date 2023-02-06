@@ -22,10 +22,10 @@ class Effect{
     virtual ~Effect();
 
     //Init
-    void init(CRGB *leds, uint16_t numLeds);
+    virtual void reset() = 0;
     
     //Process
-    void loop(CRGB *leds, uint16_t numLeds); 
+    virtual void proceed(CRGB *leds, uint16_t numLeds) = 0;
 
     //Read/Write condig
     virtual bool config(EEPROMCfg &cfg, bool read);
@@ -36,10 +36,11 @@ class Effect{
     //Speed delay
     void setSpeedDelay(uint8_t speedDelay);
     uint8_t  getSpeedDelay() const;    
-
-  protected:
-    virtual void reset() = 0;
-    virtual void proceed(CRGB *leds, uint16_t numLeds) = 0;
+    
+    //Color control    
+    const CHSV & getHSV() const;
+    void setHSV(const CHSV &hsv);
+    void setRandomColor();
   
   protected:
     ///////////////////
@@ -77,14 +78,6 @@ class EffectColor: public Effect{
 
     //Read/Write condig
     bool config(EEPROMCfg &cfg, bool read);
-
-  protected:  
-  //Color control
-    
-    const CHSV & getHSV() const;
-    void setHSV(const CHSV &hsv);
-    CRGB getColor() const;
-    void setRandomColor();
 };
 
 /////////////////////////////////////////

@@ -1,22 +1,18 @@
 #ifndef __NTF_H
 #define __NTF_H
 
-
 #include <Notification.h>
-
 
 //////////////////////////////////////
 // Set of notifiers
 #ifndef MAX_NTF
   #define MAX_NTF 2
 #endif //MAX_NTF
-  
 
 typedef NtfBaseSet<MAX_NTF> NtfSet;
 
 ///////////////////////////////////////
 // Serialization for command responses
-
 
 template <typename ...Ts>
 struct EECmdResponse{};
@@ -45,40 +41,6 @@ void putNtfObject(NtfBase &resp, const EECmdResponse<T> &r){
   resp.put_F(F("data"), r.data);
 }
 
-
-//Mode/Effect list
-
-struct EEResp_Effect{
-  uint8_t index;
-  const __FlashStringHelper *effectName;
-};
-
-inline void putNtfObject(NtfBase &resp, const EEResp_Effect &data){  
-  resp.put_F(F("effectIndex"), data.index);
-  resp.put_F(F("effectName"), data.effectName);
-}
-
-struct EEResp_Mode{
-  uint8_t numEffects;                             //Number of effects
-  const __FlashStringHelper *modeName;            //Name of the mode 
-  struct EEResp_Effect      effects[MAX_EFFECTS]; //Max effects
-}; 
-
-inline void putNtfObject(NtfBase &resp, const EEResp_Mode &data){
-  resp.put_F(F("modeName"), data.modeName);
-  resp.put_F(F("effectCount"), data.numEffects);   
-  resp.put_F(F("effects"), data.effects, data.numEffects);
-}
-
-struct EEResp_ModeList{
-  uint8_t numModes;
-  struct EEResp_Mode modes[MAX_MODES];
-};
-
-inline void putNtfObject(NtfBase &resp, const EEResp_ModeList &data){
-   resp.put_F(F("modeCount"), data.numModes);
-   resp.put_F(F("modes"), data.modes, data.numModes);
-}
 
 //Getting/setting mode or effect - EEMC_MODE, EEMC_EFFECT...
 struct EEResp_ModeEffect{

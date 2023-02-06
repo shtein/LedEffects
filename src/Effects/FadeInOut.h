@@ -5,12 +5,11 @@
 // Fade in and out effect
 
 
-class EffectFadeInOut: public EffectColor{
+class EffectFadeInOut: public Effect{
   protected:
     void proceed(CRGB *leds, uint16_t numLeds); 
     void reset();
 };
-
 
 
 inline void EffectFadeInOut::reset(){   

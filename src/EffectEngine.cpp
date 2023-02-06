@@ -1,14 +1,47 @@
 #include "LedEffects.h"
-#include <Controls.h>
-#include <CtrlSerial.h>
 
+#include <Controls.h>
 #include <EEPROMCfg.h>
+#include <CtrlWiFi.h>
 
 
 #include "Effect.h"
 #include "EffectEngine.h"
 #include "EffectEngineCtx.h"
 
+
+////////////////////////////////////////////
+//Notifictaions serialization
+struct EEResp_ModeList{
+  uint8_t     numModes;
+  EFFECT_MODE *modes;
+};
+
+inline void putNtfObject(NtfBase &resp, const EFFECT_EFFECT &data){  
+  if(resp.getContext().flags & NTF_CTX_ARRAY){
+    resp.put_F(F("effect"), resp.getContext().arrayIndex);
+  }
+  resp.put_F(F("effectName"), data.effectName);
+}
+
+void putNtfObject(NtfBase &resp, const EFFECT_MODE &data){
+  if(resp.getContext().flags & NTF_CTX_ARRAY){
+    resp.put_F(F("mode"), resp.getContext().arrayIndex);    
+  }
+  resp.put_F(F("modeName"), data.modeName);
+  resp.put_F(F("effectCount"), data.numEffects);   
+  resp.put_F(F("effects"), data.effects, data.numEffects);
+}
+
+void putNtfObject(NtfBase &resp, const EEResp_ModeList &data){
+   resp.put_F(F("modeCount"), data.numModes);
+   resp.put_F(F("modes"), data.modes, data.numModes);
+}
+
+
+
+////////////////////////////////////////////
+// EffectEngine
 #define CUR_MODE _modes[_modeNum]  
 
 EffectEngine::EffectEngine(uint8_t flags){
@@ -94,8 +127,6 @@ void EffectEngine::init() {
   FastLED.show();
 }
 
-
-
 void EffectEngine::setMode(uint8_t mode){
   //Remember new mode
   _modeNum = mode;
@@ -116,7 +147,8 @@ void EffectEngine::setEffect(uint8_t effectNum){
   
   if(curEffect != NULL){
     //Init effect
-    curEffect->init(_leds, _numLeds);
+    //curEffect->init(_leds, _numLeds);
+    curEffect->reset();
 
     //Read config previously saved data
     configCurEffect(true);
@@ -124,6 +156,7 @@ void EffectEngine::setEffect(uint8_t effectNum){
     //Process right away
     _millis = 0;
   }
+ 
 }
 
 Effect *EffectEngine::getEffect() const{
@@ -152,7 +185,7 @@ void EffectEngine::onModeChange(struct CtrlQueueData &data){
 
 
 void EffectEngine::onEffectChange(struct CtrlQueueData &data){
-  
+
   //Get new effect value  
   uint8_t effectNum = (uint8_t)data.translate(CUR_MODE.effectNum, 0, CUR_MODE.numEffects - 1);
   
@@ -180,10 +213,7 @@ void EffectEngine::onNumLedsChange(struct CtrlQueueData &data){
 }
 
 
-
-bool EffectEngine::onCmd(struct CtrlQueueItemEx &itm){
-  //Initial error
-  bool processed = true;
+bool EffectEngine::onCmdEE(struct CtrlQueueItemEx &itm){
   
   //Process command
   switch(itm.cmd){
@@ -208,56 +238,68 @@ bool EffectEngine::onCmd(struct CtrlQueueItemEx &itm){
     break;
 #endif
     
-    default: //Processed by current effect
-      Effect *curEffect = getEffect();      
-      if(curEffect){
-         processed = curEffect->onCmd(itm);
-      }
-    break;
+    default: 
+    return false;
   };
 
 //Notifications
 #ifdef NTF_ENABLED
-// Process unhandled error
+
   switch(itm.cmd){
     case EEMC_MODE:            
     case EEMC_GET_MODE:
     case EEMC_EFFECT:  
     case EEMC_GET_EFFECT:  
-      { itm.ntf.put_F(NULL, EECmdResponse<EEResp_ModeEffect> {itm.cmd, {_modeNum, CUR_MODE.effectNum}}); }
+      { itm.ntf.put(EECmdResponse<EEResp_ModeEffect> {itm.cmd, {_modeNum, CUR_MODE.effectNum}}); }
     break;
 
     case EEMC_NUMLEDS:    
     case EEMC_GET_NUMLEDS:       
-      { itm.ntf.put_F(NULL, EECmdResponse<EEResp_NumLeds>{ itm.cmd, { MAX_LEDS, (uint16_t)_numLeds }}); }
+      { itm.ntf.put(EECmdResponse<EEResp_NumLeds>{ itm.cmd, { MAX_LEDS, (uint16_t)_numLeds }}); }
     break;
-    
-    case EEMC_GET_MODE_LIST: {
-        EECmdResponse<EEResp_ModeList> resp;
-        resp.cmd           = itm.cmd;
-        resp.data.numModes = _numModes;
-        for(size_t i = 0; i < _numModes; i++){
-          resp.data.modes[i].numEffects = _modes[i].numEffects;
-          resp.data.modes[i].modeName   = _modes[i].modeName;
+      
+    case EEMC_GET_MODE_LIST:               
+      { itm.ntf.put(EECmdResponse<EEResp_ModeList>{itm.cmd, {_numModes, _modes}}); }
+    break;        
+  }
+#endif
 
-          for(size_t j = 0; j < _modes[i].numEffects; j++){
-            resp.data.modes[i].effects[j].index = j;          
-            resp.data.modes[i].effects[j].effectName = _modes[i].effects[j].effectName;
-          }
-        }
-        
-        itm.ntf.put_F(NULL, resp);
+  return true;
+
+}
+
+bool EffectEngine::onCmd(struct CtrlQueueItemEx &itm){
+  
+  //Process error
+  if(itm.cmd == EEMC_ERROR) {
+#ifdef NTF_ENABLED    
+    itm.ntf.put(EECmdResponse<>{ itm.cmd, EEER_INVALID } );
+#endif    
+    return true;
+  }
+  
+  //Initial
+  bool processed = false;
+  
+  if(itm.cmd & EEMC_EE){ //Engine command
+    processed = onCmdEE(itm);
+  }  
+#if defined(ESP8266) || defined(ESP32)
+  else if(itm.cmd & EEMC_WIFI){ //Wifi command
+    processed =  _wifi.onCmd(itm);
+  }
+#endif
+  else{ //Effect command
+      Effect *curEffect = getEffect();      
+      if(curEffect){
+         processed = curEffect->onCmd(itm);
       }
-    break;
-    case EEMC_ERROR:
-      { itm.ntf.put_F(NULL, EECmdResponse<>{ itm.cmd, EEER_INVALID } ); }
-    break;
-    default:{
-      if(!processed){
-         itm.ntf.put_F(NULL, EECmdResponse<>{ itm.cmd, EEER_UNHANDLED } );
-      }
-    }
-    break;
+  }
+    
+  //Report of not processed
+#ifdef NTF_ENABLED    
+  if(!processed){
+    itm.ntf.put(EECmdResponse<>{ itm.cmd, EEER_UNHANDLED } );
   }
 #endif
 
@@ -266,12 +308,11 @@ bool EffectEngine::onCmd(struct CtrlQueueItemEx &itm){
 
 void EffectEngine::loop(struct CtrlQueueItemEx &itm){
  
-  //Process command if there is command    
   if(itm.cmd != EEMC_NONE){
-    onCmd(itm);  
+    onCmd(itm);      
   }
   
-  //Proceed with current effect
+  //See if there were changes
   bool updateLeds = (itm.cmd & EEMC_LED) != EEMC_NONE;
   if(updateLeds){
     preSaveConfig(); 
@@ -286,7 +327,7 @@ void EffectEngine::loop(struct CtrlQueueItemEx &itm){
      if(_millis <= millis()){
 
         //Proceed
-        curEffect->loop(_leds, _numLeds);
+        curEffect->proceed(_leds, _numLeds);
         
         //Remember when proceed next time
         _millis = millis() + curEffect->getSpeedDelay();
@@ -371,7 +412,7 @@ void EffectEngine::configCurEffect(bool read){
     return;
   
   //Calculate EEPROM index for 
-  uint8_t index = EE_EFFECT_IDX; 
+  size_t index = EE_EFFECT_IDX; 
   for(int i = 0; i < _modeNum; i++){
       index += _modes[i].numEffects * EE_EFFECT_IDX_SIZE; 
   }
@@ -390,45 +431,76 @@ void EffectEngine::preSaveConfig(){
 /////////////////////////////
 // parseSerialInput
 // Nothing fancy, enter from terminal if serial inteface is available
-BEGIN_PARSE_ROUTINE(parseSerialInput)  
+BEGIN_PARSE_ROUTINE(parseCommandInput)  
   BEGIN_GROUP_TOKEN("mode|m") //mode 
-    TOKEN_IS_TEXT("list|l", EEMC_GET_MODE_LIST)
-    TOKEN_IS_TEXT("get|g|", EEMC_GET_MODE)
+    VALUE_IS_TOKEN("list|l", EEMC_GET_MODE_LIST)
+    VALUE_IS_TOKEN("get|g|", EEMC_GET_MODE)
     BEGIN_GROUP_TOKEN("set|s") //sets     
-      TOKEN_IS_TEXT("next|n|", EEMC_MODE, 0, CTF_VAL_NEXT) //next mode
-      TOKEN_IS_TEXT("prev|p", EEMC_MODE, 0, CTF_VAL_PREV)  //prev mode
-      TOKEN_IS_NUMBER(EEMC_MODE, CTF_VAL_ABS)              //specific mode
+      VALUE_IS_TOKEN("next|n|", EEMC_MODE, 0, CTF_VAL_NEXT) //next mode
+      VALUE_IS_TOKEN("prev|p", EEMC_MODE, 0, CTF_VAL_PREV)  //prev mode
+      VALUE_IS_NUMBER(EEMC_MODE, CTF_VAL_ABS)              //specific mode
     END_GROUP_TOKEN()  
 
     BEGIN_GROUP_TOKEN("effect|e") //effect
-      TOKEN_IS_TEXT("get|g|", EEMC_GET_EFFECT)
+      VALUE_IS_TOKEN("get|g|", EEMC_GET_EFFECT)
       BEGIN_GROUP_TOKEN("set|s") //sets     
-        TOKEN_IS_TEXT("next|n|", EEMC_EFFECT, 0, CTF_VAL_NEXT) //next effect
-        TOKEN_IS_TEXT("prev|p", EEMC_EFFECT, 0, CTF_VAL_PREV)  //prev effect
-        TOKEN_IS_NUMBER(EEMC_EFFECT, CTF_VAL_ABS)              //specific effect
+        VALUE_IS_TOKEN("next|n|", EEMC_EFFECT, 0, CTF_VAL_NEXT) //next effect
+        VALUE_IS_TOKEN("prev|p", EEMC_EFFECT, 0, CTF_VAL_PREV)  //prev effect
+        VALUE_IS_NUMBER(EEMC_EFFECT, CTF_VAL_ABS)              //specific effect
       END_GROUP_TOKEN()
     END_GROUP_TOKEN()
   END_GROUP_TOKEN() //mode
 
   BEGIN_GROUP_TOKEN("effect|e") //current effect
     BEGIN_GROUP_TOKEN("speed|s")
-      TOKEN_IS_TEXT("get|g|", EEMC_GET_SPEED)
-      TOKEN_IS_PAIR("set|s", EEMC_SPEED, CTF_VAL_ABS)      
+      VALUE_IS_TOKEN("get|g|", EEMC_GET_SPEED)
+      VALUE_IS_PAIR("set|s", EEMC_SPEED, CTF_VAL_ABS)      
     END_GROUP_TOKEN()    
     
     BEGIN_GROUP_TOKEN("color|c") //set hsv 
-      TOKEN_IS_TEXT("get|g|", EEMC_GET_COLOR_HSV)
+      VALUE_IS_TOKEN("get|g|", EEMC_GET_COLOR_HSV)
       BEGIN_GROUP_TOKEN("set|s") //set hsv    
-        TOKEN_IS_PAIR("hue|h", EEMC_COLOR_HUE, CTF_VAL_ABS)  //hue
-        TOKEN_IS_PAIR("sat|s", EEMC_COLOR_SAT, CTF_VAL_ABS)  //saturation
-        TOKEN_IS_PAIR("val|v", EEMC_COLOR_VAL, CTF_VAL_ABS)  //value
+        VALUE_IS_PAIR("hue|h", EEMC_COLOR_HUE, CTF_VAL_ABS)  //hue
+        VALUE_IS_PAIR("sat|s", EEMC_COLOR_SAT, CTF_VAL_ABS)  //saturation
+        VALUE_IS_PAIR("val|v", EEMC_COLOR_VAL, CTF_VAL_ABS)  //value
       END_GROUP_TOKEN()
     END_GROUP_TOKEN()    
   END_GROUP_TOKEN() //effect
 
   BEGIN_GROUP_TOKEN("leds|l") //num leds
-    TOKEN_IS_TEXT("get|g|", EEMC_GET_NUMLEDS)
-    TOKEN_IS_PAIR("set|s", EEMC_NUMLEDS, CTF_VAL_ABS) //sets     
+    VALUE_IS_TOKEN("get|g|", EEMC_GET_NUMLEDS)
+    VALUE_IS_PAIR("set|s", EEMC_NUMLEDS, CTF_VAL_ABS) //sets     
   END_GROUP_TOKEN() //leds
+  
+//WIFI
+#if defined(ESP8266) || defined(ESP32)
+  BEGIN_GROUP_TOKEN("wifi") 
+    VALUE_IS_TOKEN("status|", EEMC_WIFI_STATUS)                //WiFi status
+
+    BEGIN_GROUP_TOKEN("ap|a")                                     //AP control
+      VALUE_IS_TOKEN("off", EEMC_WIFI_AP_OFF)                     //AP off
+      VALUE_IS_TOKEN("on", EEMC_WIFI_AP_ON)                       //AP on
+    END_GROUP_TOKEN()
+
+    VALUE_IS_TOKEN("scan|s", EEMC_WIFI_SCAN)                      //Scan networks  
+
+    BEGIN_OBJECT("connect|c|", WIFI_CONNECT, EEMC_WIFI_CONNECT)   //Connect
+      DATA_MEMBER("ssid|s", ssid)
+      DATA_MEMBER("pwd|p", pwd)
+    END_OBJECT()
+    VALUE_IS_TOKEN("disconnect|d", EEMC_WIFI_DISCONNECT)          //Disconnect
+
+    BEGIN_OBJECT("config|cfg", WIFI_CONFIG, EEMC_WIFI_CFG_SET)    //Config
+      DATA_MEMBER_AS_IP("ipaddress|ip", ip, 0)                    //IP address
+      DATA_MEMBER_AS_IP("gateway|gw", gateway, 0)                 //Gateway
+      DATA_MEMBER_AS_IP("subnetmask|sm", subnetMask, 0)           //Subnet mask
+      DATA_MEMBER_AS_IP("dns1", dns1, 0)                          //DNS 1
+      DATA_MEMBER_AS_IP("dns2", dns1, 0)                          //DNS 2
+    END_OBJECT()
+    
+    //VALUE_IS_TOKEN("", EEMC_WIFI_CFG_GET)                       //Get config
+  
+  END_GROUP_TOKEN()
+#endif
 
 END_PARSE_ROUTINE()

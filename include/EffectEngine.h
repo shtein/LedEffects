@@ -2,6 +2,7 @@
 #define __EFFECTENGINE_H
 
 #include "EffectEngineCtx.h"
+#include "WiFiConnect.h"
 
 class CtrlQueueItemEx;
 class Effect;
@@ -48,10 +49,12 @@ class EffectEngine{
     
     //Command handling
     bool onCmd(struct CtrlQueueItemEx &itm);
+    bool onCmdEE(struct CtrlQueueItemEx &itm);
 
     void onModeChange(struct CtrlQueueData &data);
     void onNumLedsChange(struct CtrlQueueData &data);
     void onEffectChange(struct CtrlQueueData &data); 
+
 
     //Notifications    
 #ifdef NTF_ENABLED    
@@ -82,11 +85,15 @@ class EffectEngine{
    
     unsigned long _millis;                //Processing
     unsigned long _millisToSaveCfg;       //When to safe config
+
+#if defined(ESP8266) || defined(ESP32)
+    WiFiConnection   _wifi;               //WiFi connectivity
+#endif
 };
 
 
 //////////////////////////////////
 // Serial command line
-uint8_t parseSerialInput(char *cmdLine, CtrlQueueData &data);
+uint8_t parseCommandInput(char *cmdLine, CtrlQueueData &data);
 
 #endif //__EFFECTENGINE_H

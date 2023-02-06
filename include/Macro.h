@@ -3,15 +3,6 @@
 
 #include <utils.h>
 
-///////////////////////////////
-//Memory check during compilation
-#ifdef CHECK_MEM 
-  #define _CM static
-#else
-  #define _CM
-#endif
-
-
 ///////////////////////////////////////
 //Macros for temp variable names
 #define VAR_NAME(prefix) TOKEN_CONCAT(prefix, __LINE__)
@@ -38,44 +29,50 @@
 
 #define SW2POS_NAME VAR_NAME(sw2p)
 #define SW2POS_CTRL VAR_NAME(ecsw2p)
-
-#define SER_NAME VAR_NAME(ser)
-#define SER_CTRL VAR_NAME(serec)
   
 //Notifications
 #ifdef NTF_ENABLED
-  #define _NTF_INIT() _CM NtfSet ntf;      
+  #define _NTF_INIT() static NtfSet ntf;      
   #define _NTF_ADD(a) ntf.addNtf(a); 
-  #define _CTRLQITEM_INIT() _CM struct CtrlQueueItemEx itm(ntf); 
+  #define _CTRLQITEM_INIT() struct CtrlQueueItemEx itm(ntf); 
   #define _OBJ_NAME(name) F(name)
 #else
   #define _NTF_INIT()
   #define _NTF_ADD(a)
-  #define _CTRLQITEM_INIT() _CM struct CtrlQueueItemEx itm; 
+  #define _CTRLQITEM_INIT() struct CtrlQueueItemEx itm; 
   #define _OBJ_NAME(name) NULL
 #endif
 
 //Effect Engine
-#define BEGIN_EFFECT_ENGINE(flags) \
-  _CM EffectEngine ee(flags); \
-  _CM CtrlPanel cp; \
-  _NTF_INIT(); \
-  _CTRLQITEM_INIT();
+#define BEGIN_EFFECT_ENGINE(name, flags) \
+static EffectEngine ee(flags); \
+static CtrlPanel cp; \
+_NTF_INIT(); \
+\
+void setup(){ \
+  DBG_INIT(); \
+  DBG_OUTLN("Led effect started - "#name);  
 
 
 #define END_EFFECT_ENGINE() \
   ee.init(); \
-  for( ;; ){ \
+} \
+\
+void loop() \
+{ \
+  _CTRLQITEM_INIT(); \
+    for( ;; ){ \
     cp.loop(itm); \
     ee.loop(itm); \
-  }
+  } \
+}
 
 #define BEGIN_EFFECTS()
 
 #define END_EFFECTS()
 
 #define BEGIN_MODE(modeName, maxEffects) \
-  _CM EFFECT_EFFECT MODE_NAME[maxEffects]; \
+  static EFFECT_EFFECT MODE_NAME[maxEffects]; \
   ee.addMode(_OBJ_NAME(modeName), MODE_NAME);
   
 #define END_MODE()
@@ -90,9 +87,10 @@
 #define ARGS(a1, a2, a3, a4, a5, a6, a7, ...) a7
 #define EFFECT_ARGS(...) ARGS(, ## __VA_ARGS__, LPR, LPR, LPR, LPR, LPR, )  __VA_ARGS__  ARGS(, ## __VA_ARGS__, RPR, RPR, RPR, RPR, RPR, )
 
+
 #define ADD_EFFECT(effectName, classEffect, ...) \
-  _CM classEffect EFFECT_NAME EFFECT_ARGS(__VA_ARGS__); \
-  ee.addEffect(_OBJ_NAME(effectName), &EFFECT_NAME); 
+  static  classEffect EFFECT_NAME EFFECT_ARGS(__VA_ARGS__); \
+  ee.addEffect(_OBJ_NAME(effectName), &EFFECT_NAME);   
 
 #define ADD_STATIC_COLOR(effectName, hue) \
   ADD_EFFECT(effectName, EffectStatic<hue>);
@@ -103,33 +101,32 @@
 
 #define ADD_STRIP(Type, ...) \
   FastLED.addLeds<Type, __VA_ARGS__ >(ee.getLeds(), MAX_LEDS).setCorrection( TypicalLEDStrip );  
-
 #define END_LEDS() 
 
 
 ///////////////////////////////////////
 //Sound capture
 #define INIT_SOUND_CAPTURE(className, ...) \
-  _CM className snd (__VA_ARGS__); \
+  static className snd(__VA_ARGS__); \
   EffectSound::initSoundCapture(&snd); 
 
 ///////////////////////////////////////
 //Control map
 #define BEGIN_CONTROL_MAP() \
-  _CM BaseInput *ai = NULL;
+  BaseInput *ai = NULL;
 
 #define END_CONTROL_MAP() \
   ai = NULL;
 
 #define BEGIN_PUSH_BUTTON(pin) \
-  _CM PushButton BTN(pin); \
+  static PushButton BTN(pin); \
   ai = &BTN;  
 
 #define END_PUSH_BUTTON() \
   ai = NULL;  
 
 #define PUSH_BUTTON_TO_CMD(cmd, ...) \
-  _CM CtrlItemPb<__VA_ARGS__> BTN_CTRL(cmd, (PushButton *)ai); \
+  static CtrlItemPb<__VA_ARGS__> BTN_CTRL(cmd, (PushButton *)ai); \
   cp.addControl(&BTN_CTRL);
 
 
@@ -139,47 +136,60 @@
   END_PUSH_BUTTON()
 
 #define SW2POS_TO_CMD(cmd, pin) \
-  _CM Switch2Pos SW2POS_NAME(pin); \
-  _CM CtrlSwicth2Pos SW2POS_CTRL(cmd, &SW2POS_NAME); \
+  static Switch2Pos SW2POS_NAME(pin); \
+  static CtrlSwicth2Pos SW2POS_CTRL(cmd, &SW2POS_NAME); \
   cp.addControl(&SW2POS_CTRL);
 
 
 #define POT_TO_CMD(cmd, pin, ...) \
-  _CM AnalogInput POT_NAME(pin); \
-  _CM CtrlItemPtmtr<__VA_ARGS__> POT_CTRL(cmd, &POT_NAME); \
+  static AnalogInput POT_NAME(pin); \
+  static CtrlItemPtmtr<__VA_ARGS__> POT_CTRL(cmd, &POT_NAME); \
   cp.addControl(&POT_CTRL);
 
 #define ROTENC_TO_CMD(cmd, pinData, pinClock) \
-  _CM RotaryEncoder ROT_NAME(pinData, pinClock); \
-  _CM CtrlItemRotEnc ROT_CTRL(cmd, &ROT_NAME); \
+  static RotaryEncoder ROT_NAME(pinData, pinClock); \
+  static CtrlItemRotEnc ROT_CTRL(cmd, &ROT_NAME); \
   cp.addControl(&ROT_CTRL);
 
 #ifdef USE_IR_REMOTE
 
 #define BEGIN_REMOTE(pin) \
-  _CM IRRemoteRecv IR_NAME(pin); \
+  static IRRemoteRecv IR_NAME(pin); \
   ai = &IR_NAME;
   
 #define END_REMOTE() \
   ai = NULL;
 
 #define RMT_BUTTON_TO_CMD(cmd, code) \
-  _CM CtrlItemIRBtn<code> IR_CTRL(cmd, (IRRemoteRecv *)ai); \
+  static CtrlItemIRBtn<code> IR_CTRL(cmd, (IRRemoteRecv *)ai); \
   cp.addControl(&IR_CTRL);
 
 #define RMT_BUTTON_PAIR_TO_CMD(cmd, code1, code2, repeat) \
-  _CM CtrlItemIRBtn<code1, true, repeat> IR_CTRL_UP(cmd, (IRRemoteRecv *)ai); \
+  static CtrlItemIRBtn<code1, true, repeat> IR_CTRL_UP(cmd, (IRRemoteRecv *)ai); \
   cp.addControl(&IR_CTRL_UP); \
-  _CM CtrlItemIRBtn<code2, false, repeat> IR_CTRL_DOWN(cmd, (IRRemoteRecv *)ai); \
+  static CtrlItemIRBtn<code2, false, repeat> IR_CTRL_DOWN(cmd, (IRRemoteRecv *)ai); \
   cp.addControl(&IR_CTRL_DOWN);
 
 #endif //USE_IR_REMOTE
 
 #define SERIAL_INPUT() \
-  _CM SerialInput     SER_NAME; \
-  _CM CtrlItemSerial<parseSerialInput> SER_CTRL(&SER_NAME); \
-  cp.addControl(&SER_CTRL); \
-  _NTF_ADD(&SER_CTRL);
+  static SerialInput inSer; \
+  static CtrlItemSerial<parseCommandInput> ctrlSer(&inSer); \
+  cp.addControl(&ctrlSer); \
+  _NTF_ADD(&ctrlSer);
 
+
+//Wifi and Web
+#if defined(ESP8266) || defined(ESP32)
+
+#define WEB_INPUT(port) \
+  static WebApiInput inWeb; \
+  static CtrlItemWebApi<parseCommandInput> ctrlWeb(&inWeb); \
+  cp.addControl(&ctrlWeb); \
+  _NTF_ADD(&ctrlWeb); \
+  webServer.begin(port); \
+  static CtrlWifiStatus ctrlWifi(EEMC_WIFI_STATUS); \
+  cp.addControl(&ctrlWifi);
+#endif
 
 #endif //__MACRO_H  

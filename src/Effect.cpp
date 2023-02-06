@@ -18,20 +18,6 @@ Effect::Effect(){
 Effect::~Effect(){
 }
 
-void Effect::init(CRGB *leds, uint16_t numLeds){  
-
-  //Black all leds
-  fill_solid(leds, numLeds, CRGB::Black);
-
-  //reset data
-  reset();
-}
-
-
-void Effect::loop(CRGB *leds, uint16_t numLeds){    
-  proceed(leds, numLeds);
-}
-
 bool Effect::onCmd(struct CtrlQueueItemEx &itm){
 
   //Process command
@@ -55,7 +41,7 @@ bool Effect::onCmd(struct CtrlQueueItemEx &itm){
   switch(itm.cmd){    
     case EEMC_SPEED:      
     case EEMC_GET_SPEED:
-      { itm.ntf.put_F(NULL, EECmdResponse<EEResp_EffectSpeed> {itm.cmd, { getSpeedDelay() }}); }
+      { itm.ntf.put(EECmdResponse<EEResp_EffectSpeed> {itm.cmd, { getSpeedDelay() }}); }
     break;
   }    
 #endif         
@@ -95,6 +81,19 @@ bool Effect::config(EEPROMCfg &cfg, bool read){
   return true; 
 }
 
+const CHSV &Effect::getHSV() const{
+  return _ctx.hsv;
+}
+
+void Effect::setHSV(const CHSV &hsv){
+  _ctx.hsv = hsv;
+}
+    
+void Effect::setRandomColor(){
+  setHSV(CHSV(random(256), 0xFF, 0xFF));
+}
+
+
 //////////////////////////////////////
 // EffectColor
 EffectColor::EffectColor(){
@@ -103,21 +102,6 @@ EffectColor::EffectColor(){
 EffectColor::~EffectColor(){  
 }
 
-const CHSV &EffectColor::getHSV() const{
-  return _ctx.hsv;
-}
-
-void EffectColor::setHSV(const CHSV &hsv){
-  _ctx.hsv   = hsv;
-}
-
-CRGB EffectColor::getColor() const{
-  return _ctx.hsv;
-}
-    
-void EffectColor::setRandomColor(){
-  setHSV(CHSV(random(256), 0xFF, 0xFF));
-}
 
 
 bool EffectColor::onCmd(struct CtrlQueueItemEx &itm){  
@@ -154,7 +138,7 @@ bool EffectColor::onCmd(struct CtrlQueueItemEx &itm){
     case EEMC_COLOR_SAT: 
     case EEMC_COLOR_VAL: 
     case EEMC_GET_COLOR_HSV:
-      { itm.ntf.put_F(NULL, EECmdResponse<EEResp_Color>{ itm.cmd, { { getHSV() } }}); }   
+      { itm.ntf.put(EECmdResponse<EEResp_Color>{ itm.cmd, { { getHSV() } }}); }   
     break;
   }    
 #endif
