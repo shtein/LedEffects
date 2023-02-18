@@ -1,0 +1,82 @@
+body {
+}    
+a{
+  color: var(--body-color);
+}
+
+button{  
+  cursor: pointer;
+}
+
+.topbar{
+  position: -webkit-sticky; 
+  position: sticky;
+  top:0; 
+  text-align: center;
+  background-color:white;
+  width: 100%;
+  margin: auto;
+}
+
+.centerbar{
+  text-align: center; 
+  align-content: center;
+  margin: auto;
+  width: 100%;
+}
+
+.params{
+  margin: auto; 
+  width: fit-content;
+  min-width: 310px;
+  text-align: left;
+  margin-top: 20px;
+}
+
+.params h3{
+  margin-left: 0px;
+  margin-bottom: 10px;
+  text-align: left;
+}
+
+.params input[type = checkbox]{
+  margin-left: 0px;
+  align-content: left;
+}
+
+.params fieldset{  
+  border-width: 0px;
+  margin-inline-start: 0px;
+  margin-inline-end: 0px;
+  padding-block-start: 0px;
+  padding-block-end: 0px;
+  padding-inline-start: 0px;
+  padding-inline-end: 0px;
+}
+
+.params label {
+  display: inline-block;
+  width: 100px;
+  text-align: left;  
+  margin-bottom: 7px;
+  margin-left: 5px;
+}
+
+.params button{  
+  width: 50px;
+  margin-left: 5px;
+}
+
+.spinner {
+  border: 4px solid #f3f3f3; 
+  border-top: 4px solid #3498db; 
+  border-radius: 50%;
+  width: 15px;
+  height: 15px;
+  animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform:   rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}

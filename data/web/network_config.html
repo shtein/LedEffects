@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+	<meta content='width=device-width' name='viewport'>
+  <meta name="theme-color" content="#222222">
+  <title>WiFi Setup</title>
+  <script type="text/javascript" src="js/api.js"></script>
+  <script type="text/javascript" src="js/utils.js"></script>
+  <style>
+		@import url("style.css");
+	</style>
+</head>
+<body>
+    <div class="topbar">    
+      <h2>Network Configuration</h2>      
+    </div>
+    <div class="centerbar">                    
+      <div class = params>
+        <hr>
+        <h3>WiFi Setup</h3>  
+        <label for="ssid">SSID:</label><input type="text" id="ssid" maxlength="32" list="networks"/><datalist id="networks"></datalist><button id="scan" onclick="onWiFiScan()">Scan</button><br>
+        <label for="pwd">Password:</label><input id="pwd" maxlength="64" type="Password"/><button id="shpwd" onclick="onShowHidePwd()">Show</button>
+      </div>      
+      <div class="params">
+        <hr>
+        <h3>IP Setup</h3>
+        <label for="dhcp" style="width: max-content;"><input type="checkbox" id="dhcp" checked="true" onclick="onUseDHCP()"/> Automatically assign IP address</label><br>      
+        <label for="ip">IP address:</label><input type="text" minlength="7" maxlength="15" id = "ip" /><br>
+        <label for="gw">Gateway:</label><input type="text" minlength="7" maxlength="15" id = "gw"><br>
+        <label for= "subnet">Subnet Mask:</label><input type="text" minlength="7" maxlength="15" id = "subnet"/><br>
+        <label for="dns1">DNS 1:</label><input type="text" minlength="7" maxlength="15" id = "dns1" /><br>
+        <label for="dns2">DNS 2:</label><input type="text" minlength="7" maxlength="15" id = "dns2" />
+        <br>        
+      </div>      
+    </div>
+</body>
+<script>    
+
+function onUseDHCP(){
+  var isStaticIP = !document.getElementById("dhcp").checked;
+}
+
+function onShowHidePwd(){
+  var btn   = document.getElementById("shpwd");
+  var input = document.getElementById("pwd");
+  
+  if(btn.innerHTML == "Show"){
+    btn.innerHTML = "Hide";
+    input.type = "input"
+  } 
+  else{
+    btn.innerHTML = "Show";
+    input.type = "password"
+  }
+}
+
+function onWiFiScan(){
+  document.getElementById("scan").disabled = true;
+
+  apiWifiScan().then(object=>{        
+
+      var ctrl = document.getElementById("networks"); 
+      while(ctrl.children.length ){
+        ctrl.children[0].remove();
+      }
+      
+      object.networks.forEach(function(item){
+        var option = document.createElement("option");
+        option.value = item.ssid;
+                              
+        ctrl.appendChild(option);
+      });
+      document.getElementById("scan").disabled = false;
+      
+      document.getElementById("ssid").focus();          
+
+  },error=>{
+      document.getElementById("scan").disabled = false;
+    }
+        
+  ); 
+}
+
+function onWiFiStatus(){
+  apiWifiStatus().then(object=>{
+    console.log(JSON.stringify(object, null, 4));     
+  },error=>{
+      
+  }); 
+}
+
+function onWifiConnect(){
+  var ssid = document.getElementById("ssid").value;  
+  var pwd = document.getElementById("pwd").value;
+  var ipaddress = document.getElementById("ip").value;
+
+  if(ssid == ""){
+    alert("SSID is requred");
+    return;
+  }
+
+  if(!isValidIP(ipaddress)){
+    alert("Invalid IP Address");
+    return;
+  }
+
+
+  apiWifiConnect(ssid, pwd).then(object=>{
+    console.log(JSON.stringify(object, null, 4));     
+  },error=>{
+      
+  }); 
+}
+
+</script>
+</html>

@@ -5,6 +5,8 @@ class EEPROMCfg;
 
 //Only for supported hardware
 #if defined(ESP8266) || defined(ESP32)
+
+//Wifi connection control
 class WiFiConnection{
 public:
   WiFiConnection();
@@ -17,6 +19,9 @@ protected:
   bool writeConfig(const WIFI_CONNECT &wcn);
   bool readConfig(WIFI_CONNECT &wcn);
 };
+
+//Web server initialization
+void initWebServer(uint16_t port);
 
 #endif
 

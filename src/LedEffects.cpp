@@ -111,8 +111,7 @@ BEGIN_EFFECT_ENGINE(Test, 0)
     //Serial
     SERIAL_INPUT()
     
-    //Web
-    ADD_API_REQUEST_HANDLER(HTTP_GET, "/api");
+    //Web    
     WEB_INPUT(80)
 
     //SW2POS_TO_CMD(EEMC_SOUND_LOG, 7)

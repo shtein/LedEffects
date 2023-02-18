@@ -1,10 +1,13 @@
 #include "LedEffects.h"
 #include <Controls.h>
 #include <CtrlWiFi.h>
+#include <CtrlWebSrv.h>
 #include <EEPROMCfg.h>
+#include <LittleFS.h>
 
 #include "WiFiConnect.h"
 #include "EffectEngineCtx.h"
+
 
 
 ///////////////////////
@@ -105,7 +108,7 @@ bool WiFiConnection::onCmd(struct CtrlQueueItemEx &itm){
     }
     break;
 
-    case EEMC_WIFI_CFG_SET:{
+    case EEMC_WIFI_CFG_SET: {
       EECmdResponse<WIFI_CONFIG> resp;
       resp.cmd = itm.cmd;
       resp.data = *(WIFI_CONFIG *)itm.data.str;
@@ -145,4 +148,37 @@ bool WiFiConnection::readConfig(WIFI_CONNECT &wcn){
   ee >> wcn;
 
   return true;
+}
+
+////////////////////////////////////
+// Web Server functions
+
+//Web server initialization
+void initWebServer(uint16_t port){
+  LittleFS.begin();
+
+  //API
+  ADD_API_REQUEST_HANDLER(HTTP_GET, "/api");
+
+  webServer.serveStatic("/", LittleFS, "/web/");
+
+
+  //Not found - captive portal
+  webServer.onNotFound([](){
+    //Captive portal
+    if(WiFi.softAPIP() == webServer.client().localIP()){      
+      webServer.sendHeader("Location", "http://" + WiFi.softAPIP().toString() + "/welcome.html", true); 
+      webServer.send(302, "text/plain", "");       
+    }
+    else{
+      webServer.send(404);
+    }
+  });
+
+
+
+
+
+  webServer.begin(port);
+  
 }
