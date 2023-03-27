@@ -187,9 +187,12 @@ void loop() \
   static CtrlItemWebApi<parseCommandInput> ctrlWeb(&inWeb); \
   cp.addControl(&ctrlWeb); \
   _NTF_ADD(&ctrlWeb); \
-  static CtrlWifiStatus ctrlWifi(EEMC_WIFI_STATUS); \
-  cp.addControl(&ctrlWifi); \
   initWebServer(port);
+
+#define WIFI_INPUT() \
+  static CtrlWifiStatus ctrlWifi(EEMC_WIFI_STATUS_CHANGE); \
+  cp.addControl(&ctrlWifi);
+
 #endif
 
 #endif //__MACRO_H  

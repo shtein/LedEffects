@@ -22,6 +22,7 @@ DECLARE_GRADIENT_PALETTE( july4_2_gp );
 
 //Other usefull palettes
 extern const TProgmemRGBPalette16 UkraineFlag_p FL_PROGMEM;
+extern const TProgmemRGBPalette16 PortugalFlag_p FL_PROGMEM;
 extern const TProgmemRGBPalette16 RedGreenWhite_p FL_PROGMEM;
 extern const TProgmemRGBPalette16 Holly_p FL_PROGMEM;
 extern const TProgmemRGBPalette16 RedWhite_p FL_PROGMEM;

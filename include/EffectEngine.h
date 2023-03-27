@@ -11,6 +11,7 @@ class EEPROMCfg;
 //Engine flags
 #define EFF_RANDOM_START_MODE     0x01
 #define EFF_RANDOM_START_EFFECT   0x02
+#define EEF_DEFINED               0x08 //Marker that flag is defined
 
 typedef CRGB EELEDS[MAX_LEDS];
 

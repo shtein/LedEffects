@@ -1,10 +1,10 @@
 #ifndef __WIFI_CONNECT_H
 #define __WIFI_CONNECT_H
 
-class EEPROMCfg;
 
 //Only for supported hardware
 #if defined(ESP8266) || defined(ESP32)
+
 
 //Wifi connection control
 class WiFiConnection{
@@ -16,8 +16,11 @@ public:
 
 protected:
   //Read and write config
-  bool writeConfig(const WIFI_CONNECT &wcn);
-  bool readConfig(WIFI_CONNECT &wcn);
+  bool writeConfig();
+  bool readConfig();
+
+protected:
+  WIFI_CONFIG_ALL _wcn;
 };
 
 //Web server initialization

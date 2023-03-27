@@ -196,9 +196,15 @@ END_TRANSFORM_SCHEMA()
 
 
 ///////////////////
-//Ukraine Flags
+//Ukraine Flag
 BEGIN_TRANSFORM_SCHEMA_RGB16_PALETTE(UkraineFlag)
   TRANSOFRM_PALETTE(UkraineFlag_p)
+END_TRANSFORM_SCHEMA()
+
+///////////////////
+//Portugal Flag
+BEGIN_TRANSFORM_SCHEMA_RGB16_PALETTE(PortugalFlag)
+  TRANSOFRM_PALETTE(PortugalFlag_p)
 END_TRANSFORM_SCHEMA()
 
 

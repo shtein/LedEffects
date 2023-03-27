@@ -110,7 +110,8 @@ BEGIN_EFFECT_ENGINE(Test, 0)
 
     //Serial
     SERIAL_INPUT()
-    
+    //WiFi
+    WIFI_INPUT() 
     //Web    
     WEB_INPUT(80)
 

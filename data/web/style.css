@@ -1,5 +1,6 @@
 body {
 }    
+
 a{
   color: var(--body-color);
 }
@@ -11,32 +12,38 @@ button{
 .topbar{
   position: -webkit-sticky; 
   position: sticky;
-  top:0; 
-  text-align: center;
+  top:0;  
   background-color:white;
-  width: 100%;
-  margin: auto;
+  width: auto;
+  margin: auto;  
+  text-align: center;
+  align-content: center; 
+  justify-content: center;
+  align-items: center;
 }
 
 .centerbar{
   text-align: center; 
   align-content: center;
-  margin: auto;
-  width: 100%;
+  margin: auto;  
+  display: flex; 
+  flex-direction: column; 
+  width: fit-content;
 }
 
 .params{
-  margin: auto; 
+  margin:auto; 
   width: fit-content;
   min-width: 310px;
-  text-align: left;
-  margin-top: 20px;
+  text-align: left;  
 }
+
 
 .params h3{
   margin-left: 0px;
   margin-bottom: 10px;
-  text-align: left;
+  text-align: left;  
+  text-align: center;
 }
 
 .params input[type = checkbox]{
@@ -44,39 +51,103 @@ button{
   align-content: left;
 }
 
-.params fieldset{  
-  border-width: 0px;
-  margin-inline-start: 0px;
-  margin-inline-end: 0px;
-  padding-block-start: 0px;
-  padding-block-end: 0px;
-  padding-inline-start: 0px;
-  padding-inline-end: 0px;
-}
-
-.params label {
-  display: inline-block;
-  width: 100px;
-  text-align: left;  
-  margin-bottom: 7px;
-  margin-left: 5px;
-}
 
 .params button{  
   width: 50px;
   margin-left: 5px;
 }
 
-.spinner {
-  border: 4px solid #f3f3f3; 
-  border-top: 4px solid #3498db; 
-  border-radius: 50%;
-  width: 15px;
-  height: 15px;
-  animation: spin 2s linear infinite;
+.param-value{
+  display: flex;
+  flex-direction: row;
+  white-space: nowrap;
+  margin-bottom: 5px;
 }
 
-@keyframes spin {
-  0% { transform:   rotate(0deg); }
-  100% { transform: rotate(360deg); }
+.param {
+  text-align: left;  
+  width: 100px;
+}
+
+.value {
+}
+
+.info-small{
+  font-size: 0.7em;
+}
+
+.info-small .param-value{
+  margin-bottom: 0px;
+}
+
+.info-small .param{ 
+  width: 75px;
+}
+
+.action{
+  text-align: right; 
+  align-items: right;
+  margin-top: 20px;
+}
+
+.action button{
+  width: 80px; 
+}
+
+
+.banner{
+  display: none;
+  padding: 40px;
+  opacity: 0.95;
+  position: absolute;  
+  min-width: 340px;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 9999; 
+}
+
+.banner .message{  
+  font-size: 1.2em;
+  position: absolute;  
+  text-align: center;
+  font-size: 16px;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.banner .close{ 
+  position: absolute;
+  top: 5px;
+  right:10px;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+  color: black;
+}
+
+
+.progress-container{
+  height: 3px;
+  position: relative;
+}
+
+.progress-container .progress {  
+  height: 100%;
+  background-color: #3498db;
+  position: absolute;
+  width: 100px;
+  left: 50%;  
+  transform: translateX(-50%);  
+  animation: progress 0.5s linear infinite alternate;
+}
+
+@keyframes progress {
+  from {
+    width: 0%;
+  }
+  to {
+    width: 250px;
+  }
 }

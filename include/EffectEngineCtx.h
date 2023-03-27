@@ -44,16 +44,16 @@
 
 #if defined(ESP8266) || defined(ESP32)
   //Wifi control
-  #define EEMC_WIFI             0x40    //Wifi commands
-  #define EEMC_WIFI_STATUS      0x40    //WIFI status
-  #define EEMC_WIFI_SCAN        0x41    //WIFI status
-  #define EEMC_WIFI_AP_ON       0x42    //Enable AP
-  #define EEMC_WIFI_AP_OFF      0x43    //Disable AP
-  #define EEMC_WIFI_CONNECT     0x44    //Connect WIFI
-  #define EEMC_WIFI_DISCONNECT  0x45    //Diconnect WIFI
-  #define EEMC_WIFI_CFG_GET     0x46    //Get WIFI configuration
-  #define EEMC_WIFI_CFG_SET     0x47    //Set WIFI configuration
-
+  #define EEMC_WIFI                 0x40    //Wifi commands
+  #define EEMC_WIFI_STATUS          0x40    //WIFI status
+  #define EEMC_WIFI_STATUS_CHANGE   0x41    //WIFI status
+  #define EEMC_WIFI_SCAN            0x42    //WIFI scan networks
+  #define EEMC_WIFI_AP_ON           0x43    //Enable AP
+  #define EEMC_WIFI_AP_OFF          0x44    //Disable AP
+  #define EEMC_WIFI_CONNECT         0x45    //Connect WIFI
+  #define EEMC_WIFI_DISCONNECT      0x46    //Diconnect WIFI
+  #define EEMC_WIFI_CFG_GET         0x47    //Get WIFI configuration
+  #define EEMC_WIFI_CFG_CLEAR       0x48    //Clear config 
 #endif
 
 //Effect sound commands
@@ -81,19 +81,40 @@
 #define SAVE_CONFIG_TIMEOUT 30000
 
 //Config parameters
-#define EE_VERSION 0x04 //Config version
+#define EE_VERSION 0x05    //Config version
 
 //Config storage blocks
-#define EE_ENGINE_IDX       0     //Effect Engine index
+
+// EEPROM address is 0x00
+// version          (1 byte)
+// number of modes  (1 byte)
+// current mode     (1 byte)
+// flags            (1 byte)
+// for each mode
+//    number of effect (1 byte) 
+//    current effect (1 byte) 
+// assuming no more than 10 modes (unrealistic), total bytes for effect engine is 4 + 2 * 10 = 24 bytes for effect enigne
+
+// EEPROM address for first effect is 0x20 (32)
+// 8 bytes per effect
+// assuming no more than 40 effects 320 bytes per effect block
+
+// Next block starts at 0x168 (360)
+
+//EEProm is 512 bytes, last block size is 512 - 360 = 152
+
+
+#define EE_ENGINE_IDX       0                                //Effect Engine index
+#define EE_ENGINE_BS        32                               //Effect Engine block size
+
+#define EE_EFFECT_IDX       (EE_ENGINE_IDX + EE_ENGINE_BS)   //First Effect index
+#define EE_EFFECT_BS        320                              //Effect block size - 40 effects, 8 bytes per effect
+#define EE_EFFECT_IDX_SIZE  8
 
 #if defined(ESP8266) || defined(ESP32)
-  #define EE_WIFI_IDX         128  //WiFi configuration
-  #define EE_EFFECT_IDX       256   //First Effect index
-#else   
-  #define EE_EFFECT_IDX       128   //First Effect index
+  #define EE_WIFI_IDX       (EE_EFFECT_IDX + EE_EFFECT_BS)  //WiFi configuration
 #endif
 
-#define EE_EFFECT_IDX_SIZE  8     //8 bytes per effect
 
 
 

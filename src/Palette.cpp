@@ -328,3 +328,13 @@ DEFINE_GRADIENT_PALETTE( passionata_gp  ) {
   122, 217,  4,  5,
   186, 161,  4,219,
   255,  78,  4,219};
+
+//Portugal Flag
+const TProgmemRGBPalette16 PortugalFlag_p FL_PROGMEM ={
+  0x006600, 0x006600, 0x006600, 0x006600, 0xFFFFFF, //Green
+  0xFF0000, 0xFF0000, 0xFF0000, 0xFF0000, 0xFF0000, 0xFF0000, 0xFF0000, //Red
+  0xFFFF00, 0xFFFF00, //Yellow
+  0xFFFFFF, //White
+  0x003399, //Blue 
+};
+

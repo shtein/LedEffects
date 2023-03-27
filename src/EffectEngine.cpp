@@ -9,7 +9,7 @@
 #include "EffectEngine.h"
 #include "EffectEngineCtx.h"
 
-
+#ifdef NTF_ENABLED  
 ////////////////////////////////////////////
 //Notifictaions serialization
 struct EEResp_ModeList{
@@ -37,7 +37,7 @@ void putNtfObject(NtfBase &resp, const EEResp_ModeList &data){
    resp.put_F(F("modeCount"), data.numModes);
    resp.put_F(F("modes"), data.modes, data.numModes);
 }
-
+#endif
 
 
 ////////////////////////////////////////////
@@ -45,7 +45,7 @@ void putNtfObject(NtfBase &resp, const EEResp_ModeList &data){
 #define CUR_MODE _modes[_modeNum]  
 
 EffectEngine::EffectEngine(uint8_t flags){
-  _flags    = flags;
+  _flags    = flags | EEF_DEFINED;
   
   _numModes = 0;
   _modeNum  = 0;
@@ -362,17 +362,23 @@ void EffectEngine::readConfig(){
   uint8_t version;
   uint8_t total;
   uint8_t current;
+  uint8_t flags;
 
   //Read version, number of modes, current mode
-  ee >> version >> total >> current;
+  ee >> version >> total >> current >> flags;
 
   //Check if version is correct 
-  if(version != EE_VERSION)
+  if(version != EE_VERSION){
     return;
+  }
 
   //Check if number of modes match
   if(total != _numModes)
     return;
+
+  //Only use flags if they are set
+  if(flags & EEF_DEFINED)
+    _flags = flags;
 
   //Set current mode
   _modeNum = current < total ? current : 0;
@@ -395,11 +401,11 @@ void EffectEngine::writeConfig(){
   EEPROMCfg ee(EE_ENGINE_IDX);
 
   //Write version, number of modes and current mode
-  ee << (uint8_t)EE_VERSION <<  (uint8_t) _numModes << (uint8_t)_modeNum;
+  ee << (uint8_t)EE_VERSION <<  (uint8_t) _numModes << (uint8_t)_modeNum << (uint8_t)_flags;
 
   //Write number of effects and current effect for each mode
   for(uint8_t i = 0; i < _numModes; i++){
-    ee << (uint8_t)_modes[i].numEffects << (uint8_t)_modes[i].effectNum;;
+    ee << (uint8_t)_modes[i].numEffects << (uint8_t)_modes[i].effectNum;
   }  
 }
 
@@ -475,30 +481,29 @@ BEGIN_PARSE_ROUTINE(parseCommandInput)
 //WIFI
 #if defined(ESP8266) || defined(ESP32)
   BEGIN_GROUP_TOKEN("wifi") 
-    VALUE_IS_TOKEN("status|", EEMC_WIFI_STATUS)                //WiFi status
+    VALUE_IS_TOKEN("status|", EEMC_WIFI_STATUS)                   //WiFi status
 
-    BEGIN_GROUP_TOKEN("ap|a")                                     //AP control
-      VALUE_IS_TOKEN("off", EEMC_WIFI_AP_OFF)                     //AP off
-      VALUE_IS_TOKEN("on", EEMC_WIFI_AP_ON)                       //AP on
+    BEGIN_GROUP_TOKEN("ap")                                       //AP control
+      VALUE_IS_TOKEN("on", EEMC_WIFI_AP_ON)                       //AP off               
+      VALUE_IS_TOKEN("off", EEMC_WIFI_AP_OFF)                     //AP off         
     END_GROUP_TOKEN()
 
     VALUE_IS_TOKEN("scan|s", EEMC_WIFI_SCAN)                      //Scan networks  
 
     BEGIN_OBJECT("connect|c|", WIFI_CONNECT, EEMC_WIFI_CONNECT)   //Connect
-      DATA_MEMBER("ssid|s", ssid)
-      DATA_MEMBER("pwd|p", pwd)
-    END_OBJECT()
-    VALUE_IS_TOKEN("disconnect|d", EEMC_WIFI_DISCONNECT)          //Disconnect
-
-    BEGIN_OBJECT("config|cfg", WIFI_CONFIG, EEMC_WIFI_CFG_SET)    //Config
-      DATA_MEMBER_AS_IP("ipaddress|ip", ip, 0)                    //IP address
+      DATA_MEMBER("ssid|s", ssid)                                 //SSID
+      DATA_MEMBER("pwd|p", pwd, "")                               //Password
       DATA_MEMBER_AS_IP("gateway|gw", gateway, 0)                 //Gateway
       DATA_MEMBER_AS_IP("subnetmask|sm", subnetMask, 0)           //Subnet mask
       DATA_MEMBER_AS_IP("dns1", dns1, 0)                          //DNS 1
-      DATA_MEMBER_AS_IP("dns2", dns1, 0)                          //DNS 2
+      DATA_MEMBER_AS_IP("dns2", dns2, 0)                          //DNS 2
     END_OBJECT()
-    
-    //VALUE_IS_TOKEN("", EEMC_WIFI_CFG_GET)                       //Get config
+    VALUE_IS_TOKEN("disconnect|d", EEMC_WIFI_DISCONNECT)          //Disconnect
+
+    BEGIN_GROUP_TOKEN("config|cfg")
+      VALUE_IS_TOKEN("get|", EEMC_WIFI_CFG_GET)               //Get config saved after last succesfull connect
+      VALUE_IS_TOKEN("clear", EEMC_WIFI_CFG_CLEAR)               //Clear config for debugging purposes
+    END_GROUP_TOKEN()
   
   END_GROUP_TOKEN()
 #endif

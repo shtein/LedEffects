@@ -11,39 +11,151 @@
 		@import url("style.css");
 	</style>
 </head>
+
 <body>
-    <div class="topbar">    
-      <h2>Network Configuration</h2>      
-    </div>
-    <div class="centerbar">                    
-      <div class = params>
-        <hr>
-        <h3>WiFi Setup</h3>  
-        <label for="ssid">SSID:</label><input type="text" id="ssid" maxlength="32" list="networks"/><datalist id="networks"></datalist><button id="scan" onclick="onWiFiScan()">Scan</button><br>
-        <label for="pwd">Password:</label><input id="pwd" maxlength="64" type="Password"/><button id="shpwd" onclick="onShowHidePwd()">Show</button>
+  <div class="topbar">
+    <h2>Network Configuration</h2>
+  </div>
+  <div class="centerbar">       
+    <div class = "params" style="display: flex; align-content: center; justify-content: center; flex-wrap:wrap;">        
+      <div style="margin: 10px; margin-top: 0px;">
+        <h3 >WiFi</h3>   
+        <div class="info-small">
+          <div class="param-value"><span class="param">MAC address:</span><span class="value" id="status.st.mac"></span></div>
+          <div class="param-value"><span class="param">Host:</span><span class="value" id="status.st.host"></span></div>
+          <div class="param-value"><span class="param">Status:</span><span class="value" id="status.st.wifistatus"></span></div>
+          <div class="param-value"><span class="param">SSID:</span><span class="value" id="status.st.ssid"></span></div>          
+          <div class="param-value"><span class="param">IP address:</span><span class="value" id="status.st.ip"></span></div>
+          <div class="param-value"><span class="param">Gateway:</span><span class="value" id="status.st.gw"></span></div>
+          <div class="param-value"><span class="param">Subnet mask:</span><span class="value" id="status.st.subnet"></span></div>
+          <div class="param-value"><span class="param">DNS 1:</span><span class="value" id="status.st.dns1"></span></div>
+          <div class="param-value"><span class="param">DNS 2:</span><span class="value" id="status.st.dns2"></span></div>                  
+      </div> 
+      </div>         
+        <div style=" margin: 10px;margin-top: 0px;">
+          <h3>AP</h3>            
+          <div class="info-small">
+            <div class="param-value"><span class="param" id>MAC address:</span><span class="value" id="status.ap.mac"></div>
+            <div class="param-value"><span class="param">Status:</span><span class="value" id="status.ap.status"></div>
+            <div class="param-value"><span class="param">SSID:</span><span class="value" id="status.ap.ssid"></div>
+            <div class="param-value"><span class="param">IP address:</span><span class="value" id="status.ap.ip"></div>
+            <div class="param-value"><span class="param">Stations:</span><span class="value" id="status.ap.stations"></div>
+          </div>
+        </div>        
       </div>      
-      <div class="params">
-        <hr>
-        <h3>IP Setup</h3>
-        <label for="dhcp" style="width: max-content;"><input type="checkbox" id="dhcp" checked="true" onclick="onUseDHCP()"/> Automatically assign IP address</label><br>      
-        <label for="ip">IP address:</label><input type="text" minlength="7" maxlength="15" id = "ip" /><br>
-        <label for="gw">Gateway:</label><input type="text" minlength="7" maxlength="15" id = "gw"><br>
-        <label for= "subnet">Subnet Mask:</label><input type="text" minlength="7" maxlength="15" id = "subnet"/><br>
-        <label for="dns1">DNS 1:</label><input type="text" minlength="7" maxlength="15" id = "dns1" /><br>
-        <label for="dns2">DNS 2:</label><input type="text" minlength="7" maxlength="15" id = "dns2" />
-        <br>        
-      </div>      
-    </div>
+      <div style="width: 100%;"><hr></div> 
+      <div class = "params" >
+        <div style="margin: 10px; margin-top: 0px;">
+          <h3>WiFi Setup</h3>          
+          <div>                
+            <div class="param-value"><span class="param">SSID:</span><input type="text" id="cfg.st.ssid" maxlength="32" list="networks"/><datalist id="networks"></datalist><button id="scan" onclick="onWiFiScan()">Scan</button></div>        
+            <div class="param-value"><span class="param">Password:</span><input id="cfg.st.pwd" maxlength="64" type="Password"/><button id="shpwd" onclick="onShowHidePwd()">Show</button></div>      
+            <div class="param-value"><label for="dhcp" style="margin-bottom: 5px;"><input type="checkbox" id="cfg.st.dhcp" onclick="onUseDHCP()"/> Automatically assign IP address</label></div>          
+            <div class="param-value"><span class="param">IP address:</span><input type="text" id = "cfg.st.ip" /></div>
+            <div class="param-value"><span class="param">Gateway:</span><input type="text"  id = "cfg.st.gw"></div>
+            <div class="param-value"><span class="param">Subnet mask:</span><input type="text" minlength="7" maxlength="15" id = "cfg.st.subnet"/></div>    
+            <div class="param-value"><span class="param">DNS 1:</span><input type="text" minlength="7" maxlength="15" id = "cfg.st.dns1" /></div>
+            <div class="param-value"><span class="param">DNS 2:</span><input type="text" minlength="7" maxlength="15" id = "cfg.st.dns2" /></div>         
+            <div class="action">              
+              <button  id="connect" onclick="onWifiConnect()">Connect</button>
+              <button  id="disconnect" onclick="onWifiDisconnect()">Disconnect</button>
+            </div>
+          </div>     
+          <div style="width: 100%; margin-top:20px"><hr></div>                
+      </div>  
+      <div style="margin: 10px; margin-top: 0px;">
+        <h3>AP Control</h3>          
+          <div>
+            
+            <div class="action">          
+              <button id="connect" onclick="onWifiAPOn()">On</button>
+              <button id="disconnect" onclick="onWifiAPOff()">Off</button>              
+            </div>
+        </div>
+      </div>
+    </div>   
+  </div>
 </body>
 <script>    
 
+var wifiConfig = null; 
+var wifiStatus = null;
+
+window.onload = function() {
+  setupApiProgress(document.querySelectorAll(".topbar")[0]);  
+  showWiFiStatus();
+  showWiFiConfig();  
+}
+
+function showWiFiConfig(){
+  apiWifiConfig().then(object=>{
+    wifiConfig = object;
+
+    fillFied("cfg.st.ssid", object.station.ssid)
+    fillFied("cfg.st.dhcp", !object.station.staticip);
+    onUseDHCP();
+
+    fillFied("cfg.ap.ssid", object.ap.ssid);
+  }, error=>{    
+  })
+}
+
+function showWiFiStatus(){
+  apiWifiStatus().then(object=>{    
+    wifiStatus = object;
+
+    showWifiStStatus(object.station, object.wifimode)
+    showWifiAPStatus(object.ap, object.wifimode);
+    setTimeout(showWiFiStatus, 10000);
+  },
+  error=>{    
+    wifiStatus = null;
+
+    const elements = document.querySelectorAll('[id^="status."]');
+    elements.forEach(function(element) {
+      element.innerHTML = "";    
+    });
+    setTimeout(showWiFiStatus, 10000);
+  })  
+}
+
+function showWifiStStatus(st, wifiMode){
+  with(st){
+      fillFied("status.st.mac", macaddress);
+      fillFied("status.st.host", host);
+      fillFied("status.st.wifistatus", wifiMode & WIFI_MODE_ST ? wifiStatusToStr(wifistatus) : "Disabled");
+      fillFied("status.st.ssid", ssid);
+      fillFied("status.st.ip", ipaddress);
+      fillFied("status.st.gw", gateway);
+      fillFied("status.st.subnet", netmask);
+      fillFied("status.st.dns1", dns1);
+      fillFied("status.st.dns2", dns2);
+    }
+}
+
+function showWifiAPStatus(ap, wifiMode){
+  with(ap){
+    fillFied("status.ap.mac", macaddress);
+    fillFied("status.ap.status", wifiMode & WIFI_MODE_AP ? (ssid != "" ? "On": "Off") : "Disabled");
+    fillFied("status.ap.ssid", ssid);
+    fillFied("status.ap.ip", ipaddress);
+    fillFied("status.ap.stations", stations);
+  }
+}
+
 function onUseDHCP(){
-  var isStaticIP = !document.getElementById("dhcp").checked;
+  var isStaticIP = !document.getElementById("cfg.st.dhcp").checked;  
+
+  enableInputSetValue("cfg.st.ip", wifiConfig ? wifiConfig.station.ipaddress : "", isStaticIP);
+  enableInputSetValue("cfg.st.gw", wifiConfig ? wifiConfig.station.gateway : "", isStaticIP);
+  enableInputSetValue("cfg.st.subnet", wifiConfig ? wifiConfig.station.netmask : "", isStaticIP);
+  enableInputSetValue("cfg.st.dns1", wifiConfig ? wifiConfig.station.dns1 : "", isStaticIP);
+  enableInputSetValue("cfg.st.dns2",  wifiConfig ? wifiConfig.station.dns2 : "", isStaticIP);
 }
 
 function onShowHidePwd(){
   var btn   = document.getElementById("shpwd");
-  var input = document.getElementById("pwd");
+  var input = document.getElementById("cfg.st.pwd");
   
   if(btn.innerHTML == "Show"){
     btn.innerHTML = "Hide";
@@ -57,61 +169,105 @@ function onShowHidePwd(){
 
 function onWiFiScan(){
   document.getElementById("scan").disabled = true;
+  document.getElementById("cfg.st.ssid").value = "";
 
-  apiWifiScan().then(object=>{        
+  var ctrl = document.getElementById("networks"); 
 
-      var ctrl = document.getElementById("networks"); 
-      while(ctrl.children.length ){
-        ctrl.children[0].remove();
-      }
-      
+  while(ctrl.children.length ){
+    ctrl.children[0].remove();
+  }
+
+  apiWifiScan().then(object=>{              
       object.networks.forEach(function(item){
-        var option = document.createElement("option");
-        option.value = item.ssid;
-                              
-        ctrl.appendChild(option);
+        if(item.ssid != ""){
+          var option = document.createElement("option");
+          option.value = item.ssid;
+                                
+          ctrl.appendChild(option);
+        }
       });
-      document.getElementById("scan").disabled = false;
-      
-      document.getElementById("ssid").focus();          
-
+      document.getElementById("scan").disabled = false;      
+      document.getElementById("cfg.st.ssid").focus();       
   },error=>{
       document.getElementById("scan").disabled = false;
+      showError(error);
     }
         
   ); 
 }
 
-function onWiFiStatus(){
-  apiWifiStatus().then(object=>{
-    console.log(JSON.stringify(object, null, 4));     
-  },error=>{
-      
-  }); 
-}
-
 function onWifiConnect(){
-  var ssid = document.getElementById("ssid").value;  
-  var pwd = document.getElementById("pwd").value;
-  var ipaddress = document.getElementById("ip").value;
+  
+  
+  try{
+    var ssid = getValidValue("cfg.st.ssid", isNotEmpty, "SSID is required");
+    var pwd = getValidValue("cfg.st.pwd");
 
-  if(ssid == ""){
-    alert("SSID is requred");
-    return;
-  }
+    var dhcp = document.getElementById("cfg.st.dhcp").checked;
 
-  if(!isValidIP(ipaddress)){
-    alert("Invalid IP Address");
-    return;
-  }
+    var ip = dhcp ? "" : getValidValue("cfg.st.ip", isValidIP, "Invalid IP address");
+    var gw = dhcp ? "" : getValidValue("cfg.st.gw", isValidIP, "Invalid gateway");
+    var subnet = dhcp ? "" : getValidValue("cfg.st.subnet", isValidIP, "Invalid subnet mask");
+    var dns1 = dhcp ? "" : getValidValue("cfg.st.dns1", function(value){
+                                                          if(value == ""){
+                                                            return true;
+                                                          }
+                                                          return isValidIP(value);
+                                                        }, "Invalid DNS 1");
+    var dns2 = dhcp ? "" : getValidValue("cfg.st.dns1", function(value){
+                                                          if(value == ""){
+                                                            return true;
+                                                          }
+                                                          return isValidIP(value);
+                                                        }, "Invalid DNS 2");
 
-
-  apiWifiConnect(ssid, pwd).then(object=>{
-    console.log(JSON.stringify(object, null, 4));     
-  },error=>{
+    apiWifiConnect(ssid, pwd, ip, gw, subnet, dns1, dns2).then(object=>{  
       
-  }); 
+           
+    },error=>{
+      showError(error);
+    }); 
+  }
+  catch(error){
+    showError(error);
+    return;
+  }
+
 }
 
+function onWifiDisconnect(){
+  apiWifiDisconnect().then(object=>{
+  }, error=>{
+    showError(error);
+  });
+}
+
+
+
+function onWifiAPOn(){  
+  apiWifiAPOn().then(object=>{
+    showWifiAPStatus(object, WIFI_MODE_AP);
+  }, error=>{
+    showError(error);
+  });
+}
+
+function onWifiAPOff(){ 
+
+  //If connected to wifi
+  if(wifiStatus){
+    //Connected to ap and ap name changes
+    if(wifiStatus.ap.ipaddress == host() ){
+      showMessage("Your WiFi connection to <b>" + wifiStatus.ap.ssid + "</b> will be lost.");
+    }
+  }
+
+
+  apiWifiAPOff().then(object=>{
+    showAPStatus(object, WIFI_MODE_NONE);
+  }, error=>{
+    showError(error);
+  });
+}
 </script>
 </html>
