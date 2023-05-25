@@ -107,8 +107,6 @@ inline void EffectRipple<MAX_RIPPLES>::proceed(CRGB *leds, uint16_t numLeds){
         //Move first
         ripple.move();
 
-        XYDraw xy(leds, numLeds, XY_DRAW_ADD_COLORS);
-
         //Prepare color        
         CHSV hsv(ripple.getColorIndex(), 255, 255);
         hsv.hue        += ripple.getOffset() * 2;
@@ -116,11 +114,11 @@ inline void EffectRipple<MAX_RIPPLES>::proceed(CRGB *leds, uint16_t numLeds){
         hsv.value       = cos8(map(ripple.getOffset(), 1, RIPPLE_MAX, 0, 128));
 
         //Light left led
-        if((int) ripple.getCenter() - (int)ripple.getOffset() >= 0) 
+        if(ripple.getCenter() >= ripple.getOffset()) 
           leds[ripple.getCenter() - ripple.getOffset()] += hsv;
 
         //Light right led
-        if((int) ripple.getCenter() + ripple.getOffset() < numLeds) 
+        if(ripple.getCenter() + ripple.getOffset() < numLeds) 
           leds[ripple.getCenter() + ripple.getOffset()] += hsv;
 
     }    

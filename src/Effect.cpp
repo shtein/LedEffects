@@ -90,7 +90,7 @@ void Effect::setHSV(const CHSV &hsv){
 }
     
 void Effect::setRandomColor(){
-  setHSV(CHSV(random(256), 0xFF, 0xFF));
+  setHSV(CHSV(random8(0xFF), 0xFF, 0xFF));
 }
 
 
@@ -172,7 +172,7 @@ bool EffectColor::config(EEPROMCfg &cfg, bool read){
 //////////////////////////////////////
 // EffectPaletteTransform
 
-void FuncGetPal_Default(CRGBPalette16 &pal){
+void FuncGetPal_Default(CRGBPalette16 &pal){  
    pal = CRGBPalette16(CHSV(random8(), 255, random8(128,255)), 
                        CHSV(random8(), 255, random8(128,255)), 
                        CHSV(random8(), 192, random8(128,255)), 

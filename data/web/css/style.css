@@ -1,3 +1,5 @@
+@import url("fonts.css");
+
 body {
 }    
 
@@ -20,6 +22,7 @@ button{
   align-content: center; 
   justify-content: center;
   align-items: center;
+  min-width: 310px;
 }
 
 .centerbar{
@@ -150,4 +153,89 @@ button{
   to {
     width: 250px;
   }
+}
+
+
+.menu-button {
+  display: inline-block;
+  cursor: pointer;
+  background-color: transparent;
+  border: none;
+  padding: 1px;
+  width: 25px;
+  height: 20px;
+  position: absolute;
+  top:3px;
+  left:0;
+}
+
+.menu-button span {
+  display: block;
+  position: absolute;
+  width: 100%;
+  height: 2px;
+  background-color: #333;
+  transition: all 0.3s ease;
+  pointer-events: none;
+}
+
+.menu-button span:nth-child(1) {
+  top: 0;
+}
+
+.menu-button span:nth-child(2) {
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.menu-button span:nth-child(3) {
+  bottom: 0;
+}
+
+.menu-button:focus {
+  outline: none;
+}
+
+.popup-menu {
+  display: none;
+  position: absolute;
+  background-color: white;
+  border: 1px solid #ccc;
+  padding: 1.5rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+  width:auto;
+}
+
+.popup-menu ul{
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.popup-menu li {
+  margin-bottom: 1rem;
+  text-align: left;
+}
+
+.popup-menu li:last-child {
+  margin-bottom: 0;
+}
+
+.popup-menu a {
+  color: #333;
+  text-decoration: none;
+}
+
+.popup-menu a:hover {
+  color: #007BFF; 
+}
+
+
+.button-input {
+  position: absolute;
+  right: 10px; /* Adjust based on the desired padding between the icon and the input box */
+  top: 50%;
+  transform: translateY(-50%);
+  text-decoration: none;
 }

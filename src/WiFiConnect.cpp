@@ -166,7 +166,7 @@ void initWebServer(uint16_t port){
   LittleFS.begin();
   webServer.begin(port);
 
-  //
+  //Enable CORS
   webServer.enableCORS(true);  
 
   //API

@@ -156,7 +156,6 @@ void EffectEngine::setEffect(uint8_t effectNum){
     //Process right away
     _millis = 0;
   }
- 
 }
 
 Effect *EffectEngine::getEffect() const{
@@ -350,7 +349,6 @@ void EffectEngine::loop(struct CtrlQueueItemEx &itm){
     writeConfig();
     configCurEffect(false);  
   }
- 
 }
 
 ////////////////////////
@@ -490,7 +488,7 @@ BEGIN_PARSE_ROUTINE(parseCommandInput)
 
     VALUE_IS_TOKEN("scan|s", EEMC_WIFI_SCAN)                      //Scan networks  
 
-    BEGIN_OBJECT("connect|c|", WIFI_CONNECT, EEMC_WIFI_CONNECT)   //Connect
+    BEGIN_OBJECT("connect|c", WIFI_CONNECT, EEMC_WIFI_CONNECT)   //Connect
       DATA_MEMBER("ssid|s", ssid)                                 //SSID
       DATA_MEMBER("pwd|p", pwd, "")                               //Password
       DATA_MEMBER_AS_IP("gateway|gw", gateway, 0)                 //Gateway
@@ -501,8 +499,8 @@ BEGIN_PARSE_ROUTINE(parseCommandInput)
     VALUE_IS_TOKEN("disconnect|d", EEMC_WIFI_DISCONNECT)          //Disconnect
 
     BEGIN_GROUP_TOKEN("config|cfg")
-      VALUE_IS_TOKEN("get|", EEMC_WIFI_CFG_GET)               //Get config saved after last succesfull connect
-      VALUE_IS_TOKEN("clear", EEMC_WIFI_CFG_CLEAR)               //Clear config for debugging purposes
+      VALUE_IS_TOKEN("get|", EEMC_WIFI_CFG_GET)                   //Get config saved after last succesfull connect
+      VALUE_IS_TOKEN("clear", EEMC_WIFI_CFG_CLEAR)                //Clear config for debugging purposes
     END_GROUP_TOKEN()
   
   END_GROUP_TOKEN()

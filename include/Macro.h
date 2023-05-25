@@ -101,6 +101,8 @@ void loop() \
 
 #define ADD_STRIP(Type, ...) \
   FastLED.addLeds<Type, __VA_ARGS__ >(ee.getLeds(), MAX_LEDS).setCorrection( TypicalLEDStrip );  
+
+  
 #define END_LEDS() 
 
 
@@ -192,7 +194,7 @@ void loop() \
 #define WIFI_INPUT() \
   static CtrlWifiStatus ctrlWifi(EEMC_WIFI_STATUS_CHANGE); \
   cp.addControl(&ctrlWifi);
-
+  
 #endif
 
 #endif //__MACRO_H  

@@ -41,7 +41,7 @@ inline void EffectPacificOcean::proceed(CRGB *leds, uint16_t numLeds){
 
   SCIStart[0] += (deltams1 * beatsin88(1011, 10, 13));
   SCIStart[1] -= (deltams21 * beatsin88(777, 8, 11));
-  SCIStart[2]-= (deltams1 * beatsin88(501, 5, 7));
+  SCIStart[2] -= (deltams1 * beatsin88(501, 5, 7));
   SCIStart[3] -= (deltams2 * beatsin88(257, 4, 6));
 
   // Clear out the LED array to a dim background blue-green

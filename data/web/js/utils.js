@@ -69,6 +69,59 @@ function setupApiProgress(parentElem){
   }
 }
 
+function setupMenu(parentElem){
+
+  var btn  = document.createElement("button");
+  btn.className = "menu-button";
+  if(parentElem)
+    parentElem.appendChild(btn);
+  
+  btn.appendChild(document.createElement("span"));
+  btn.appendChild(document.createElement("span"));
+  btn.appendChild(document.createElement("span"));
+
+  const menuItems = [
+    { text: "Menu Item 1", link: "#" },
+    { text: "Menu Item 2", link: "#" },
+    { text: "Menu Item 3", link: "#" },
+  ];
+
+  var popupMenu = document.createElement("div");
+  if(parentElem)
+    parentElem.appendChild(popupMenu);
+  
+  popupMenu.className = "popup-menu";
+  popupMenu.id = "mainMenu";
+
+  const ul = document.createElement("ul");
+
+  menuItems.forEach(item => {
+    const li = document.createElement("li");
+    const a = document.createElement("a");
+
+    a.href = item.link;
+    a.textContent = item.text;
+
+    li.appendChild(a);
+    ul.appendChild(li);
+  });
+
+  popupMenu.appendChild(ul);
+
+  btn.addEventListener("click", function(){    
+    popupMenu.style.display = popupMenu.style.display === "block" ? "none" : "block";
+  });
+
+
+  document.addEventListener("click", function (event) {
+    if (event.target !== btn && !popupMenu.contains(event.target)) {
+      popupMenu.style.display = "none";
+    }
+  });
+
+
+}
+
 
 function showBannerMessage(msg, isError){
   if(!this.banner){

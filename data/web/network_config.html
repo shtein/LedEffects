@@ -8,7 +8,7 @@
   <script type="text/javascript" src="js/api.js"></script>
   <script type="text/javascript" src="js/utils.js"></script>
   <style>
-		@import url("style.css");
+		@import url("css/style.css");
 	</style>
 </head>
 
@@ -49,7 +49,7 @@
           <h3>WiFi Setup</h3>          
           <div>                
             <div class="param-value"><span class="param">SSID:</span><input type="text" id="cfg.st.ssid" maxlength="32" list="networks"/><datalist id="networks"></datalist><button id="scan" onclick="onWiFiScan()">Scan</button></div>        
-            <div class="param-value"><span class="param">Password:</span><input id="cfg.st.pwd" maxlength="64" type="Password"/><button id="shpwd" onclick="onShowHidePwd()">Show</button></div>      
+            <div class="param-value"><span class="param">Password:</span><div style="position:relative; display:inline-block"><input id="cfg.st.pwd" maxlength="64" type="Password"><button id="shpwd" onclick="onShowHidePwd()"><i class="icon-eye"></i></button></div></div>      
             <div class="param-value"><label for="dhcp" style="margin-bottom: 5px;"><input type="checkbox" id="cfg.st.dhcp" onclick="onUseDHCP()"/> Automatically assign IP address</label></div>          
             <div class="param-value"><span class="param">IP address:</span><input type="text" id = "cfg.st.ip" /></div>
             <div class="param-value"><span class="param">Gateway:</span><input type="text"  id = "cfg.st.gw"></div>
@@ -65,8 +65,7 @@
       </div>  
       <div style="margin: 10px; margin-top: 0px;">
         <h3>AP Control</h3>          
-          <div>
-            
+          <div>            
             <div class="action">          
               <button id="connect" onclick="onWifiAPOn()">On</button>
               <button id="disconnect" onclick="onWifiAPOff()">Off</button>              
@@ -83,6 +82,7 @@ var wifiStatus = null;
 
 window.onload = function() {
   setupApiProgress(document.querySelectorAll(".topbar")[0]);  
+  setupMenu(document.querySelectorAll(".topbar")[0]);
   showWiFiStatus();
   showWiFiConfig();  
 }
@@ -198,7 +198,6 @@ function onWiFiScan(){
 
 function onWifiConnect(){
   
-  
   try{
     var ssid = getValidValue("cfg.st.ssid", isNotEmpty, "SSID is required");
     var pwd = getValidValue("cfg.st.pwd");
@@ -261,7 +260,6 @@ function onWifiAPOff(){
       showMessage("Your WiFi connection to <b>" + wifiStatus.ap.ssid + "</b> will be lost.");
     }
   }
-
 
   apiWifiAPOff().then(object=>{
     showAPStatus(object, WIFI_MODE_NONE);

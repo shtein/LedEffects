@@ -3,6 +3,8 @@
 ////////////////////////////////////////
 // WS28101 string, 100 LEDs, 1 push button
 
+
+
 #pragma message "Compile for office window"
 
   
@@ -67,7 +69,7 @@ BEGIN_EFFECT_ENGINE(Window, 0)
     SERIAL_INPUT()     
 
   END_CONTROL_MAP()
-      
+    
 END_EFFECT_ENGINE() 
 
 

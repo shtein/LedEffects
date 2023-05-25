@@ -126,11 +126,10 @@ void FunctionName(CRGBPalette16 &pal){ \
 
 
 #define END_TRANSFORM_SCHEMA() }; \
-  pal = ts[random(0, sizeof(ts) / sizeof(ts[0]))].item; \
+  pal = ts[random8(0, sizeof(ts) / sizeof(ts[0]))].item; \
 } 
 
 #define TRANSOFRM_PALETTE(pal) pal,
-
 
 /*
 Usage of transform shchema: 

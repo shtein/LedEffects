@@ -101,8 +101,7 @@
 
 // Next block starts at 0x168 (360)
 
-//EEProm is 512 bytes, last block size is 512 - 360 = 152
-
+// EEProm is 512 bytes, last block size is 512 - 360 = 152
 
 #define EE_ENGINE_IDX       0                                //Effect Engine index
 #define EE_ENGINE_BS        32                               //Effect Engine block size
@@ -114,8 +113,6 @@
 #if defined(ESP8266) || defined(ESP32)
   #define EE_WIFI_IDX       (EE_EFFECT_IDX + EE_EFFECT_BS)  //WiFi configuration
 #endif
-
-
 
 
 #ifdef NTF_ENABLED

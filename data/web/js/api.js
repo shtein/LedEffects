@@ -93,7 +93,7 @@ function apiCall(url){
 
 //API prefix
 function host(){
-  return location.host == "" ? "172.16.25.25" : location.host;
+  return location.host == "" ? "192.168.101.138" : location.host;
 }
 
 function apiPrefix(){

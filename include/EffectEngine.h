@@ -95,6 +95,6 @@ class EffectEngine{
 
 //////////////////////////////////
 // Serial command line
-uint8_t parseCommandInput(char *cmdLine, CtrlQueueData &data);
+uint8_t parseCommandInput(const char *tokens[], CtrlQueueData &data);
 
 #endif //__EFFECTENGINE_H
