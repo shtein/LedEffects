@@ -24,10 +24,10 @@ inline void EffectEmergencyLights::proceed(CRGB *leds, uint16_t numLeds){
   //Black all
   fill_solid(leds, numLeds, CRGB::Black);
 
-  uint16_t bounds[][2] = { { 0, (numLeds / 2) }, 
-                           { 1, (numLeds / 2) }, 
-                           { (numLeds / 2 + 1), numLeds }, 
-                           { (numLeds / 2), numLeds },                       
+  uint16_t bounds[][2] = { { 0, (uint16_t)(numLeds / 2) }, 
+                           { 1, (uint16_t)(numLeds / 2) }, 
+                           { (uint16_t)(numLeds / 2 + 1), numLeds }, 
+                           { (uint16_t)(numLeds / 2), numLeds },                       
                          };
 
   //Even - on, odd - off

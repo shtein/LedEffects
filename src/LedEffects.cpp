@@ -1,8 +1,6 @@
 //For Platformio specific setup is defined in platformio.ini using build_flags -DXXX option
 //Far arduino IDE it needs to be #define XXX explictely in ledeffects.h
 
-
-
 #include "LedEffects.h"
 
 #include <AnalogInput.h>
@@ -57,9 +55,35 @@
 #include "Setup/Vadim.h"
 #include "Setup/Window.h"
 
+
 #if defined(__TEST)
 #pragma message "Compile for default"
 
+
+enum EffectList{
+  el_TwinkleFox = 0,
+  el_Confetti,
+  el_Noise, 
+  el_Total
+};
+
+
+Effect *createEffect(uint8_t effectId){
+  switch(effectId){
+    case el_TwinkleFox:{ 
+      static EffectTwinkleFox c; 
+      return &c; 
+    } 
+    
+    case el_Confetti: {
+      static EffectConfetti c;
+      return &c;
+    }
+    
+  }
+
+  return NULL;
+}
   
   //Effect Engine
 BEGIN_EFFECT_ENGINE(Test, 0) 
@@ -74,7 +98,7 @@ BEGIN_EFFECT_ENGINE(Test, 0)
       ADD_EFFECT("Twinkle fox", EffectTwinkleFox)
       ADD_EFFECT("Confetti", EffectConfetti)
       ADD_EFFECT("Meteor rain", EffectMeteorRain<5>)
-      //ADD_EFFECT("Plazma", EffectPlasma)        
+      ADD_EFFECT("Plazma", EffectPlasma)        
       ADD_EFFECT("Juggle", EffectJuggle)
       ADD_EFFECT("Pacific Ocean", EffectPacificOcean)        
       ADD_EFFECT("Blur", EffectBlur)
@@ -85,7 +109,6 @@ BEGIN_EFFECT_ENGINE(Test, 0)
       ADD_EFFECT("Running lights", EffectRunningLights)         //Single color
       ADD_EFFECT("Color wipe", EffectColorWipe)               //Not intersting   
       ADD_EFFECT("Theater rainbow", EffectTheaterChaseRainbow) 
-
     END_MODE()
     
     BEGIN_MODE("Static", 1)    
@@ -111,9 +134,9 @@ BEGIN_EFFECT_ENGINE(Test, 0)
     //Serial
     SERIAL_INPUT()
     //WiFi
-    WIFI_INPUT() 
+    //WIFI_INPUT() 
     //Web    
-    WEB_INPUT(80)
+    //WEB_INPUT(80)
 
     //SW2POS_TO_CMD(EEMC_SOUND_LOG, 7)
     //SW2POS_TO_CMD(EEMC_SOUND_USE_MAX, 6)
@@ -144,6 +167,11 @@ BEGIN_EFFECT_ENGINE(Test, 0)
     */
     
   END_CONTROL_MAP()
+
+  for(int i = 0; i < 10; i++){
+    Effect *e = createEffect(random8(8));
+  }
+
       
 END_EFFECT_ENGINE() 
 
