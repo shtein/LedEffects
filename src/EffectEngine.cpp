@@ -6,8 +6,10 @@
 
 
 #include "Effect.h"
+#include "EffectsAll.h"
 #include "EffectEngine.h"
 #include "EffectEngineCtx.h"
+
 
 #ifdef NTF_ENABLED  
 ////////////////////////////////////////////
@@ -17,12 +19,6 @@ struct EEResp_ModeList{
   EFFECT_MODE *modes;
 };
 
-inline void putNtfObject(NtfBase &resp, const EFFECT_EFFECT &data){  
-  if(resp.getContext().flags & NTF_CTX_ARRAY){
-    resp.put_F(F("effect"), resp.getContext().arrayIndex);
-  }
-  resp.put_F(F("effectName"), data.effectName);
-}
 
 void putNtfObject(NtfBase &resp, const EFFECT_MODE &data){
   if(resp.getContext().flags & NTF_CTX_ARRAY){
@@ -30,13 +26,37 @@ void putNtfObject(NtfBase &resp, const EFFECT_MODE &data){
   }
   resp.put_F(F("modeName"), data.modeName);
   resp.put_F(F("effectCount"), data.numEffects);   
-  resp.put_F(F("effects"), data.effects, data.numEffects);
+  //resp.put_F(F("effects"), data.effects, data.numEffects);
 }
 
 void putNtfObject(NtfBase &resp, const EEResp_ModeList &data){
    resp.put_F(F("modeCount"), data.numModes);
    resp.put_F(F("modes"), data.modes, data.numModes);
 }
+
+
+void putNtfObject(NtfBase &resp, const EFFECT_DESCRIPTION &data){
+   resp.put_F(F("effectId"), data.effectId);
+   resp.put_F(F("effectName"), data.effectName);
+}
+
+struct EEResp_EffectList{};
+
+void putNtfObject(NtfBase &resp, const EEResp_EffectList &data){
+  resp.beginArray_F(F("Effects"));
+
+  EFFECT_DESCRIPTION ed;
+  for(size_t i = 0; i < el_Total; i++){
+    getEffect(i, ed);
+    if(ed.effect){
+      resp.put_F(F("Effect"), ed);
+    }
+  }
+
+  resp.endArray();
+}
+
+
 #endif
 
 
@@ -45,11 +65,12 @@ void putNtfObject(NtfBase &resp, const EEResp_ModeList &data){
 #define CUR_MODE _modes[_modeNum]  
 
 EffectEngine::EffectEngine(uint8_t flags){
-  _flags    = flags | EEF_DEFINED;
-  
-  _numModes = 0;
-  _modeNum  = 0;
+  _flags      = flags | EEF_DEFINED;
+  _curEffect  = NULL;
+  _numModes   = 0;
+  _modeNum    = 0;
   ::memset(_modes, 0, sizeof(_modes));
+  
 
   _numLeds = MAX_LEDS;
 
@@ -67,7 +88,7 @@ CRGB *EffectEngine::getLeds() const{
 EffectEngine::~EffectEngine(){
 }
 
-void EffectEngine::addMode(const __FlashStringHelper *modeName, EFFECT_EFFECT *effects){
+void EffectEngine::addMode(const __FlashStringHelper *modeName, uint8_t *effects){
   if(_numModes == MAX_MODES)
     return;
 
@@ -80,9 +101,12 @@ void EffectEngine::addMode(const __FlashStringHelper *modeName, EFFECT_EFFECT *e
   _numModes ++;
 }
 
-void EffectEngine::addEffect(const __FlashStringHelper *effectName, Effect *effect){
-  if(!effect)
+void EffectEngine::addEffect(uint8_t effect){
+
+  EFFECT_DESCRIPTION ed;
+  if(!::getEffect(effect, ed)){
     return;
+  }
 
   if(_numModes == 0)
     return;
@@ -91,13 +115,11 @@ void EffectEngine::addEffect(const __FlashStringHelper *effectName, Effect *effe
   
   //Only add effect if there is where to add
   if(mode->effects){
-    mode->effects[mode->numEffects].effect     = effect;
-#ifdef NTF_ENABLED
-    mode->effects[mode->numEffects].effectName = effectName;
-#endif    
+    mode->effects[mode->numEffects] = effect;
 
     mode->numEffects ++;
   }
+
 } 
 
 void EffectEngine::init() {  
@@ -143,12 +165,22 @@ void EffectEngine::setEffect(uint8_t effectNum){
   CUR_MODE.effectNum = effectNum;
 
  //Get effect object
-  Effect *curEffect = getEffect();
+  if(_numModes == 0){
+    _curEffect =  NULL; 
+  }
+  else if(!CUR_MODE.effects){
+    _curEffect =  NULL; 
+  }
+  else {
+    EFFECT_DESCRIPTION ed;    
+     getEffect(CUR_MODE.effects[CUR_MODE.effectNum], ed);
+     _curEffect = ed.effect;
+  }
   
-  if(curEffect != NULL){
+  if(_curEffect != NULL){
     //Init effect
     //curEffect->init(_leds, _numLeds);
-    curEffect->reset();
+    _curEffect->reset();
 
     //Read config previously saved data
     configCurEffect(true);
@@ -156,16 +188,6 @@ void EffectEngine::setEffect(uint8_t effectNum){
     //Process right away
     _millis = 0;
   }
-}
-
-Effect *EffectEngine::getEffect() const{
-  if(_numModes == 0)
-    return NULL; 
-
-  if(!CUR_MODE.effects)
-    return NULL;
-
-  return CUR_MODE.effects[CUR_MODE.effectNum].effect; 
 }
 
 //////////////////////////////
@@ -234,6 +256,7 @@ bool EffectEngine::onCmdEE(struct CtrlQueueItemEx &itm){
     case EEMC_GET_EFFECT:
     case EEMC_GET_NUMLEDS:
     case EEMC_GET_MODE_LIST:
+    case EEMC_GET_EFFECT_LIST:
     break;
 #endif
     
@@ -259,7 +282,11 @@ bool EffectEngine::onCmdEE(struct CtrlQueueItemEx &itm){
       
     case EEMC_GET_MODE_LIST:               
       { itm.ntf.put(EECmdResponse<EEResp_ModeList>{itm.cmd, {_numModes, _modes}}); }
-    break;        
+    break;       
+
+    case EEMC_GET_EFFECT_LIST:
+      { itm.ntf.put(EECmdResponse<EEResp_EffectList>{itm.cmd}); }
+    break; 
   }
 #endif
 
@@ -289,9 +316,8 @@ bool EffectEngine::onCmd(struct CtrlQueueItemEx &itm){
   }
 #endif
   else{ //Effect command
-      Effect *curEffect = getEffect();      
-      if(curEffect){
-         processed = curEffect->onCmd(itm);
+      if(_curEffect){
+         processed = _curEffect->onCmd(itm);
       }
   }
     
@@ -318,18 +344,16 @@ void EffectEngine::loop(struct CtrlQueueItemEx &itm){
   }
 
   //Current effect
-  Effect  *curEffect = getEffect();
-
-  if(curEffect != NULL){
+  if(_curEffect != NULL){
 
     //Is it time to process ?
      if(_millis <= millis()){
 
         //Proceed
-        curEffect->proceed(_leds, _numLeds);
+        _curEffect->proceed(_leds, _numLeds);
         
         //Remember when proceed next time
-        _millis = millis() + curEffect->getSpeedDelay();
+        _millis = millis() + _curEffect->getSpeedDelay();
         
         updateLeds = true;
      }
@@ -410,9 +434,7 @@ void EffectEngine::writeConfig(){
 void EffectEngine::configCurEffect(bool read){  
 
   //Check if there is current effect
-  Effect *curEffect = getEffect();
-
-  if(!curEffect)
+  if(!_curEffect)
     return;
   
   //Calculate EEPROM index for 
@@ -424,7 +446,7 @@ void EffectEngine::configCurEffect(bool read){
 
   //Read or write current effect config
   EEPROMCfg ee(index);  
-  curEffect->config(ee, read);
+  //_curEffect->config(ee, read);
 }
 
 
@@ -436,6 +458,8 @@ void EffectEngine::preSaveConfig(){
 // parseSerialInput
 // Nothing fancy, enter from terminal if serial inteface is available
 BEGIN_PARSE_ROUTINE(parseCommandInput)  
+  VALUE_IS_TOKEN("effectlist|el", EEMC_GET_EFFECT_LIST)
+  
   BEGIN_GROUP_TOKEN("mode|m") //mode 
     VALUE_IS_TOKEN("list|l", EEMC_GET_MODE_LIST)
     VALUE_IS_TOKEN("get|g|", EEMC_GET_MODE)
@@ -450,7 +474,7 @@ BEGIN_PARSE_ROUTINE(parseCommandInput)
       BEGIN_GROUP_TOKEN("set|s") //sets     
         VALUE_IS_TOKEN("next|n|", EEMC_EFFECT, 0, CTF_VAL_NEXT) //next effect
         VALUE_IS_TOKEN("prev|p", EEMC_EFFECT, 0, CTF_VAL_PREV)  //prev effect
-        VALUE_IS_NUMBER(EEMC_EFFECT, CTF_VAL_ABS)              //specific effect
+        VALUE_IS_NUMBER(EEMC_EFFECT, CTF_VAL_ABS)               //specific effect
       END_GROUP_TOKEN()
     END_GROUP_TOKEN()
   END_GROUP_TOKEN() //mode

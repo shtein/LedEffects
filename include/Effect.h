@@ -3,6 +3,7 @@
 
 #include "Palette.h"
 #include "EffectEngineCtx.h"
+#include "EffectEngineCfg.h"
 
 ///////////////////
 // Helpers
@@ -11,10 +12,9 @@
 
 ///////////////////
 // Basic effect
-
 class CRGB;
 class CHSV;
-class EEPROMCfg;
+
 
 class Effect{
   public:
@@ -27,8 +27,8 @@ class Effect{
     //Process
     virtual void proceed(CRGB *leds, uint16_t numLeds) = 0;
 
-    //Read/Write condig
-    virtual bool config(EEPROMCfg &cfg, bool read);
+    //Read/Write config
+    virtual bool config(EffectConfig &cfg, bool read);
 
     //Command processing
     virtual bool onCmd(struct CtrlQueueItemEx &itm);
@@ -77,7 +77,7 @@ class EffectColor: public Effect{
     virtual bool onCmd(struct CtrlQueueItemEx &itm);
 
     //Read/Write condig
-    bool config(EEPROMCfg &cfg, bool read);
+    bool config(EffectConfig &cfg, bool read);
 };
 
 /////////////////////////////////////////

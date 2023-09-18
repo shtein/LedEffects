@@ -9,7 +9,6 @@
 
 /////////////////////////////////
 // Effect
-
 Effect::EffectContext Effect::_ctx;
 
 Effect::Effect(){
@@ -58,24 +57,17 @@ uint8_t Effect::getSpeedDelay() const{
 }
 
 
-bool Effect::config(EEPROMCfg &cfg, bool read){
-  if(read){
-    //Version, speed  
-    uint8_t version;
-    uint8_t speedDelay;
-
-    cfg >> version >> speedDelay;
-
-    //Check if version is correct 
-    if(version != EE_VERSION)
-      return false;
-
+bool Effect::config(EffectConfig &cfg, bool read){
+  if(read){    
     //Set speed delay
+    uint8_t speedDelay = getSpeedDelay();
+    cfg >> speedDelay;
+
     setSpeedDelay(speedDelay);
   }
   else{
     //Write version and speed
-    cfg << (uint8_t)EE_VERSION << getSpeedDelay();
+    cfg << getSpeedDelay();
   }
 
   return true; 
@@ -147,21 +139,24 @@ bool EffectColor::onCmd(struct CtrlQueueItemEx &itm){
 }
 
 
-bool EffectColor::config(EEPROMCfg &cfg, bool read){
-  
-  if(!Effect::config(cfg, read))
-      return false;
+bool EffectColor::config(EffectConfig &cfg, bool read){
 
-  if(read){    
+  if(!Effect::config(cfg, read))
+    return false;
+
+  //Color  
+  CHSV  hsv = getHSV();
+
+  if(read){
     //Read color
-    CHSV hsv;
     cfg >> hsv;
 
+    //Set
     setHSV(hsv);
   }
   else{
-  //Write color
-    cfg << getHSV();
+    //Write color
+    cfg << hsv;
   }
 
   return true;

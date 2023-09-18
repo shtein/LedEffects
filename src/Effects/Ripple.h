@@ -65,9 +65,12 @@ inline uint8_t Ripple::getColorIndex() const{
 #define RIPPLE_MAX         16
 #define RIPPLE_MAX_DELTA   4
 
-template <const int MAX_RIPPLES = 5>
-class EffectRipple: public Effect{
+#ifndef EFFECT_RIPPLE_COUNT
+  #define EFFECT_RIPPLE_COUNT 5
+#endif // EFFECT_RIPPLE_COUNT
 
+template <const int MAX_RIPPLES = EFFECT_RIPPLE_COUNT>
+class EffectRipple: public Effect{
 protected:
   void reset();
   void proceed(CRGB *leds, uint16_t numLeds);

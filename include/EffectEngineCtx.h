@@ -19,16 +19,16 @@
 #define EEMC_LED         0x80   //Something changed - update LEDs
 
 //Engine commands
-#define EEMC_EE             0x20   //Generic effect engine
-#define EEMC_GET_MODE       0x21   //Mode 
-#define EEMC_GET_EFFECT     0x22   //Effect 
-#define EEMC_GET_NUMLEDS    0x23   //Number of leds 
-#define EEMC_GET_MODE_LIST  0x24   //Available modes
+#define EEMC_EE               0x20   //Generic effect engine
+#define EEMC_GET_MODE         0x21   //Mode 
+#define EEMC_GET_EFFECT       0x22   //Effect 
+#define EEMC_GET_NUMLEDS      0x23   //Number of leds 
+#define EEMC_GET_MODE_LIST    0x24   //Available modes
+#define EEMC_GET_EFFECT_LIST  0x25   //Available effects
 
 #define EEMC_MODE        (EEMC_LED | EEMC_GET_MODE)       //Mode changed
 #define EEMC_EFFECT      (EEMC_LED | EEMC_GET_EFFECT)     //Effect changed
 #define EEMC_NUMLEDS     (EEMC_LED | EEMC_GET_NUMLEDS)    //Number of leds changed
-
 
 //Effect commands
 #define EEMC_GET_COLOR_HSV  0x01   //Get effect HSV
@@ -88,7 +88,7 @@
 // EEPROM address is 0x00
 // version          (1 byte)
 // number of modes  (1 byte)
-// current mode     (1 byte)
+// current effect   (1 byte)
 // flags            (1 byte)
 // for each mode
 //    number of effect (1 byte) 
@@ -101,7 +101,7 @@
 
 // Next block starts at 0x168 (360)
 
-// EEProm is 512 bytes, last block size is 512 - 360 = 152
+// EEPROM is 512 bytes, last block size is 512 - 360 = 152
 
 #define EE_ENGINE_IDX       0                                //Effect Engine index
 #define EE_ENGINE_BS        32                               //Effect Engine block size
@@ -128,9 +128,10 @@ struct CtrlQueueItemEx: public CtrlQueueItem{
   
   NtfSet &ntf;
 };
+
 #else 
 
-struct CtrlQueueItemEx: public CtrlQueueItem{};
+struct CtrlQueueItemEx: public CtrlQueueItem {};
 
 #endif //NTF_ENABLED
 

@@ -51,7 +51,7 @@ _NTF_INIT(); \
 \
 void setup(){ \
   DBG_INIT(); \
-  DBG_OUTLN("Led effect started - "#name);  
+  DBG_OUTLN("Led effect started - " name);  
 
 
 #define END_EFFECT_ENGINE() \
@@ -72,7 +72,7 @@ void loop() \
 #define END_EFFECTS()
 
 #define BEGIN_MODE(modeName, maxEffects) \
-  static EFFECT_EFFECT MODE_NAME[maxEffects]; \
+  static uint8_t MODE_NAME[maxEffects]; \
   ee.addMode(_OBJ_NAME(modeName), MODE_NAME);
   
 #define END_MODE()
@@ -88,13 +88,8 @@ void loop() \
 #define EFFECT_ARGS(...) ARGS(, ## __VA_ARGS__, LPR, LPR, LPR, LPR, LPR, )  __VA_ARGS__  ARGS(, ## __VA_ARGS__, RPR, RPR, RPR, RPR, RPR, )
 
 
-#define ADD_EFFECT(effectName, classEffect, ...) \
-  static  classEffect EFFECT_NAME EFFECT_ARGS(__VA_ARGS__); \
-  ee.addEffect(_OBJ_NAME(effectName), &EFFECT_NAME);   
-
-#define ADD_STATIC_COLOR(effectName, hue) \
-  ADD_EFFECT(effectName, EffectStatic<hue>);
-
+#define ADD_EFFECT(effect) \
+  ee.addEffect(effect);   
 
 #define BEGIN_LEDS() \
    

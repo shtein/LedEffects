@@ -15,21 +15,14 @@ class EEPROMCfg;
 
 typedef CRGB EELEDS[MAX_LEDS];
 
-struct EFFECT_EFFECT{
-  Effect                    *effect;      //Effect
-#ifdef NTF_ENABLED  
-  const __FlashStringHelper *effectName;  //Name of the effect
-#endif  
-};
-
 struct EFFECT_MODE{
-      EFFECT_EFFECT             *effects;               //Effects
-      uint8_t                    numEffects:4;          //Total number of effects
-      uint8_t                    effectNum:4;           //Index of the current or last effect from _effects
+  uint8_t  *effects;                    //Effects
+  uint8_t  numEffects;                  //Total number of effects
+  uint8_t  effectNum;                   //Index of the current or last effect from _effects
 #ifdef NTF_ENABLED      
-      const __FlashStringHelper *modeName;              //Name of the mode
+  const __FlashStringHelper *modeName;  //Name of the mode
 #endif      
-    }; 
+}; 
 
 /////////////////////////////////
 // EffectEngine
@@ -39,8 +32,8 @@ class EffectEngine{
     ~EffectEngine();
 
     void init();
-    void addMode(const __FlashStringHelper *modeName, EFFECT_EFFECT *effects); //add mode
-    void addEffect(const __FlashStringHelper *effectName, Effect *effect); //add effect to current mode
+    void addMode(const __FlashStringHelper *modeName, uint8_t *effects); //add mode
+    void addEffect(uint8_t effect); //add effect to current mode
     
     void loop(struct CtrlQueueItemEx &itm);   
 
@@ -56,7 +49,6 @@ class EffectEngine{
     void onNumLedsChange(struct CtrlQueueData &data);
     void onEffectChange(struct CtrlQueueData &data); 
 
-
     //Notifications    
 #ifdef NTF_ENABLED    
     void ntf(uint8_t cmd, uint8_t error, NtfSet &ntf);
@@ -65,7 +57,6 @@ class EffectEngine{
     //Internal routines
     void setMode(uint8_t mode);
     void setEffect(uint8_t effectNum);
-    Effect *getEffect() const;
 
     //Reading/writing config from/to EEPROM
     void readConfig();
@@ -79,6 +70,7 @@ class EffectEngine{
 
     uint8_t    _numModes:4;               //Total number of modes
     uint8_t    _modeNum:4;                //Current mode
+    Effect    *_curEffect;                //Current Effect
 
     EELEDS     _leds;                     //Leds
     uint16_t   _numLeds:12;               //Max number of leds    

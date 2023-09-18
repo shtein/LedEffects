@@ -21,23 +21,7 @@
 #include "Pins.h"
 
 //Effects
-#include "Effects/Rainbow.h"
-#include "Effects/FadeInOut.h"
-#include "Effects/RunningLights.h"
-#include "Effects/ColorWipe.h"
-#include "Effects/MoodBlobs.h"
-#include "Effects/Static.h"
-#include "Effects/Noise.h"
-#include "Effects/Blur.h"
-#include "Effects/EmergencyLights.h"
-#include "Effects/Fire.h"
-#include "Effects/Meteor.h"  
-#include "Effects/Ripple.h"
-#include "Effects/Juggle.h"
-#include "Effects/TwinkleFox.h"
-#include "Effects/PacificOcean.h"
-#include "Effects/MatrixAnimation.h"
-#include "Effects/Sound.h"
+#include "EffectsAll.h"
 
 //Setups
 #include "Setup/ChristmasTree.h"
@@ -59,62 +43,16 @@
 #if defined(__TEST)
 #pragma message "Compile for default"
 
-
-enum EffectList{
-  el_TwinkleFox = 0,
-  el_Confetti,
-  el_Noise, 
-  el_Total
-};
-
-
-Effect *createEffect(uint8_t effectId){
-  switch(effectId){
-    case el_TwinkleFox:{ 
-      static EffectTwinkleFox c; 
-      return &c; 
-    } 
-    
-    case el_Confetti: {
-      static EffectConfetti c;
-      return &c;
-    }
-    
-  }
-
-  return NULL;
-}
-  
   //Effect Engine
-BEGIN_EFFECT_ENGINE(Test, 0) 
+BEGIN_EFFECT_ENGINE("Test", 0) 
   //Effects   
-  BEGIN_EFFECTS()
-    //BEGIN_MODE(Sound, 3)            
-    //  ADD_EFFECT(EffectSoundMatrixSymmetric)
-      // ADD_EFFECT(EffectSoundMatrixColumn)
-    //END_MODE()
-    
-    BEGIN_MODE("Effects", 15)
-      ADD_EFFECT("Twinkle fox", EffectTwinkleFox)
-      ADD_EFFECT("Confetti", EffectConfetti)
-      ADD_EFFECT("Meteor rain", EffectMeteorRain<5>)
-      ADD_EFFECT("Plazma", EffectPlasma)        
-      ADD_EFFECT("Juggle", EffectJuggle)
-      ADD_EFFECT("Pacific Ocean", EffectPacificOcean)        
-      ADD_EFFECT("Blur", EffectBlur)
-      ADD_EFFECT("Noise", EffectNoise)            
-      ADD_EFFECT("Mood blobs", EffectMoodBlobs)         
-      ADD_EFFECT("Ripple", EffectRipple<5>)         
-      ADD_EFFECT("Fade in out", EffectFadeInOut)
-      ADD_EFFECT("Running lights", EffectRunningLights)         //Single color
-      ADD_EFFECT("Color wipe", EffectColorWipe)               //Not intersting   
-      ADD_EFFECT("Theater rainbow", EffectTheaterChaseRainbow) 
+  BEGIN_EFFECTS()    
+    BEGIN_MODE("Effects", 16)
+      ADD_EFFECT(el_StaticColor)
+      ADD_EFFECT(el_Blur)
+      ADD_EFFECT(el_ColorWipe)
     END_MODE()
-    
-    BEGIN_MODE("Static", 1)    
-      ADD_STATIC_COLOR("Static Color", HUE_BLUE)
-    END_MODE()
-    
+        
     //BLACK_MODE()
   END_EFFECTS()
   
@@ -167,10 +105,6 @@ BEGIN_EFFECT_ENGINE(Test, 0)
     */
     
   END_CONTROL_MAP()
-
-  for(int i = 0; i < 10; i++){
-    Effect *e = createEffect(random8(8));
-  }
 
       
 END_EFFECT_ENGINE() 

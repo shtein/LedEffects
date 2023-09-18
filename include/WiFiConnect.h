@@ -5,7 +5,6 @@
 //Only for supported hardware
 #if defined(ESP8266) || defined(ESP32)
 
-
 //Wifi connection control
 class WiFiConnection{
 public:

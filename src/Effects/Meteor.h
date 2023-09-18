@@ -85,7 +85,11 @@ inline CHSV Meteor::getHSV() const{
 ///////////////////////////
 // Effect Meteor Rain
 
-template <const size_t MAX_METEORS = 2>
+#ifndef EFFECT_METOUR_COUNT
+  #define EFFECT_METOUR_COUNT 2
+#endif //EFFECT_METOUR_COUNT
+
+template <const size_t MAX_METEORS = EFFECT_METOUR_COUNT>
 class EffectMeteorRain: public Effect{
 protected:
   void reset();
