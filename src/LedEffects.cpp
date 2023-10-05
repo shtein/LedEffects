@@ -46,6 +46,7 @@
   //Effect Engine
 BEGIN_EFFECT_ENGINE("Test", 0) 
   //Effects   
+/*
   BEGIN_EFFECTS()    
     BEGIN_MODE("Effects", 16)
       ADD_EFFECT(el_StaticColor)
@@ -55,7 +56,21 @@ BEGIN_EFFECT_ENGINE("Test", 0)
         
     //BLACK_MODE()
   END_EFFECTS()
-  
+ */  
+
+  //BEGIN_EFFECTS()
+  if(1){ //check if need to rewrite effects config
+    EE_CFG_EFFECT_ENGINE eeCfg;
+    memset(&eeCfg, 0, sizeof(eeCfg));
+
+    //BEGIN_MODE(modeName)
+
+
+
+  //END_EFFECTS()
+  }
+
+ 
   //Leds
   BEGIN_LEDS()       
     ADD_STRIP(NEOPIXEL, 2)
