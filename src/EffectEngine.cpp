@@ -56,8 +56,7 @@ EffectEngine::EffectEngine(uint8_t flags){
   _millis          = 0;
   _millisToSaveCfg = 0;
 
-  //FastLed randmization seeding Random number initialization  
-  random16_set_seed(analogRead(0)); 
+  //FastLed randmization seeding Random number initialization    
 }
 
 CRGB *EffectEngine::getLeds() const{
@@ -101,6 +100,9 @@ void EffectEngine::addEffect(const __FlashStringHelper *effectName, Effect *effe
 } 
 
 void EffectEngine::init() {  
+
+  //Random seeding
+  random16_set_seed(analogRead(0));
  
   //Don't uncomment it if you don;t know what it is 
   //FastLED.setMaxPowerInVoltsAndMilliamps(5,1000);
@@ -116,8 +118,9 @@ void EffectEngine::init() {
     CUR_MODE.effectNum = 0;                  //first effect  
   }
 
-  if(_flags & EFF_RANDOM_START_EFFECT){
+  if(_flags & EFF_RANDOM_START_EFFECT){    
     CUR_MODE.effectNum = random8(CUR_MODE.numEffects); //random effect
+    DBG_OUTLN("Random effect %d", CUR_MODE.effectNum);
   }
 
   //Set mode
@@ -375,8 +378,8 @@ void EffectEngine::readConfig(){
     return;
 
   //Only use flags if they are set
-  if(flags & EEF_DEFINED)
-    _flags = flags;
+  //if(flags & EEF_DEFINED)
+  //  _flags = flags;
 
   //Set current mode
   _modeNum = current < total ? current : 0;

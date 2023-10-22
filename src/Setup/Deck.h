@@ -40,6 +40,12 @@ BEGIN_EFFECT_ENGINE(Deck, EFF_RANDOM_START_EFFECT)
       ADD_EFFECT("Twinkle fox-urk", EffectTwinkleFox, &UkraineFlag )
     END_MODE()  
 
+
+    BEGIN_MODE("Israel", 3)
+      ADD_EFFECT("Confetti-Isrl",  EffectConfetti, &IsraelFlag )
+      ADD_EFFECT("Plazma-Isrl",  EffectPlasma, &IsraelFlag)  
+      ADD_EFFECT("TwinkeFox-Isrl",  EffectTwinkleFox, &IsraelFlag )
+    END_MODE()
     
   END_EFFECTS()
   

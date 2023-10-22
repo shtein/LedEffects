@@ -9,12 +9,16 @@
 
   
 //Effect Engine
-BEGIN_EFFECT_ENGINE(Window, 0) 
+BEGIN_EFFECT_ENGINE(Window, EFF_RANDOM_START_EFFECT) 
   
   //Effects   
   BEGIN_EFFECTS()
 
     BEGIN_MODE("Themes", 15)        
+      ADD_EFFECT("Confetti-Isrl",  EffectConfetti, &IsraelFlag )
+      ADD_EFFECT("Plazma-Isrl",  EffectPlasma, &IsraelFlag)  
+      ADD_EFFECT("TwinkeFox-Isrl",  EffectTwinkleFox, &IsraelFlag )
+      ADD_EFFECT("Plazma-Israel",  EffectPlasma, &TransformAutunm)  
       ADD_EFFECT("Confetti-autumn",  EffectConfetti, &TransformAutunm )
       ADD_EFFECT("Plazma-autumn",  EffectPlasma, &TransformAutunm)
       ADD_EFFECT("Noise-autumn",  EffectNoise, &TransformAutunm )
@@ -25,7 +29,7 @@ BEGIN_EFFECT_ENGINE(Window, 0)
       ADD_EFFECT("Plazma-crsm", EffectPlasma, &TransformChristmas)
       ADD_EFFECT("Noise-crsm", EffectNoise, &TransformChristmas )
     END_MODE()      
-
+/*
     BEGIN_MODE("Effects", 15)
       ADD_EFFECT("Ripple", EffectRipple<>)
       ADD_EFFECT("Fire", EffectFire)
@@ -42,7 +46,7 @@ BEGIN_EFFECT_ENGINE(Window, 0)
       ADD_EFFECT("Juggle", EffectJuggle)
       ADD_EFFECT("Emergency lights", EffectEmergencyLights)
     END_MODE()
-
+*/
     BEGIN_MODE("Old Effects", 8)
       //ADD_EFFECT("Fade in/out", EffectFadeInOut)
       //ADD_EFFECT("Running lighs", EffectRunningLights)         //Single color
