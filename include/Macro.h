@@ -71,11 +71,14 @@ void loop() \
 
 #define END_EFFECTS()
 
+
 #define BEGIN_MODE(modeName, maxEffects) \
   static uint8_t MODE_NAME[maxEffects]; \
   ee.addMode(_OBJ_NAME(modeName), MODE_NAME);
+
   
 #define END_MODE()
+
 
 #define BLACK_MODE() \
   ee.addMode(_OBJ_NAME(Off), NULL);
