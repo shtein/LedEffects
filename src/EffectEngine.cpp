@@ -75,10 +75,7 @@ EffectEngine::EffectEngine(uint8_t flags){
   _numLeds = MAX_LEDS;
 
   _millis          = 0;
-  _millisToSaveCfg = 0;
-
-  //FastLed randmization seeding Random number initialization  
-  random16_set_seed(analogRead(0)); 
+  _millisToSaveCfg = 0;  
 }
 
 CRGB *EffectEngine::getLeds() const{
@@ -123,6 +120,9 @@ void EffectEngine::addEffect(uint8_t effect){
 } 
 
 void EffectEngine::init() {  
+
+  //FastLed randmization seeding Random number initialization  
+  random16_set_seed(analogRead(0)); 
  
   //Don't uncomment it if you don;t know what it is 
   //FastLED.setMaxPowerInVoltsAndMilliamps(5,1000);
