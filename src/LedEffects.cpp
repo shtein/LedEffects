@@ -56,6 +56,7 @@
 #include "Setup/Udalov.h"
 #include "Setup/Vadim.h"
 #include "Setup/Window.h"
+#include "Setup/AllPurpose.h"
 
 #if defined(__TEST)
 #pragma message "Compile for default"

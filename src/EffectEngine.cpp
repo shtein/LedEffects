@@ -120,7 +120,6 @@ void EffectEngine::init() {
 
   if(_flags & EFF_RANDOM_START_EFFECT){    
     CUR_MODE.effectNum = random8(CUR_MODE.numEffects); //random effect
-    DBG_OUTLN("Random effect %d", CUR_MODE.effectNum);
   }
 
   //Set mode
