@@ -2,40 +2,6 @@
 #include "EffectEngineCfg.h"
 #include <EEPROMCfg.h>
 
-
-/////////////////////////////
-// EffectConfig
-EffectConfig::EffectConfig(void *buf, size_t size){
-  _buf  = buf;
-  _size = size;
-  _pos  = 0; 
-}
-
-bool EffectConfig::read(void *p, size_t size){
-  if(_pos + size > _size)
-    return false;
-
-  memcpy(p, (uint8_t *)_buf + _pos, size);
-  _pos += size;
-
-  return true;
-}
-
-bool EffectConfig::write(const void *p, size_t size){
-  if(_pos + size > _size)
-    return false;
-
-  memcpy((uint8_t *)_buf + _pos, p, size);
-  _pos += size;
-
-  return true;
-}
-
-
-
-/////////////////////////
-// EffectEngineCfg
-
 // Engine version structure
 
 //  version - 2 bytes  |
@@ -44,10 +10,7 @@ bool EffectConfig::write(const void *p, size_t size){
 // |  8 bit  | 8 bit   |
 // ---------------------
 
-struct EFFECT_ENGINE_VERSION{
-  uint8_t verHigh;
-  uint8_t verLow;
-};
+
 // Engine config structure
 
 // |      engine - 3 bytes       |       effect slots - 5 bytes, 40 effects     |         spare             |
@@ -88,16 +51,3 @@ struct EEFFECT_MODE_CONFIG {
 // |         |         |         |         |         |         |         |         |
 // ---------------------------------------------------------------------------------
 
-
-//Erase all data
-void EffectEngineCfg::getEngineConfig(EE_CFG_EFFECT_ENGINE &cfg){
-}
-
-void EffectEngineCfg::setEngineConfig(const EE_CFG_EFFECT_ENGINE &cfg){
-}
-
-void EffectEngineCfg::getModeConfig(size_t mode, EE_CFG_EFFECT_MODE &cfg){
-}
-
-void EffectEngineCfg::setModeConfig(size_t mode, const EE_CFG_EFFECT_MODE &cfg){
-}
