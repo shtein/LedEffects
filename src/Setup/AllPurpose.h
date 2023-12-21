@@ -41,6 +41,7 @@ BEGIN_EFFECT_ENGINE(All purpose, 0)
   //Leds
   BEGIN_LEDS()
     ADD_STRIP(WS2811, LED_PIN, BRG)
+    ADD_STRIP(WS2811, LED_PIN2, BRG)
   END_LEDS()
 
 //Control     
