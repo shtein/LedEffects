@@ -16,14 +16,31 @@ struct EEResp_ModeList{
   uint8_t     numModes;
 };
 
+void putNtfObject(NtfBase &resp, const EFFECT_MODE_CONFIG &data){
+  resp.put_F(F("modeName"), data.name);
+  resp.put_F(F("effectCount"), data.numEffects);
+  resp.put_F(F("effect"), data.effectNum);
+  
+}
+
 void putNtfObject(NtfBase &resp, const EEResp_ModeList &data){
-   resp.put_F(F("modeCount"), data.numModes);
+  resp.put_F(F("modeCount"), data.numModes);
+  
+  resp.beginArray_F(F("modes"));
+
+  EFFECT_MODE_CONFIG cfg;
+  for(size_t i = 0; i < data.numModes; i++){
+    getModeConfig(i, cfg);
+    resp.put_F(F("mode"), cfg);
+  }
+  resp.endArray_F();
+
 }
 
 
 void putNtfObject(NtfBase &resp, const EFFECT_DESCRIPTION &data){
-   resp.put_F(F("effectId"), data.effectId);
-   resp.put_F(F("effectName"), data.effectName);
+  resp.put_F(F("effectId"), data.effectId);
+  resp.put_F(F("effectName"), data.effectName);
 }
 
 struct EEResp_EffectList{};
