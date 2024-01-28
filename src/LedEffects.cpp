@@ -112,9 +112,9 @@ BEGIN_EFFECT_ENGINE(Test, 0)
     //Serial
     SERIAL_INPUT()
     //WiFi
-    WIFI_INPUT() 
+    //WIFI_INPUT() 
     //Web    
-    WEB_INPUT(80)
+    //WEB_INPUT(80)
 
     //SW2POS_TO_CMD(EEMC_SOUND_LOG, 7)
     //SW2POS_TO_CMD(EEMC_SOUND_USE_MAX, 6)
