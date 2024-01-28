@@ -40,36 +40,70 @@
 #include "Setup/Window.h"
 
 
+#if defined(__TEST1)
+void setup(){
+
+  DBG_INIT();
+
+  //Check engine version
+  eraseEngineConfig();
+  checkEngineVersion();
+
+  if(addMode("One")){
+    EFFECT_CONFIG cfgEff = {el_StaticColor, 10};
+    addEffect(cfgEff);    
+  }
+
+
+  addMode("Two");
+  addMode("Three");
+  addMode("Four");
+
+  if(addMode("Five")){
+    EFFECT_CONFIG cfgEff = {el_Blur, 10};
+    addEffect(cfgEff);
+  }
+
+
+
+
+  EFFECT_ENGINE_CONFIG cfgEng;
+  getEngineConfig(cfgEng);
+  DBG_OUTLN("EE Config: %d, %d, %d", cfgEng.flags, cfgEng.numModes, cfgEng.modeNum);
+
+  for(size_t i = 0; i < MODES_MAX; i++){
+    EFFECT_MODE_CONFIG cfgMode;
+    getModeConfig(i, cfgMode);
+    DBG_OUTLN("   Mode config: %s, %d, %d", cfgMode.name, cfgMode.numEffects, cfgMode.effectNum);
+
+    for(size_t j = 0; j < cfgMode.numEffects; j++){
+      EFFECT_CONFIG cfgEffect;
+      if(getEffectConfig(i, j, cfgEffect)){
+
+        EFFECT_DESCRIPTION dscEffect;
+        if(getEffect(cfgEffect.effect, dscEffect )){
+          char name[16];
+          //strncpy_P(name, (const char *)dscEffect.effectName, sizeof(name));
+          DBG_OUTLN("      Effect: %s", name);
+        }
+      }
+    }
+  }
+}
+
+
+void loop(){
+
+}
+
+#endif
+
 #if defined(__TEST)
 #pragma message "Compile for default"
 
   //Effect Engine
-BEGIN_EFFECT_ENGINE("Test", 0) 
+BEGIN_EFFECT_ENGINE("Test") 
   //Effects   
-/*
-  BEGIN_EFFECTS()    
-    BEGIN_MODE("Effects", 16)
-      ADD_EFFECT(el_StaticColor)
-      ADD_EFFECT(el_Blur)
-      ADD_EFFECT(el_ColorWipe)
-    END_MODE()
-        
-    //BLACK_MODE()
-  END_EFFECTS()
- */  
-
-  //BEGIN_EFFECTS()
-  if(1){ //check if need to rewrite effects config
-    EE_CFG_EFFECT_ENGINE eeCfg;
-    memset(&eeCfg, 0, sizeof(eeCfg));
-
-    //BEGIN_MODE(modeName)
-
-
-
-  //END_EFFECTS()
-  }
-
  
   //Leds
   BEGIN_LEDS()       

@@ -8,30 +8,16 @@
 #include "Effect.h"
 #include "EffectsAll.h"
 #include "EffectEngine.h"
-#include "EffectEngineCtx.h"
-
 
 #ifdef NTF_ENABLED  
 ////////////////////////////////////////////
 //Notifictaions serialization
 struct EEResp_ModeList{
   uint8_t     numModes;
-  EFFECT_MODE *modes;
 };
-
-
-void putNtfObject(NtfBase &resp, const EFFECT_MODE &data){
-  if(resp.getContext().flags & NTF_CTX_ARRAY){
-    resp.put_F(F("mode"), resp.getContext().arrayIndex);    
-  }
-  resp.put_F(F("modeName"), data.modeName);
-  resp.put_F(F("effectCount"), data.numEffects);   
-  //resp.put_F(F("effects"), data.effects, data.numEffects);
-}
 
 void putNtfObject(NtfBase &resp, const EEResp_ModeList &data){
    resp.put_F(F("modeCount"), data.numModes);
-   resp.put_F(F("modes"), data.modes, data.numModes);
 }
 
 
@@ -62,18 +48,16 @@ void putNtfObject(NtfBase &resp, const EEResp_EffectList &data){
 
 ////////////////////////////////////////////
 // EffectEngine
-#define CUR_MODE _modes[_modeNum]  
 
-EffectEngine::EffectEngine(uint8_t flags){
-  _flags      = flags | EEF_DEFINED;
+EffectEngine::EffectEngine(){
+  memset(&_cfgEngine, 0, sizeof(_cfgEngine));
+  memset(&_cfgMode, 0, sizeof(_cfgMode));
   _curEffect  = NULL;
-  _numModes   = 0;
-  _modeNum    = 0;
-  ::memset(_modes, 0, sizeof(_modes));
-  
 
-  _numLeds = MAX_LEDS;
+  //Leds
+  _numLeds  = MAX_LEDS;
 
+  //Timing
   _millis          = 0;
   _millisToSaveCfg = 0;  
 }
@@ -85,39 +69,6 @@ CRGB *EffectEngine::getLeds() const{
 EffectEngine::~EffectEngine(){
 }
 
-void EffectEngine::addMode(const __FlashStringHelper *modeName, uint8_t *effects){
-  if(_numModes == MAX_MODES)
-    return;
-
-  _modes[_numModes].effects   = effects;
-#ifdef NTF_ENABLED  
-  _modes[_numModes].modeName  = modeName; 
-#endif  
-
-  //Next mode
-  _numModes ++;
-}
-
-void EffectEngine::addEffect(uint8_t effect){
-
-  EFFECT_DESCRIPTION ed;
-  if(!::getEffect(effect, ed)){
-    return;
-  }
-
-  if(_numModes == 0)
-    return;
-
-  EFFECT_MODE *mode = & _modes[_numModes - 1]; 
-  
-  //Only add effect if there is where to add
-  if(mode->effects){
-    mode->effects[mode->numEffects] = effect;
-
-    mode->numEffects ++;
-  }
-
-} 
 
 void EffectEngine::init() {  
 
@@ -128,66 +79,74 @@ void EffectEngine::init() {
   //FastLED.setMaxPowerInVoltsAndMilliamps(5,1000);
 
   fill_solid(_leds, MAX_LEDS, CRGB::Black);
-  
-  //Try to read from EEPROM
-  readConfig();
 
-  //Check startup flags
+  //Read engine config
+  getEngineConfig(_cfgEngine);
+
+  //Check mode startup flags
   if(_flags & EFF_RANDOM_START_MODE){
-    _modeNum           = random8(_numModes); //random mode
-    CUR_MODE.effectNum = 0;                  //first effect  
+    _cfgEngine.modeNum  = random8(_cfgEngine.numModes); //random mode
   }
 
+  //Read mode config
+  getModeConfig(_cfgEngine.modeNum, _cfgMode);
+
+  //Check effect startup flags
   if(_flags & EFF_RANDOM_START_EFFECT){
-    CUR_MODE.effectNum = random8(CUR_MODE.numEffects); //random effect
+    _cfgMode.effectNum = random8(_cfgMode.numEffects); //random effect
   }
 
   //Set mode
-  setMode(_modeNum);
+  setEffect(_cfgMode.effectNum);
 
   //Light LEDs
   FastLED.show();
 }
 
-void EffectEngine::setMode(uint8_t mode){
-  //Remember new mode
-  _modeNum = mode;
-
+void EffectEngine::setMode(uint8_t mode){  
   //Black the lights
   fill_solid(_leds, MAX_LEDS, CRGB::Black);
 
+  //Read mode configuration
+  getModeConfig(mode, _cfgMode);
+
   //Refresh effect
-  setEffect(CUR_MODE.effectNum);
+  setEffect(_cfgMode.effectNum);
 }
 
 void EffectEngine::setEffect(uint8_t effectNum){  
   //Set new effect number  
-  CUR_MODE.effectNum = effectNum;
+  _cfgMode.effectNum = effectNum;
 
  //Get effect object
-  if(_numModes == 0){
+  if(_cfgEngine.numModes){
     _curEffect =  NULL; 
   }
-  else if(!CUR_MODE.effects){
+  else if(_cfgMode.numEffects == 0){
     _curEffect =  NULL; 
   }
   else {
-    EFFECT_DESCRIPTION ed;    
-     getEffect(CUR_MODE.effects[CUR_MODE.effectNum], ed);
+    //Get effect config
+    EFFECT_CONFIG cfgEffect;
+    if(getEffectConfig(_cfgEngine.modeNum, _cfgMode.effectNum, cfgEffect)){
+
+      //Get effect object
+      EFFECT_DESCRIPTION ed;    
+      getEffect(cfgEffect.effect, ed);
      _curEffect = ed.effect;
+
+      //Configgure it
+      if(_curEffect != NULL){
+        _curEffect->reset();
+
+        //Set Effect speed delay
+        _curEffect->setSpeedDelay(cfgEffect.speedDelay);
+      }
+    }
   }
   
-  if(_curEffect != NULL){
-    //Init effect
-    //curEffect->init(_leds, _numLeds);
-    _curEffect->reset();
-
-    //Read config previously saved data
-    configCurEffect(true);
-
-    //Process right away
-    _millis = 0;
-  }
+  //Process right away
+  _millis = 0;
 }
 
 //////////////////////////////
@@ -195,10 +154,11 @@ void EffectEngine::setEffect(uint8_t effectNum){
 
 void EffectEngine::onModeChange(struct CtrlQueueData &data){ 
   //Get new mode value    
-  uint8_t mode = (uint8_t)data.translate(_modeNum, 0, _numModes - 1);
+  uint8_t mode = (uint8_t)data.translate(_cfgEngine.modeNum, 0, _cfgEngine.numModes - 1);
   
   //Do nothing if did not change
-  if(_modeNum != mode){    
+  if(_cfgEngine.modeNum != mode){    
+
     //Change mode
     setMode(mode);  
   }
@@ -208,7 +168,7 @@ void EffectEngine::onModeChange(struct CtrlQueueData &data){
 void EffectEngine::onEffectChange(struct CtrlQueueData &data){
 
   //Get new effect value  
-  uint8_t effectNum = (uint8_t)data.translate(CUR_MODE.effectNum, 0, CUR_MODE.numEffects - 1);
+  uint8_t effectNum = (uint8_t)data.translate(_cfgMode.effectNum, 0, _cfgMode.numEffects - 1);
   
   //Black the leds
   fill_solid(_leds, MAX_LEDS, CRGB::Black);
@@ -272,7 +232,7 @@ bool EffectEngine::onCmdEE(struct CtrlQueueItemEx &itm){
     case EEMC_GET_MODE:
     case EEMC_EFFECT:  
     case EEMC_GET_EFFECT:  
-      { itm.ntf.put(EECmdResponse<EEResp_ModeEffect> {itm.cmd, {_modeNum, CUR_MODE.effectNum}}); }
+      { itm.ntf.put(EECmdResponse<EEResp_ModeEffect> {itm.cmd, {_cfgEngine.modeNum, _cfgMode.effectNum}}); }
     break;
 
     case EEMC_NUMLEDS:    
@@ -281,7 +241,7 @@ bool EffectEngine::onCmdEE(struct CtrlQueueItemEx &itm){
     break;
       
     case EEMC_GET_MODE_LIST:               
-      { itm.ntf.put(EECmdResponse<EEResp_ModeList>{itm.cmd, {_numModes, _modes}}); }
+      { itm.ntf.put(EECmdResponse<EEResp_ModeList>{itm.cmd, {_cfgEngine.numModes}}); }
     break;       
 
     case EEMC_GET_EFFECT_LIST:
@@ -378,75 +338,11 @@ void EffectEngine::loop(struct CtrlQueueItemEx &itm){
 ////////////////////////
 // Read/Write configuration
 
-void EffectEngine::readConfig(){
-  EEPROMCfg ee(EE_ENGINE_IDX);
-
-  uint8_t version;
-  uint8_t total;
-  uint8_t current;
-  uint8_t flags;
-
-  //Read version, number of modes, current mode
-  ee >> version >> total >> current >> flags;
-
-  //Check if version is correct 
-  if(version != EE_VERSION){
-    return;
-  }
-
-  //Check if number of modes match
-  if(total != _numModes)
-    return;
-
-  //Only use flags if they are set
-  if(flags & EEF_DEFINED)
-    _flags = flags;
-
-  //Set current mode
-  _modeNum = current < total ? current : 0;
- 
-  //For each mode check consistency and set current effect  
-  for(uint8_t i = 0; i < _numModes; i++){
-    //Read total and current
-    ee >> total >> current;
-
-    //Check if number of effect matchs
-    if(total != _modes[i].numEffects)
-      continue;
-
-    //Save mode effect
-    _modes[i].effectNum = current < total ? current : 0;
-  }
-}
-
 void EffectEngine::writeConfig(){ 
-  EEPROMCfg ee(EE_ENGINE_IDX);
 
-  //Write version, number of modes and current mode
-  ee << (uint8_t)EE_VERSION <<  (uint8_t) _numModes << (uint8_t)_modeNum << (uint8_t)_flags;
-
-  //Write number of effects and current effect for each mode
-  for(uint8_t i = 0; i < _numModes; i++){
-    ee << (uint8_t)_modes[i].numEffects << (uint8_t)_modes[i].effectNum;
-  }  
 }
 
-void EffectEngine::configCurEffect(bool read){  
-
-  //Check if there is current effect
-  if(!_curEffect)
-    return;
-  
-  //Calculate EEPROM index for 
-  size_t index = EE_EFFECT_IDX; 
-  for(int i = 0; i < _modeNum; i++){
-      index += _modes[i].numEffects * EE_EFFECT_IDX_SIZE; 
-  }
-  index += CUR_MODE.effectNum * EE_EFFECT_IDX_SIZE;
-
-  //Read or write current effect config
-  EEPROMCfg ee(index);  
-  //_curEffect->config(ee, read);
+void EffectEngine::configCurEffect(bool read){
 }
 
 

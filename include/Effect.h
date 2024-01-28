@@ -28,7 +28,7 @@ class Effect{
     virtual void proceed(CRGB *leds, uint16_t numLeds) = 0;
 
     //Read/Write config
-    virtual bool config(EffectConfig &cfg, bool read);
+    //virtual bool config(EffectConfig &cfg, bool read);
 
     //Command processing
     virtual bool onCmd(struct CtrlQueueItemEx &itm);
@@ -77,7 +77,7 @@ class EffectColor: public Effect{
     virtual bool onCmd(struct CtrlQueueItemEx &itm);
 
     //Read/Write condig
-    bool config(EffectConfig &cfg, bool read);
+    //bool config(EffectConfig &cfg, bool read);
 };
 
 /////////////////////////////////////////

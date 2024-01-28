@@ -44,8 +44,8 @@
 #endif
 
 //Effect Engine
-#define BEGIN_EFFECT_ENGINE(name, flags) \
-static EffectEngine ee(flags); \
+#define BEGIN_EFFECT_ENGINE(name) \
+static EffectEngine ee; \
 static CtrlPanel cp; \
 _NTF_INIT(); \
 \
@@ -66,7 +66,7 @@ void loop() \
     ee.loop(itm); \
   } \
 }
-
+/*
 #define BEGIN_EFFECTS()
 
 #define END_EFFECTS()
@@ -93,6 +93,7 @@ void loop() \
 
 #define ADD_EFFECT(effect) \
   ee.addEffect(effect);   
+*/
 
 #define BEGIN_LEDS() \
    

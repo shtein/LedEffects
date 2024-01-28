@@ -57,6 +57,7 @@ uint8_t Effect::getSpeedDelay() const{
 }
 
 
+/*
 bool Effect::config(EffectConfig &cfg, bool read){
   if(read){    
     //Set speed delay
@@ -72,6 +73,7 @@ bool Effect::config(EffectConfig &cfg, bool read){
 
   return true; 
 }
+*/
 
 const CHSV &Effect::getHSV() const{
   return _ctx.hsv;
@@ -138,7 +140,7 @@ bool EffectColor::onCmd(struct CtrlQueueItemEx &itm){
   return true;
 }
 
-
+/*
 bool EffectColor::config(EffectConfig &cfg, bool read){
 
   if(!Effect::config(cfg, read))
@@ -162,7 +164,7 @@ bool EffectColor::config(EffectConfig &cfg, bool read){
   return true;
 }
 
-
+*/
 
 //////////////////////////////////////
 // EffectPaletteTransform
