@@ -12,7 +12,6 @@ class EffectRunningLights: public EffectColor{
 };
 
 inline void EffectRunningLights::reset(){
-  setHSV(CHSV(HUE_RED, 0xFF, 0xFF));
   _ctx.step = 0;
   setSpeedDelay(50);
 }
@@ -23,7 +22,7 @@ inline void EffectRunningLights::proceed(CRGB *leds, uint16_t numLeds){
   
   for(uint16_t i = 0; i < numLeds; i++) {   
     
-    CHSV hsv = getHSV();
+    CHSV hsv = _cfg.hsv;
     hsv.v  = sin8( ((i + _ctx.step) % RL_SIZE) * 255 / (RL_SIZE - 1) );
     leds[i] =  hsv;
   }  

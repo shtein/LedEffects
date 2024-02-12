@@ -179,7 +179,7 @@ void EffectSound::proceed(CRGB *leds, uint16_t numLeds){
     updateLeds(leds, numLeds, output);  
 }
 
-bool EffectSound::onCmd(struct CtrlQueueItemEx &itm){  
+bool EffectSound::onCmd(const struct CtrlQueueItem &itm, NtfSet &ntf){  
   switch(itm.cmd){    
     case EEMC_SOUND_LOW:
       _lower = itm.data.translate(_lower, SOUND_LOWER_MIN, SOUND_UPPER_MAX);
@@ -206,7 +206,7 @@ bool EffectSound::onCmd(struct CtrlQueueItemEx &itm){
     break;
 
     default:
-    return Effect::onCmd(itm);
+    return Effect::onCmd(itm, ntf);
   }   
 
   return true;

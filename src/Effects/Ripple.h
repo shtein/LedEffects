@@ -65,70 +65,65 @@ inline uint8_t Ripple::getColorIndex() const{
 #define RIPPLE_MAX         16
 #define RIPPLE_MAX_DELTA   4
 
-#ifndef EFFECT_RIPPLE_COUNT
-  #define EFFECT_RIPPLE_COUNT 5
-#endif // EFFECT_RIPPLE_COUNT
+#ifndef RIPPLE_COUNT
+  #define RIPPLE_COUNT 5
+#endif // RIPPLE_COUNT
 
-template <const int MAX_RIPPLES = EFFECT_RIPPLE_COUNT>
 class EffectRipple: public Effect{
 protected:
-  void reset();
-  void proceed(CRGB *leds, uint16_t numLeds);
+  void reset(){
+      setSpeedDelay(80);
+  }
+  void proceed(CRGB *leds, uint16_t numLeds){
+    
+    //Fade current
+    fadeToBlackBy(leds, numLeds, RIPPLE_FADE);  
+
+    //Proceed with Ripples
+    for(int i = 0; i < RIPPLE_COUNT; i++){
+      Ripple &ripple = _ripples[i];
+    
+      if(random16(RIPPLE_MAX - RIPPLE_MAX_DELTA, RIPPLE_MAX + RIPPLE_MAX_DELTA) <= ripple.getOffset()){
+
+        //Setup ripple      
+        ripple.setup(random16(i * numLeds / RIPPLE_COUNT, (i + 1) * numLeds / RIPPLE_COUNT), 
+                      random8(0, RIPPLE_MAX_DELTA), 
+                      random8()
+                    );
+
+        //Show center
+        leds[ripple.getCenter()] = CHSV(ripple.getColorIndex(), 255, 255);
+      }
+      else{
+          //Move first
+          ripple.move();
+
+          //Prepare color        
+          CHSV hsv(ripple.getColorIndex(), 255, 255);
+          hsv.hue        += ripple.getOffset() * 2;
+          hsv.saturation -= ripple.getOffset() * 5;
+          hsv.value       = cos8(map(ripple.getOffset(), 1, RIPPLE_MAX, 0, 128));
+
+          //Light left led
+          if(ripple.getCenter() >= ripple.getOffset()) 
+            leds[ripple.getCenter() - ripple.getOffset()] += hsv;
+
+          //Light right led
+          if(ripple.getCenter() + ripple.getOffset() < numLeds) 
+            leds[ripple.getCenter() + ripple.getOffset()] += hsv;
+
+      }    
+      
+    }
+
+  }
 
 protected:
-  Ripple _ripples[MAX_RIPPLES];
+  Ripple _ripples[RIPPLE_COUNT];
 };
 
 
-template <const int MAX_RIPPLES>
-inline void EffectRipple<MAX_RIPPLES>::reset(){
-  setSpeedDelay(80);
-}
 
-template <const int MAX_RIPPLES>
-inline void EffectRipple<MAX_RIPPLES>::proceed(CRGB *leds, uint16_t numLeds){
-  
-  //Fade current
-  fadeToBlackBy(leds, numLeds, RIPPLE_FADE);  
-
-  //Proceed with Ripples
-  for(int i = 0; i < MAX_RIPPLES; i++){
-    Ripple &ripple = _ripples[i];
-  
-    if(random16(RIPPLE_MAX - RIPPLE_MAX_DELTA, RIPPLE_MAX + RIPPLE_MAX_DELTA) <= ripple.getOffset()){
-
-       //Setup ripple      
-       ripple.setup(random16(i * numLeds / MAX_RIPPLES, (i + 1) * numLeds / MAX_RIPPLES), 
-                    random8(0, RIPPLE_MAX_DELTA), 
-                    random8()
-                   );
-
-       //Show center
-       leds[ripple.getCenter()] = CHSV(ripple.getColorIndex(), 255, 255);
-    }
-    else{
-        //Move first
-        ripple.move();
-
-        //Prepare color        
-        CHSV hsv(ripple.getColorIndex(), 255, 255);
-        hsv.hue        += ripple.getOffset() * 2;
-        hsv.saturation -= ripple.getOffset() * 5;
-        hsv.value       = cos8(map(ripple.getOffset(), 1, RIPPLE_MAX, 0, 128));
-
-        //Light left led
-        if(ripple.getCenter() >= ripple.getOffset()) 
-          leds[ripple.getCenter() - ripple.getOffset()] += hsv;
-
-        //Light right led
-        if(ripple.getCenter() + ripple.getOffset() < numLeds) 
-          leds[ripple.getCenter() + ripple.getOffset()] += hsv;
-
-    }    
-    
-  }
-
-}
 
 
 

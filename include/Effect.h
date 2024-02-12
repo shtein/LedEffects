@@ -9,12 +9,11 @@
 // Helpers
 #define qsuba(x, b)  ((x > b) ? x - b : 0) 
 
+void setRandomColor(CHSV &hsv);
+
 
 ///////////////////
 // Basic effect
-class CRGB;
-class CHSV;
-
 
 class Effect{
   public:
@@ -27,26 +26,21 @@ class Effect{
     //Process
     virtual void proceed(CRGB *leds, uint16_t numLeds) = 0;
 
-    //Read/Write config
-    //virtual bool config(EffectConfig &cfg, bool read);
-
     //Command processing
-    virtual bool onCmd(struct CtrlQueueItemEx &itm);
+    virtual bool onCmd(const struct CtrlQueueItem &itm, NtfSet &ntf);
    
     //Speed delay
     void setSpeedDelay(uint8_t speedDelay);
     uint8_t  getSpeedDelay() const;    
-    
-    //Color control    
-    const CHSV & getHSV() const;
-    void setHSV(const CHSV &hsv);
-    void setRandomColor();
-  
+
+    void setConfig(const EFFECT_DATA &cfg);
+    void getConfig(EFFECT_DATA &cfg);
+
   protected:
+  
     ///////////////////
     //Structure to support real-time processing elements to save some memory
-    struct EffectContext { 
-      uint8_t        speedDelay;  //speed
+    struct EFFECT_CONTEXT {       
       int            step;        //current step
 
       CRGBPalette16  palCurrent;  //palette 1
@@ -62,7 +56,9 @@ class Effect{
       };
     };
   
-    static EffectContext _ctx;  
+    static uint8_t        _speedDelay; //Speed
+    static EFFECT_DATA    _cfg;        //Config
+    static EFFECT_CONTEXT _ctx;        //Runtime context
 };
 
 /////////////////////////////////////////
@@ -70,14 +66,8 @@ class Effect{
 
 class EffectColor: public Effect{
   public:
-    EffectColor();
-    ~EffectColor();
-
   //Command processing
-    virtual bool onCmd(struct CtrlQueueItemEx &itm);
-
-    //Read/Write condig
-    //bool config(EffectConfig &cfg, bool read);
+    virtual bool onCmd(const struct CtrlQueueItem &itm, NtfSet &ntf);
 };
 
 /////////////////////////////////////////
@@ -86,15 +76,12 @@ class EffectColor: public Effect{
 #define CHANGE_PAL_STEP 500
 
 
-//Palette change routine
-typedef void (*FuncGetPalette_t) (CRGBPalette16 &);
 
 //Default palette change routine
-void FuncGetPal_Default(CRGBPalette16 &pal);
 
-class EffectPaletteTransform: public Effect{  
-  public:
-    EffectPaletteTransform(FuncGetPalette_t getPal);
+class EffectPaletteTransform: public Effect{ 
+public:
+  virtual bool onCmd(const struct CtrlQueueItem &itm, NtfSet &ntf);
 
   protected:  
     virtual void proceed(CRGB *leds, uint16_t numLeds);
@@ -103,46 +90,12 @@ class EffectPaletteTransform: public Effect{
     virtual int getMaxStep() const;
 
     CRGB getCurrentPalColor(uint8_t index, uint8_t brightness = 255, TBlendType blendType = LINEARBLEND) const;    
-
-  protected:
-    FuncGetPalette_t _getPal;
+    void updatePal();  
 };
 
 
 
 
-//////////////////////////////////////////////////////
-// Color schemes - set of transforming theme palettes 
-
-#define BEGIN_TRANSFORM_SCHEMA_TYPE(FunctionName, Type) \
-void FunctionName(CRGBPalette16 &pal){ \
-  struct _ts{ \
-    const Type &item; \
-  } const ts[] = {
-
-
-#define BEGIN_TRANSFORM_SCHEMA_GRADIENT_PALETTE(FunctionName)  BEGIN_TRANSFORM_SCHEMA_TYPE(FunctionName, TProgmemRGBGradientPalettePtr)
-#define BEGIN_TRANSFORM_SCHEMA_RGB16_PALETTE(FunctionName)  BEGIN_TRANSFORM_SCHEMA_TYPE(FunctionName, TProgmemRGBPalette16)
-
-
-#define END_TRANSFORM_SCHEMA() }; \
-  pal = ts[random8(0, sizeof(ts) / sizeof(ts[0]))].item; \
-} 
-
-#define TRANSOFRM_PALETTE(pal) pal,
-
-/*
-Usage of transform shchema: 
-BEGIN_TRANFORM_SCHEMA_XXX(YourFunctionName)
-  TRANSOFRM_PALETTE(pallete1)
-  TRANSOFRM_PALETTE(palette2)
-  ...
-  TRANSOFRM_PALETTE(paletteN)
-END_TRANSFORM_SCHEMA()
-
-It creates 
-void YourFunctionName(CRGBPalette16 &pal);
-*/
 
 
 #endif //__EFFECT_H

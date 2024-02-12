@@ -3,55 +3,51 @@
 ////////////////////////////////////////
 // WS28101 string, 100 LEDs, 1 push button
 
-
-
 #pragma message "Compile for office window"
 
-  
+//Effects   
+BEGIN_EFFECTS(0)
+
+  BEGIN_MODE("Themes")        
+    ADD_EFFECT(el_Confetti, tl_Autumn)
+    ADD_EFFECT(el_Plasma, tl_Autumn)
+    ADD_EFFECT(el_Noise, tl_Autumn )
+    ADD_EFFECT(el_Confetti, tl_Halloween )
+    ADD_EFFECT(el_Plasma, tl_Halloween )
+    ADD_EFFECT(el_Noise, tl_Halloween)
+    ADD_EFFECT(el_Confetti, tl_Christmas)
+    ADD_EFFECT(el_Plasma, tl_Christmas)
+    ADD_EFFECT(el_Noise,tl_Christmas )
+  END_MODE()      
+
+  BEGIN_MODE("Effects")
+    ADD_EFFECT(el_Ripple)
+    ADD_EFFECT(el_Fire)
+    ADD_EFFECT(el_MeteorRain)
+    ADD_EFFECT(el_Plasma, tl_Plasma)
+    ADD_EFFECT(el_Confetti, tl_Confetti)
+    ADD_EFFECT(el_PaletteTransform, tl_Default) 
+    ADD_EFFECT(el_Blur)        
+    ADD_EFFECT(el_Noise, tl_Default)            
+    ADD_EFFECT(el_MoodBlobs) 
+    ADD_EFFECT(el_Rainbow) 
+    ADD_EFFECT(el_TwinkleFox, tl_TwinkleFox)       
+    ADD_EFFECT(el_PacificOcean) 
+    ADD_EFFECT(el_Juggle)
+    ADD_EFFECT(el_EmergencyLights)
+  END_MODE()
+
+  BEGIN_MODE("Old")
+    ADD_EFFECT(el_FadeInOut)
+    ADD_EFFECT(el_RunningLights)         //Single color
+    ADD_EFFECT(el_ColorWipe)             //Not intersting
+    ADD_EFFECT(el_TheaterChaseRainbow) 
+    ADD_EFFECT(el_RainbowMove)
+  END_MODE()
+ END_EFFECTS()
+
 //Effect Engine
-BEGIN_EFFECT_ENGINE(Window, 0) 
-  
-  //Effects   
-  BEGIN_EFFECTS()
-
-    BEGIN_MODE("Themes", 15)        
-      ADD_EFFECT("Confetti-autumn",  EffectConfetti, &TransformAutunm )
-      ADD_EFFECT("Plazma-autumn",  EffectPlasma, &TransformAutunm)
-      ADD_EFFECT("Noise-autumn",  EffectNoise, &TransformAutunm )
-      ADD_EFFECT("Confetti-hlw", EffectConfetti, &TransformHalloween )
-      ADD_EFFECT("Plazma-hlw", EffectPlasma, &TransformHalloween )
-      ADD_EFFECT("Noise-hlw", EffectNoise, &TransformHalloween)
-      ADD_EFFECT("Confetti-crsm", EffectConfetti, &TransformChristmas)
-      ADD_EFFECT("Plazma-crsm", EffectPlasma, &TransformChristmas)
-      ADD_EFFECT("Noise-crsm", EffectNoise, &TransformChristmas )
-    END_MODE()      
-
-    BEGIN_MODE("Effects", 15)
-      ADD_EFFECT("Ripple", EffectRipple<>)
-      ADD_EFFECT("Fire", EffectFire)
-      ADD_EFFECT("Meteor rain", EffectMeteorRain<>)
-      ADD_EFFECT("Plazma", EffectPlasma)
-      ADD_EFFECT("Confetti", EffectConfetti)
-      ADD_EFFECT("Palette transform", EffectPaletteTransformFast) 
-      ADD_EFFECT("Blur", EffectBlur)        
-      ADD_EFFECT("Noise", EffectNoise)            
-      ADD_EFFECT("Mood blobs", EffectMoodBlobs) 
-      ADD_EFFECT("Rainbow", EffectRainbow) 
-      ADD_EFFECT("Twinkle fox", EffectTwinkleFox)       
-      ADD_EFFECT("Pacific ocean", EffectPacificOcean) 
-      ADD_EFFECT("Juggle", EffectJuggle)
-      ADD_EFFECT("Emergency lights", EffectEmergencyLights)
-    END_MODE()
-
-    BEGIN_MODE("Old Effects", 8)
-      //ADD_EFFECT("Fade in/out", EffectFadeInOut)
-      //ADD_EFFECT("Running lighs", EffectRunningLights)         //Single color
-      //ADD_EFFECT("Color wipe", EffectColorWipe)                //Not intersting
-      ADD_EFFECT("Theater rainbow", EffectTheaterChaseRainbow) 
-      ADD_EFFECT("Rainbow move", EffectRainbowMove)
-    END_MODE()
-
-  END_EFFECTS()
+BEGIN_EFFECT_ENGINE("Window") 
   
   //Leds
   BEGIN_LEDS() 
@@ -66,7 +62,7 @@ BEGIN_EFFECT_ENGINE(Window, 0)
       PUSH_BUTTON_TO_CMD(EEMC_EFFECT, PB_CONTROL_CLICK_SHORT)      
     END_PUSH_BUTTON()
 
-    SERIAL_INPUT()     
+    //SERIAL_INPUT()     
 
   END_CONTROL_MAP()
     

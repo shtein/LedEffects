@@ -1,6 +1,8 @@
 #ifndef __NTF_H
 #define __NTF_H
 
+#ifdef NTF_ENABLED
+
 #include <Notification.h>
 
 //////////////////////////////////////
@@ -13,6 +15,21 @@ typedef NtfBaseSet<MAX_NTF> NtfSet;
 
 ///////////////////////////////////////
 // Serialization for command responses
+DECLARE_STR_PROGMEM(rs_Cmd)
+DECLARE_STR_PROGMEM(rs_Data)
+DECLARE_STR_PROGMEM(rs_Error)
+DECLARE_STR_PROGMEM(rs_Mode)
+DECLARE_STR_PROGMEM(rs_Effect)
+DECLARE_STR_PROGMEM(rs_NumLeds)
+DECLARE_STR_PROGMEM(rs_MaxLeds)
+DECLARE_STR_PROGMEM(rs_Speed)
+DECLARE_STR_PROGMEM(rs_Hue)
+DECLARE_STR_PROGMEM(rs_Sat)
+DECLARE_STR_PROGMEM(rs_Val)
+DECLARE_STR_PROGMEM(rs_HSV)
+DECLARE_STR_PROGMEM(rs_Transforms)
+DECLARE_STR_PROGMEM(rs_Transform)
+
 
 template <typename ...Ts>
 struct EECmdResponse{};
@@ -30,64 +47,21 @@ struct EECmdResponse<T>{
 }; 
 
 inline void putNtfObject(NtfBase &resp, const EECmdResponse<> &r){
-  resp.put_F(F("cmd"), r.cmd);
-  resp.put_F(F("error"), r.error);
+  resp.put_F(rs_Cmd, r.cmd);
+  resp.put_F(rs_Error, r.error);
 }
 
 //Default serialization
 template<typename T>
 void putNtfObject(NtfBase &resp, const EECmdResponse<T> &r){
-  resp.put_F(F("cmd"), r.cmd);
-  resp.put_F(F("data"), r.data);
+  resp.put_F(rs_Cmd, r.cmd);
+  resp.put_F(rs_Data, r.data);
 }
 
+#else 
 
-//Getting/setting mode or effect - EEMC_MODE, EEMC_EFFECT...
-struct EEResp_ModeEffect{
-  uint8_t mode;
-  uint8_t effect;
-};
+typedef void *  NtfSet;
 
-inline void putNtfObject(NtfBase &resp, const EEResp_ModeEffect &data){
-   resp.put_F(F("mode"), data.mode);
-   resp.put_F(F("effect"), data.effect);
-}
-
-//Getting/setting numbleds - EEMC_NUMLEDS
-struct EEResp_NumLeds{  
-  uint16_t maxLeds;
-  uint16_t numLeds;
-};
-
-inline void putNtfObject(NtfBase &resp, const EEResp_NumLeds &data){
-  resp.put_F(F("maxLeds"), data.maxLeds);
-  resp.put_F(F("numLeds"), data.numLeds);
-}
-
-
-//Getting/setting effect speed
-struct EEResp_EffectSpeed{  
-  uint16_t speed;
-};
-
-inline void putNtfObject(NtfBase &resp, const EEResp_EffectSpeed &data){
-  resp.put_F(F("speed"), data.speed);
-}
-
-//Static effect color
-struct EEResp_Color{
-  CHSV hsv;
-}; 
-
-inline void putNtfObject(NtfBase &resp, const CHSV &data){
-  resp.put_F(F("hue"), data.h);
-  resp.put_F(F("saturation"), data.s);
-  resp.put_F(F("value"), data.v);
-}
-
-inline void putNtfObject(NtfBase &resp, const EEResp_Color &data){
-  resp.put_F(F("hsv"), data.hsv);
-}
-
+#endif //NTF_ENABLED
 
 #endif //__NTF_H

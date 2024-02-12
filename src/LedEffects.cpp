@@ -10,9 +10,9 @@
 #include <CtrlWebSrv.h>
 #include <SoundCapture.h>
 
+#include "Effect.h"
 #include "EffectEngine.h"
 #include "EffectEngineCtx.h"
-#include "Effect.h"
 #include "EffectSound.h"
 
 #include "Matrix.h"
@@ -40,71 +40,58 @@
 #include "Setup/Window.h"
 
 
-#if defined(__TEST1)
-void setup(){
-
-  DBG_INIT();
-
-  //Check engine version
-  eraseEngineConfig();
-  checkEngineVersion();
-
-  if(addMode("One")){
-    EFFECT_CONFIG cfgEff = {el_StaticColor, 10};
-    addEffect(cfgEff);    
-  }
-
-
-  addMode("Two");
-  addMode("Three");
-  addMode("Four");
-
-  if(addMode("Five")){
-    EFFECT_CONFIG cfgEff = {el_Blur, 10};
-    addEffect(cfgEff);
-  }
-
-
-
-
-  EFFECT_ENGINE_CONFIG cfgEng;
-  getEngineConfig(cfgEng);
-  DBG_OUTLN("EE Config: %d, %d, %d", cfgEng.flags, cfgEng.numModes, cfgEng.modeNum);
-
-  for(size_t i = 0; i < MODES_MAX; i++){
-    EFFECT_MODE_CONFIG cfgMode;
-    getModeConfig(i, cfgMode);
-    DBG_OUTLN("   Mode config: %s, %d, %d", cfgMode.name, cfgMode.numEffects, cfgMode.effectNum);
-
-    for(size_t j = 0; j < cfgMode.numEffects; j++){
-      EFFECT_CONFIG cfgEffect;
-      if(getEffectConfig(i, j, cfgEffect)){
-
-        EFFECT_DESCRIPTION dscEffect;
-        if(getEffect(cfgEffect.effect, dscEffect )){
-          char name[16];
-          //strncpy_P(name, (const char *)dscEffect.effectName, sizeof(name));
-          DBG_OUTLN("      Effect: %s", name);
-        }
-      }
-    }
-  }
-}
-
-
-void loop(){
-
-}
-
-#endif
 
 #if defined(__TEST)
 #pragma message "Compile for default"
 
+
+//Effects   
+BEGIN_EFFECTS(EFF_RANDOM_START_EFFECT)
+  BEGIN_MODE("Regular")        
+    ADD_EFFECT(el_Ripple)
+    ADD_EFFECT(el_Plasma, tl_Plasma)        
+    ADD_EFFECT(el_Confetti, tl_Confetti)
+    ADD_EFFECT(el_Noise, tl_Default)            
+    ADD_EFFECT(el_MoodBlobs)
+    ADD_EFFECT(el_Juggle)
+    ADD_EFFECT(el_TwinkleFox, tl_TwinkleFox)
+    ADD_EFFECT(el_PacificOcean)
+    ADD_EFFECT(el_StaticColor, CHSV(HUE_RED, 0xFF, 0xFF))
+  END_MODE()
+/*
+  BEGIN_MODE("Halloween", 2)      
+    ADD_EFFECT("Confetti-hlw", EffectConfetti, &TransformAutunm )
+    ADD_EFFECT("Noise-hlw", EffectNoise, &TransformHalloween )
+  END_MODE()
+
+  BEGIN_MODE("Chrsitmas", 3)      
+    ADD_EFFECT("Confetti-crsm", EffectConfetti, &TransformChristmas)
+    ADD_EFFECT("Plazma-crsm", EffectPlasma, &TransformChristmas )
+    ADD_EFFECT("Twinkle fox-crsm", EffectTwinkleFox, &SnowAndIce)
+  END_MODE()
+
+  BEGIN_MODE("Valentines", 3)      
+    ADD_EFFECT("Confetti-vlnt", EffectConfetti, &ValentinesDay )
+    ADD_EFFECT("Noise-vlnt", EffectNoise, &ValentinesDay )
+    ADD_EFFECT("Twinkle fox-vlnt", EffectTwinkleFox, &ValentinesDay)
+  END_MODE()
+
+  BEGIN_MODE(July4, 2)      
+    ADD_EFFECT("Confetti-ind", EffectConfetti, &July4th )
+    ADD_EFFECT("Noise-ind", EffectNoise, &July4th )
+  END_MODE()
+
+  BEGIN_MODE(Ukraine, 3)      
+    ADD_EFFECT("Confetti-ukr", EffectConfetti, &UkraineFlag )
+    ADD_EFFECT("Noise-ukr", EffectNoise, &UkraineFlag )
+    ADD_EFFECT("Twinkle fox-ukr", EffectTwinkleFox, &UkraineFlag )
+  END_MODE()
+
+*/    
+END_EFFECTS()
+
   //Effect Engine
 BEGIN_EFFECT_ENGINE("Test") 
-  //Effects   
- 
   //Leds
   BEGIN_LEDS()       
     ADD_STRIP(NEOPIXEL, 2)
@@ -113,11 +100,13 @@ BEGIN_EFFECT_ENGINE("Test")
 //Control    
 
   BEGIN_CONTROL_MAP()         
+
+/*
     BEGIN_PUSH_BUTTON(0)    
       PUSH_BUTTON_TO_CMD(EEMC_MODE, PB_CONTROL_PUSH_LONG)
       PUSH_BUTTON_TO_CMD(EEMC_EFFECT, PB_CONTROL_CLICK_SHORT)      
     END_PUSH_BUTTON() 
-
+*/
     //Serial
     SERIAL_INPUT()
     //WiFi

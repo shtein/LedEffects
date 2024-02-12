@@ -2,12 +2,8 @@
 #define __NOISE_H
 
 
-
+//getPal_Default
 class EffectPaletteTransformFast: public EffectPaletteTransform {
-  public:
-    EffectPaletteTransformFast(FuncGetPalette_t getPal = FuncGetPal_Default):
-      EffectPaletteTransform(getPal){}
-
   protected:
     void proceed(CRGB *leds, uint16_t numLeds){
       //Call parrent
@@ -32,11 +28,8 @@ class EffectPaletteTransformFast: public EffectPaletteTransform {
 #define XSCALE          30
 #define YSCALE          30
 
+//getPal_Default
 class EffectNoise: public EffectPaletteTransform{
-  public:
-    EffectNoise(FuncGetPalette_t getPal = FuncGetPal_Default):
-      EffectPaletteTransform(getPal){}
-
   protected:
     void proceed(CRGB *leds, uint16_t numLeds){
       //Call parrent
@@ -65,22 +58,9 @@ class EffectNoise: public EffectPaletteTransform{
 // EffectPlasma
 #define PLASMA_MAX_STEPS 100
 
-inline void FuncGetPal_Plazma(CRGBPalette16 &pal){
-
-  uint8_t clr = random8();
-  pal =  CRGBPalette16(CHSV(clr + random8(32), 192, random8(128,255)), 
-                       CHSV(clr + random8(32), 255, random8(128,255)), 
-                       CHSV(clr + random8(32), 192, random8(128,255)), 
-                       CHSV(clr + random8(32), 255, random8(128,255))
-                      );
-}
-
+//getPal_Plazma
 class EffectPlasma: public EffectPaletteTransform {
-  public:  
-    EffectPlasma(FuncGetPalette_t getPal = FuncGetPal_Plazma):
-      EffectPaletteTransform(getPal){}
-
-
+  
   protected:
     void proceed(CRGB *leds, uint16_t numLeds){
       EffectPaletteTransform::proceed(leds, numLeds);
@@ -98,7 +78,7 @@ class EffectPlasma: public EffectPaletteTransform {
 
     void reset(){
       EffectPaletteTransform::reset();
-      Effect::setSpeedDelay(50);  
+      Effect::setSpeedDelay(50);              
     }
 
     int getMaxStep() const{
@@ -111,22 +91,12 @@ class EffectPlasma: public EffectPaletteTransform {
 // Effect Confetti
 
 
-BEGIN_TRANSFORM_SCHEMA_RGB16_PALETTE(FuncGetPal_Confetti)
-  TRANSOFRM_PALETTE(OceanColors_p)
-  TRANSOFRM_PALETTE(LavaColors_p)
-  TRANSOFRM_PALETTE(ForestColors_p)
-  TRANSOFRM_PALETTE(CloudColors_p)
-END_TRANSFORM_SCHEMA()
 
 #define CONFETTI_MAX_STEPS 100
 #define LEDS_MAX 150
 
+//getPal_Confetti
 class EffectConfetti: public EffectPaletteTransform{
-  public:
-    EffectConfetti(FuncGetPalette_t getPal = FuncGetPal_Confetti):
-      EffectPaletteTransform(getPal){}
-
-
   protected:
     void proceed(CRGB *leds, uint16_t numLeds){  
       EffectPaletteTransform::proceed(leds, numLeds);
@@ -157,55 +127,5 @@ class EffectConfetti: public EffectPaletteTransform{
 
 ////////////////////////////////////////
 // Palettes for different type of transformation
-
-
-/////////////////////
-//Christmas
-BEGIN_TRANSFORM_SCHEMA_GRADIENT_PALETTE(TransformChristmas)
-  TRANSOFRM_PALETTE(christmattree1_gp)
-END_TRANSFORM_SCHEMA()
-
-////////////////////
-// Autumn
-BEGIN_TRANSFORM_SCHEMA_GRADIENT_PALETTE(TransformAutunm)
-  TRANSOFRM_PALETTE(es_autumn_01_gp)
-  TRANSOFRM_PALETTE(es_autumn_03_gp)
-END_TRANSFORM_SCHEMA()
-
-///////////////////
-//Halloween - better autumn than autumn
-BEGIN_TRANSFORM_SCHEMA_GRADIENT_PALETTE(TransformHalloween)
-  TRANSOFRM_PALETTE(halloween_gp)
-END_TRANSFORM_SCHEMA()
-
-
-///////////////////
-//Patriot - US 4th of July
-BEGIN_TRANSFORM_SCHEMA_GRADIENT_PALETTE(July4th)
-  TRANSOFRM_PALETTE(july4_2_gp)
-END_TRANSFORM_SCHEMA()
-
-
-///////////////////
-//Valentines day
-BEGIN_TRANSFORM_SCHEMA_GRADIENT_PALETTE(ValentinesDay)
-  TRANSOFRM_PALETTE(firstlove_gp)
-  TRANSOFRM_PALETTE(roseedan_gp)
-  TRANSOFRM_PALETTE(passionata_gp)
-END_TRANSFORM_SCHEMA()
-
-
-///////////////////
-//Ukraine Flag
-BEGIN_TRANSFORM_SCHEMA_RGB16_PALETTE(UkraineFlag)
-  TRANSOFRM_PALETTE(UkraineFlag_p)
-END_TRANSFORM_SCHEMA()
-
-///////////////////
-//Portugal Flag
-BEGIN_TRANSFORM_SCHEMA_RGB16_PALETTE(PortugalFlag)
-  TRANSOFRM_PALETTE(PortugalFlag_p)
-END_TRANSFORM_SCHEMA()
-
 
 #endif //__NOISE_H

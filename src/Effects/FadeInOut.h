@@ -13,26 +13,24 @@ class EffectFadeInOut: public Effect{
 
 
 inline void EffectFadeInOut::reset(){   
-  setRandomColor();
+  setRandomColor(_ctx.hsv);
   setSpeedDelay(50); 
 }
 
 #define FIO_STEP 5
 
 inline void EffectFadeInOut::proceed(CRGB *leds, uint16_t numLeds){
-  CHSV hsv = getHSV();
-
   //See if we need to change color
-  if(hsv.value == 0 ){
-     setRandomColor();
-     hsv = getHSV();
+  if(_ctx.hsv.value == 0 ){
+     setRandomColor(_ctx.hsv);    
+  }
+  else{
+    //Change value
+    _ctx.hsv.value -= FIO_STEP;
   }
 
-  //Change value
-  hsv.value -= FIO_STEP;
-  setHSV(hsv);
-
   //Transalate value 
+  CHSV hsv = _ctx.hsv;
   hsv.value = triwave8(hsv.value);
   
   //Change color

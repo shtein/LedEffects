@@ -338,3 +338,176 @@ const TProgmemRGBPalette16 PortugalFlag_p FL_PROGMEM ={
   0x003399, //Blue 
 };
 
+
+
+//////////////////////////////////////////////////
+// Transform functions
+
+void getPal_Default(CRGBPalette16 &pal){  
+   pal = CRGBPalette16(CHSV(random8(), 255, random8(128,255)), 
+                       CHSV(random8(), 255, random8(128,255)), 
+                       CHSV(random8(), 192, random8(128,255)), 
+                       CHSV(random8(), 255, random8(128,255))
+                      );
+}
+
+void getPal_Plasma(CRGBPalette16 &pal){
+
+  uint8_t clr = random8();
+  pal =  CRGBPalette16(CHSV(clr + random8(32), 192, random8(128,255)), 
+                       CHSV(clr + random8(32), 255, random8(128,255)), 
+                       CHSV(clr + random8(32), 192, random8(128,255)), 
+                       CHSV(clr + random8(32), 255, random8(128,255))
+                      );
+}
+
+
+
+BEGIN_TRANSFORM_SCHEMA_RGB16_PALETTE(getPal_Confetti)
+  TRANSOFRM_PALETTE(OceanColors_p)
+  TRANSOFRM_PALETTE(LavaColors_p)
+  TRANSOFRM_PALETTE(ForestColors_p)
+  TRANSOFRM_PALETTE(CloudColors_p)
+END_TRANSFORM_SCHEMA()
+
+/////////////////////
+//Christmas
+BEGIN_TRANSFORM_SCHEMA_GRADIENT_PALETTE(getPal_Christmas)
+  TRANSOFRM_PALETTE(christmattree1_gp)
+END_TRANSFORM_SCHEMA()
+
+////////////////////
+// Autumn
+BEGIN_TRANSFORM_SCHEMA_GRADIENT_PALETTE(getPal_Autunm)
+  TRANSOFRM_PALETTE(es_autumn_01_gp)
+  TRANSOFRM_PALETTE(es_autumn_03_gp)
+END_TRANSFORM_SCHEMA()
+
+///////////////////
+//Halloween - better autumn than autumn
+BEGIN_TRANSFORM_SCHEMA_GRADIENT_PALETTE(getPal_Halloween)
+  TRANSOFRM_PALETTE(halloween_gp)
+END_TRANSFORM_SCHEMA()
+
+
+///////////////////
+//Patriot - US 4th of July
+BEGIN_TRANSFORM_SCHEMA_GRADIENT_PALETTE(getPal_July4th)
+  TRANSOFRM_PALETTE(july4_2_gp)
+END_TRANSFORM_SCHEMA()
+
+
+///////////////////
+//Valentines day
+BEGIN_TRANSFORM_SCHEMA_GRADIENT_PALETTE(getPal_ValentinesDay)
+  TRANSOFRM_PALETTE(firstlove_gp)
+  TRANSOFRM_PALETTE(roseedan_gp)
+  TRANSOFRM_PALETTE(passionata_gp)
+END_TRANSFORM_SCHEMA()
+
+
+///////////////////
+//Ukraine Flag
+BEGIN_TRANSFORM_SCHEMA_RGB16_PALETTE(getPal_UkraineFlag)
+  TRANSOFRM_PALETTE(UkraineFlag_p)
+END_TRANSFORM_SCHEMA()
+
+///////////////////
+//Portugal Flag
+BEGIN_TRANSFORM_SCHEMA_RGB16_PALETTE(getPal_PortugalFlag)
+  TRANSOFRM_PALETTE(PortugalFlag_p)
+END_TRANSFORM_SCHEMA()
+
+//////////////////
+// Twincle Fox
+BEGIN_TRANSFORM_SCHEMA_RGB16_PALETTE(getPal_TwinkleFox)
+  TRANSOFRM_PALETTE(RetroC9_p)
+  TRANSOFRM_PALETTE(BlueWhite_p)
+  TRANSOFRM_PALETTE(RainbowColors_p)
+  TRANSOFRM_PALETTE(FairyLight_p)
+  TRANSOFRM_PALETTE(RedGreenWhite_p)
+  TRANSOFRM_PALETTE(PartyColors_p)
+  TRANSOFRM_PALETTE(RedWhite_p)
+  TRANSOFRM_PALETTE(Snow_p)
+  TRANSOFRM_PALETTE(Holly_p)
+  TRANSOFRM_PALETTE(Ice_p)
+END_TRANSFORM_SCHEMA()
+
+
+///////////////////
+//Snow and Ice
+BEGIN_TRANSFORM_SCHEMA_RGB16_PALETTE(getPal_SnowAndIce)
+  TRANSOFRM_PALETTE(BlueWhite_p)
+  TRANSOFRM_PALETTE(Snow_p)
+  TRANSOFRM_PALETTE(Ice_p)
+END_TRANSFORM_SCHEMA()
+
+
+#ifdef NTF_ENABLED
+  #define _GET_PAL_TRANSFORM_NAME(td, tname) \
+    td.transformName = tname;  
+#else
+  #define _GET_PAL_TRANSFORM_NAME(td, tname) 
+#endif
+
+
+#define GET_PAL_TRANSFORM(td, function, tname) \
+  { \
+      td.tFunc         = function; \
+      _GET_PAL_TRANSFORM_NAME(td, tname); \
+  }
+
+
+//Retrieve transform
+bool getPalTransform(uint8_t transformId, TRANSFORM_DESCRIPTION &td){
+  td.transformId  = transformId;
+  td.tFunc        = NULL;
+#ifdef NTF_ENABLED 
+  td.transformName = NULL;
+#endif  
+
+  switch(transformId){
+    case tl_Default:
+      GET_PAL_TRANSFORM(td, getPal_Default, PSTR("Default"));
+    break;
+    case tl_Plasma:
+      GET_PAL_TRANSFORM(td, getPal_PortugalFlag, PSTR("Plasma"));
+    break;
+    case tl_Confetti:
+      GET_PAL_TRANSFORM(td, getPal_Confetti, PSTR("Confetti"));
+    break;
+    case tl_Christmas:
+      GET_PAL_TRANSFORM(td, getPal_Christmas, PSTR("Christmas"));
+    break;
+    case tl_Autumn:
+      GET_PAL_TRANSFORM(td, getPal_Autunm, PSTR("Autumn"));
+    break;
+    case tl_Halloween:
+      GET_PAL_TRANSFORM(td, getPal_Halloween, PSTR("Halloween"));
+    break;
+    case tl_July_4th:
+      GET_PAL_TRANSFORM(td, getPal_July4th, PSTR("July 4th"));
+    break;
+    case tl_TwinkleFox:
+      GET_PAL_TRANSFORM(td, getPal_TwinkleFox, PSTR("Twinke fox"));
+    break;  
+    case tl_SnowAndIce:
+      GET_PAL_TRANSFORM(td, getPal_SnowAndIce, PSTR("Snow and ice"));
+    break;
+    case tl_Valentines:
+      GET_PAL_TRANSFORM(td, getPal_ValentinesDay, PSTR("Valentine's day"));
+    break;
+    case tl_UkrainianFlag:
+      GET_PAL_TRANSFORM(td, getPal_UkraineFlag, PSTR("Ukrainian Flag"));
+    break;
+    case tl_PortugalFlag:
+      GET_PAL_TRANSFORM(td, getPal_PortugalFlag, PSTR("Portugal Flag"));
+    break;
+    default:
+    return false;
+  }
+
+  return true;
+}
+
+

@@ -7,9 +7,59 @@
 #include "effectenginectx.h"
 #include "effect.h"
 
+
+void setRandomColor(CHSV &hsv){
+  hsv.h = random8(0xFF);
+  hsv.s = 0xFF;
+  hsv.v = 0xFF;
+}
+
+
+#ifdef NTF_ENABLED
+//Static effect color
+struct EEResp_Color{
+  CHSV hsv;
+}; 
+
+ void putNtfObject(NtfBase &resp, const CHSV &data){
+  resp.put_F(rs_Hue, data.h);
+  resp.put_F(rs_Sat, data.s);
+  resp.put_F(rs_Val, data.v);
+}
+
+
+void putNtfObject(NtfBase &resp, const EEResp_Color &data){
+  resp.put_F(rs_Hue, data.hsv);
+}
+
+
+//Getting/setting pallete transform rutine
+struct EEResp_EffectTransform{  
+  uint8_t transform;
+};
+
+void putNtfObject(NtfBase &resp, const EEResp_EffectTransform &data){
+  resp.put_F(rs_Transform, data.transform);
+}
+
+
+//Getting/setting effect speed
+struct EEResp_EffectSpeed{  
+  uint16_t speed;
+};
+
+void putNtfObject(NtfBase &resp, const EEResp_EffectSpeed &data){
+  resp.put_F(rs_Speed, data.speed);
+}
+
+
+#endif //NTF_ENABLED
+
 /////////////////////////////////
 // Effect
-Effect::EffectContext Effect::_ctx;
+uint8_t Effect::_speedDelay = 0;
+EFFECT_DATA Effect::_cfg;
+Effect::EFFECT_CONTEXT Effect::_ctx;
 
 Effect::Effect(){
 }
@@ -17,7 +67,7 @@ Effect::Effect(){
 Effect::~Effect(){
 }
 
-bool Effect::onCmd(struct CtrlQueueItemEx &itm){
+bool Effect::onCmd(const struct CtrlQueueItem &itm, NtfSet &ntf){ 
 
   //Process command
   switch(itm.cmd){    
@@ -40,7 +90,7 @@ bool Effect::onCmd(struct CtrlQueueItemEx &itm){
   switch(itm.cmd){    
     case EEMC_SPEED:      
     case EEMC_GET_SPEED:
-      { itm.ntf.put(EECmdResponse<EEResp_EffectSpeed> {itm.cmd, { getSpeedDelay() }}); }
+      { ntf.put(EECmdResponse<EEResp_EffectSpeed> {itm.cmd, { getSpeedDelay() }}); }
     break;
   }    
 #endif         
@@ -49,69 +99,41 @@ bool Effect::onCmd(struct CtrlQueueItemEx &itm){
 }
 
 void Effect::setSpeedDelay(uint8_t speedDelay){  
-  _ctx.speedDelay = speedDelay < SPEED_DELAY_MIN ? SPEED_DELAY_MIN : speedDelay > SPEED_DELAY_MAX ? SPEED_DELAY_MAX : speedDelay;
+  _speedDelay = speedDelay < SPEED_DELAY_MIN ? SPEED_DELAY_MIN : speedDelay > SPEED_DELAY_MAX ? SPEED_DELAY_MAX : speedDelay;
 }
 
 uint8_t Effect::getSpeedDelay() const{  
-  return _ctx.speedDelay;
+  return _speedDelay;
 }
 
-
-/*
-bool Effect::config(EffectConfig &cfg, bool read){
-  if(read){    
-    //Set speed delay
-    uint8_t speedDelay = getSpeedDelay();
-    cfg >> speedDelay;
-
-    setSpeedDelay(speedDelay);
-  }
-  else{
-    //Write version and speed
-    cfg << getSpeedDelay();
-  }
-
-  return true; 
-}
-*/
-
-const CHSV &Effect::getHSV() const{
-  return _ctx.hsv;
+void Effect::setConfig(const EFFECT_DATA &cfg){
+  _cfg = cfg;
 }
 
-void Effect::setHSV(const CHSV &hsv){
-  _ctx.hsv = hsv;
+void Effect::getConfig(EFFECT_DATA &cfg){
+  cfg = _cfg;
 }
     
-void Effect::setRandomColor(){
-  setHSV(CHSV(random8(0xFF), 0xFF, 0xFF));
-}
 
 
 //////////////////////////////////////
 // EffectColor
-EffectColor::EffectColor(){
-}
-
-EffectColor::~EffectColor(){  
-}
 
 
-
-bool EffectColor::onCmd(struct CtrlQueueItemEx &itm){  
+bool EffectColor::onCmd(const struct CtrlQueueItem &itm, NtfSet &ntf){  
 //Process command  
   switch(itm.cmd){
     case EEMC_COLOR_HUE: 
     case EEMC_COLOR_SAT: 
     case EEMC_COLOR_VAL: {
       //Get effect color
-      CHSV hsv = getHSV();
+      CHSV hsv = _cfg.hsv;
 
       //Update corresponding color value
       hsv.raw[itm.cmd - EEMC_COLOR_HUE] = (uint8_t)itm.data.translate( (int)hsv.raw[itm.cmd - EEMC_COLOR_HUE], 0, 255);
   
       //Set effect color
-      setHSV(hsv);       
+      _cfg.hsv = hsv;       
     }   
     break;
 
@@ -122,7 +144,7 @@ bool EffectColor::onCmd(struct CtrlQueueItemEx &itm){
 #endif
 
     default:
-    return Effect::onCmd(itm);    
+    return Effect::onCmd(itm, ntf);    
   }    
 
 #ifdef NTF_ENABLED
@@ -132,7 +154,7 @@ bool EffectColor::onCmd(struct CtrlQueueItemEx &itm){
     case EEMC_COLOR_SAT: 
     case EEMC_COLOR_VAL: 
     case EEMC_GET_COLOR_HSV:
-      { itm.ntf.put(EECmdResponse<EEResp_Color>{ itm.cmd, { { getHSV() } }}); }   
+      { ntf.put(EECmdResponse<EEResp_Color>{ itm.cmd, { { _cfg.hsv } }}); }   
     break;
   }    
 #endif
@@ -140,58 +162,28 @@ bool EffectColor::onCmd(struct CtrlQueueItemEx &itm){
   return true;
 }
 
-/*
-bool EffectColor::config(EffectConfig &cfg, bool read){
-
-  if(!Effect::config(cfg, read))
-    return false;
-
-  //Color  
-  CHSV  hsv = getHSV();
-
-  if(read){
-    //Read color
-    cfg >> hsv;
-
-    //Set
-    setHSV(hsv);
-  }
-  else{
-    //Write color
-    cfg << hsv;
-  }
-
-  return true;
-}
-
-*/
 
 //////////////////////////////////////
 // EffectPaletteTransform
 
-void FuncGetPal_Default(CRGBPalette16 &pal){  
-   pal = CRGBPalette16(CHSV(random8(), 255, random8(128,255)), 
-                       CHSV(random8(), 255, random8(128,255)), 
-                       CHSV(random8(), 192, random8(128,255)), 
-                       CHSV(random8(), 255, random8(128,255))
-                      );
+void EffectPaletteTransform::updatePal(){
+  //Retreive transformation schema
+  TRANSFORM_DESCRIPTION td;
+  if(getPalTransform(_cfg.byte, td)){
+    td.tFunc(_ctx.palTarget);
+  }
 }
-
-EffectPaletteTransform::EffectPaletteTransform(FuncGetPalette_t getPal){
-  _getPal = getPal;
-}
-
-#define UPDATE_PAL() if(_getPal) _getPal(_ctx.palTarget);
 
 void EffectPaletteTransform::reset(){
+  
   //Init target pallete
-  UPDATE_PAL();
+  updatePal();
   
   //Safe target into current  
   _ctx.palCurrent = _ctx.palTarget;
                       
    //Update target palette again
-   UPDATE_PAL();
+  updatePal();
 
   //Reset step
   _ctx.step = getMaxStep();
@@ -205,7 +197,7 @@ void EffectPaletteTransform::proceed(CRGB *leds, uint16_t numLeds){
     //Check if it is to update target palette
   if(_ctx.step == 0){
     //Update palette
-    UPDATE_PAL();
+    updatePal();
 
     //Reset step
     _ctx.step = getMaxStep();
@@ -226,3 +218,36 @@ CRGB EffectPaletteTransform::getCurrentPalColor(uint8_t index, uint8_t brightnes
   return ColorFromPalette(_ctx.palCurrent, index, brightness, blendType);
 }
 
+bool EffectPaletteTransform::onCmd(const struct CtrlQueueItem &itm, NtfSet &ntf){
+  switch(itm.cmd){
+  //All get commands
+    case EEMC_TRANSFORM:{
+      TRANSFORM_DESCRIPTION td;
+      if(getPalTransform(itm.data.value, td)){
+        _cfg.byte = td.transformId;
+      }
+    }
+    break;
+    
+#ifdef NTF_ENABLED    
+    case EEMC_GET_TRANSFORM: 
+    break;    
+#endif
+
+    default:
+    return Effect::onCmd(itm, ntf);    
+  }    
+
+#ifdef NTF_ENABLED
+//Notification
+  switch(itm.cmd){
+    case EEMC_GET_TRANSFORM: 
+    case EEMC_TRANSFORM:     
+      { ntf.put(EECmdResponse<EEResp_EffectTransform>{ itm.cmd, { _cfg.byte } } ); }   
+    break;
+  }    
+#endif
+
+  return true;
+
+}

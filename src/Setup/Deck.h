@@ -6,42 +6,42 @@
 #pragma message "Compile for deck"
 
 
-BEGIN_EFFECT_ENGINE(Deck, EFF_RANDOM_START_EFFECT)    
-  //Effects   
-  BEGIN_EFFECTS()
-    BEGIN_MODE("Effects", 9)        
-      ADD_EFFECT("Ripple", EffectRipple<>)
-      ADD_EFFECT("Meteor rain", EffectMeteorRain<>)   
-      ADD_EFFECT("Plazma", EffectPlasma)        
-      ADD_EFFECT("Confetti", EffectConfetti)
-      ADD_EFFECT("Blur", EffectBlur)
-      ADD_EFFECT("Rainbow move", EffectRainbowMove)
-      ADD_EFFECT("Noise", EffectNoise)            
-      ADD_EFFECT("Mood blobs", EffectMoodBlobs) 
-      ADD_EFFECT("Twinkle fox", EffectTwinkleFox, TwinkleFox)
-    END_MODE()
+//Effects   
+BEGIN_EFFECTS(EFF_RANDOM_START_EFFECT)
+  BEGIN_MODE("Effects")        
+    ADD_EFFECT(el_Ripple)
+    ADD_EFFECT(el_MeteorRain)   
+    ADD_EFFECT(el_Plasma, tl_Plasma)        
+    ADD_EFFECT(el_Confetti, tl_Confetti)
+    ADD_EFFECT(el_Blur)
+    ADD_EFFECT(el_RainbowMove)
+    ADD_EFFECT(el_Noise, tl_Default)            
+    ADD_EFFECT(el_MoodBlobs) 
+    ADD_EFFECT(el_TwinkleFox, tl_TwinkleFox)
+  END_MODE()
 
-    
-    BEGIN_MODE("Halloween", 3)      
-      ADD_EFFECT("Confetti-hlw", EffectConfetti, &TransformHalloween )
-      ADD_EFFECT("Plazma-hlw", EffectPlasma, &TransformAutunm )
-      ADD_EFFECT("Noise-hlw", EffectNoise, &TransformHalloween)
-    END_MODE()
-    
-    BEGIN_MODE("Chrsitmas", 3)      
-      ADD_EFFECT("Confetti-crsm", EffectConfetti, &TransformChristmas )
-      ADD_EFFECT("Plazma-crsm", EffectPlasma, &TransformChristmas )
-      ADD_EFFECT("Noise-crsm", EffectNoise, &TransformChristmas )
-    END_MODE()
+  BEGIN_MODE("Hlwn")      
+    ADD_EFFECT(el_Confetti, tl_Halloween )
+    ADD_EFFECT(el_Plasma, tl_Autumn )
+    ADD_EFFECT(el_Noise, tl_Halloween)
+  END_MODE()
+  
+  BEGIN_MODE("Chrms")      
+    ADD_EFFECT(el_Confetti, tl_Christmas )
+    ADD_EFFECT(el_Plasma, tl_Christmas )
+    ADD_EFFECT(el_Noise,tl_Christmas )
+  END_MODE()
 
-    BEGIN_MODE("Ukraine", 3)      
-      ADD_EFFECT("Confetti-ukr", EffectConfetti, &UkraineFlag )
-      ADD_EFFECT("Noise-urk", EffectNoise, &UkraineFlag )
-      ADD_EFFECT("Twinkle fox-urk", EffectTwinkleFox, &UkraineFlag )
-    END_MODE()  
+  BEGIN_MODE("Ukraine")      
+    ADD_EFFECT(el_Confetti, tl_UkrainianFlag )
+    ADD_EFFECT(el_Noise, tl_UkrainianFlag )
+    ADD_EFFECT(el_TwinkleFox, tl_UkrainianFlag )
+  END_MODE()  
 
-    
-  END_EFFECTS()
+END_EFFECTS()
+  
+
+BEGIN_EFFECT_ENGINE("Deck")    
   
   //Leds
   BEGIN_LEDS()

@@ -24,19 +24,19 @@ class EffectEngine{
     ~EffectEngine();
 
     void init();    
-    void loop(struct CtrlQueueItemEx &itm);   
+    void loop(const struct CtrlQueueItem &itm, NtfSet &ntf);   
 
     CRGB *getLeds() const;
     
   protected:
     
     //Command handling
-    bool onCmd(struct CtrlQueueItemEx &itm);
-    bool onCmdEE(struct CtrlQueueItemEx &itm);
+    bool onCmd(const struct CtrlQueueItem &itm, NtfSet &ntf);
+    bool onCmdEE(const struct CtrlQueueItem &itm, NtfSet &ntf);
 
-    void onModeChange(struct CtrlQueueData &data);
-    void onNumLedsChange(struct CtrlQueueData &data);
-    void onEffectChange(struct CtrlQueueData &data); 
+    void onModeChange(const struct CtrlQueueData &data);
+    void onNumLedsChange(const struct CtrlQueueData &data);
+    void onEffectChange(const struct CtrlQueueData &data); 
 
     //Notifications    
 #ifdef NTF_ENABLED    
@@ -48,18 +48,15 @@ class EffectEngine{
     void setEffect(uint8_t effectNum);
 
     //Reading/writing config from/to EEPROM
-    void writeConfig(); 
-    void configCurEffect(bool read);    
+    void saveConfig(); 
     void preSaveConfig();
   
   protected:    
-    EFFECT_ENGINE_CONFIG _cfgEngine;       //Engine config
+    EFFECT_ENGINE_CONFIG _cfgEngine;      //Engine config
     EFFECT_MODE_CONFIG   _cfgMode;        //Current mode config
-    Effect    *_curEffect;                //Current Effect
+    Effect              *_curEffect;      //Current Effect
 
-    EELEDS     _leds;                     //Leds
-    uint16_t   _numLeds;                  //Max number of leds
-    uint16_t   _flags;                    //Flags 
+    EELEDS     _leds;                     //Leds  
    
     unsigned long _millis;                //Processing
     unsigned long _millisToSaveCfg;       //When to safe config

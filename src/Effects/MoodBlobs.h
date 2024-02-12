@@ -13,8 +13,6 @@ protected:
 
 #define BLOB_PHASE _ctx.byte
 
-
-
 void EffectMoodBlobs::reset(){
   _ctx.step  = 0;
   BLOB_PHASE = 0;

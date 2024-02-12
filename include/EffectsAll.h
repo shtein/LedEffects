@@ -18,7 +18,7 @@ enum EffectList{
   el_MoodBlobs,
   el_PaletteTransform,
   el_Noise, 
-  el_Plazma,
+  el_Plasma,
   el_Confetti,
   el_PacificOcean, 
   el_Rainbow,
@@ -27,21 +27,19 @@ enum EffectList{
   el_Ripple,
   el_RunningLights, 
   el_TwinkleFox,
+  el_Fire,
   el_Total
 };
 
 struct EFFECT_DESCRIPTION{ 
   uint8_t   effectId;
-  Effect   *effect;      //Pointer to an effect  
+  Effect   *effect;       //Pointer to an effect  
 #ifdef NTF_ENABLED  
-  const __FlashStringHelper *effectName;  //Name of the effect
+  const char *effectName;  //Name of the effect, this is PROGMEM
 #endif  
 };
 
-
 //Effect factory
 bool getEffect(uint8_t effectId, EFFECT_DESCRIPTION &ed);
-
-
 
 #endif //__EFFECTS_ALL_H

@@ -35,6 +35,7 @@ inline void EffectRainbow::proceed(CRGB *leds, uint16_t numLeds){
     leds[i] = hsv;
     hsv.hue = (hsv.hue + delta) & 0xFF;
   }
+
 }
 
 

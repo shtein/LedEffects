@@ -31,17 +31,47 @@
 #define SW2POS_CTRL VAR_NAME(ecsw2p)
   
 //Notifications
+#define _NTF_INIT() static NtfSet ntf;      
 #ifdef NTF_ENABLED
-  #define _NTF_INIT() static NtfSet ntf;      
   #define _NTF_ADD(a) ntf.addNtf(a); 
-  #define _CTRLQITEM_INIT() struct CtrlQueueItemEx itm(ntf); 
-  #define _OBJ_NAME(name) F(name)
-#else
-  #define _NTF_INIT()
+#else  
   #define _NTF_ADD(a)
-  #define _CTRLQITEM_INIT() struct CtrlQueueItemEx itm; 
-  #define _OBJ_NAME(name) NULL
 #endif
+
+#ifdef WRITE_CONFIG_ONLY
+  #define _CFG_SETUP     setup
+  #define _CFG_LOOP      loop
+  #define _ENGINE_SETUP _setup
+  #define _ENGINE_LOOP  _loop
+#else
+  #define _CFG_SETUP    _setup
+  #define _CFG_LOOP     _loop
+  #define _ENGINE_SETUP  setup
+  #define _ENGINE_LOOP   loop
+#endif
+
+//Effect config
+#define BEGIN_EFFECTS(flg)\
+void _CFG_SETUP() { \
+  DBG_INIT(); \
+  DBG_OUTLN("Config setup");  \
+  prepareEngineConfig(flg); 
+
+#define END_EFFECTS() \
+} \
+void _CFG_LOOP(){}
+
+#define BEGIN_MODE(modeName) \
+  if(addModeConfig(PSTR(modeName))) {
+
+  
+#define END_MODE()\        
+  }
+
+
+#define ADD_EFFECT(effect, ...) \
+  addEffectConfig(effect, ##__VA_ARGS__);
+
 
 //Effect Engine
 #define BEGIN_EFFECT_ENGINE(name) \
@@ -49,7 +79,7 @@ static EffectEngine ee; \
 static CtrlPanel cp; \
 _NTF_INIT(); \
 \
-void setup(){ \
+void _ENGINE_SETUP(){ \
   DBG_INIT(); \
   DBG_OUTLN("Led effect started - " name);  
 
@@ -58,49 +88,19 @@ void setup(){ \
   ee.init(); \
 } \
 \
-void loop() \
+void _ENGINE_LOOP() \
 { \
-  _CTRLQITEM_INIT(); \
-    for( ;; ){ \
+  CtrlQueueItem itm; \
+  for( ;; ){ \
     cp.loop(itm); \
-    ee.loop(itm); \
+    ee.loop(itm, ntf); \
   } \
 }
-/*
-#define BEGIN_EFFECTS()
-
-#define END_EFFECTS()
-
-
-#define BEGIN_MODE(modeName, maxEffects) \
-  static uint8_t MODE_NAME[maxEffects]; \
-  ee.addMode(_OBJ_NAME(modeName), MODE_NAME);
-
-  
-#define END_MODE()
-
-
-#define BLACK_MODE() \
-  ee.addMode(_OBJ_NAME(Off), NULL);
-
-
-//Hack to enable ADD_EFFECT macro with and without parameters
-#define LPR (
-#define RPR )
-#define ARGS(a1, a2, a3, a4, a5, a6, a7, ...) a7
-#define EFFECT_ARGS(...) ARGS(, ## __VA_ARGS__, LPR, LPR, LPR, LPR, LPR, )  __VA_ARGS__  ARGS(, ## __VA_ARGS__, RPR, RPR, RPR, RPR, RPR, )
-
-
-#define ADD_EFFECT(effect) \
-  ee.addEffect(effect);   
-*/
 
 #define BEGIN_LEDS() \
-   
 
 #define ADD_STRIP(Type, ...) \
   FastLED.addLeds<Type, __VA_ARGS__ >(ee.getLeds(), MAX_LEDS).setCorrection( TypicalLEDStrip );  
-
   
 #define END_LEDS() 
 
