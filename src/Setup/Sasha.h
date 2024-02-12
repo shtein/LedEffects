@@ -6,15 +6,14 @@
 
 
 //Effect Engine
-BEGIN_EFFECT_ENGINE(0) 
+BEGIN_EFFECT_ENGINE(Sasha, 0) 
   
   //Effects   
   BEGIN_EFFECTS()
     BEGIN_MODE("Effects", 15)
       ADD_EFFECT("Meteor rain", EffectMeteorRain<>)
       ADD_EFFECT("Plazma", EffectPlasma)
-      ADD_EFFECT("Confetti", EffectConfetti)
-      ADD_EFFECT("Transform fast", EffectPaletteTransformFast) 
+      ADD_EFFECT("Confetti", EffectConfetti)  
       ADD_EFFECT("Blur", EffectBlur)
       ADD_EFFECT("Rainbow move", EffectRainbowMove)
       ADD_EFFECT("Noise", EffectNoise)            
@@ -24,7 +23,14 @@ BEGIN_EFFECT_ENGINE(0)
       ADD_EFFECT("Running lights", EffectRunningLights)           
       ADD_EFFECT("Color wipe", EffectColorWipe)               
       ADD_EFFECT("Theater rainbow", EffectTheaterChaseRainbow) 
+      ADD_EFFECT("Twinkle fox", EffectTwinkleFox) 
     END_MODE()
+    BEGIN_MODE("Flags", 3)
+      ADD_EFFECT("Twinke fox-Isrl",  EffectTwinkleFox, &IsraelFlag )
+      ADD_EFFECT("Twinkle fox-urk", EffectTwinkleFox, &UkraineFlag )
+      ADD_EFFECT("Twinkle fox-us", EffectTwinkleFox, &July4th)
+    END_MODE()
+
     BEGIN_MODE("Static", 3)
       ADD_STATIC_COLOR("Static blue", HUE_BLUE)        
       ADD_STATIC_COLOR("Static purple" ,HUE_PURPLE)
@@ -46,6 +52,7 @@ BEGIN_EFFECT_ENGINE(0)
       PUSH_BUTTON_TO_CMD(EEMC_EFFECT, PB_CONTROL_CLICK_SHORT)      
     END_PUSH_BUTTON()     
   
+  /*
     //Make sure ir remote receiver is wired and connected properly to arduino otherwise the program misbehaves: stops, slows down, etc      
     BEGIN_REMOTE(REMOTE_PIN)  //Remote
       RMT_BUTTON_TO_CMD(EEMC_MODE, RKEY_OK)                         //Mode
@@ -55,7 +62,7 @@ BEGIN_EFFECT_ENGINE(0)
       RMT_BUTTON_PAIR_TO_CMD(EEMC_COLOR_SAT, RKEY_2, RKEY_5, 5)     //Color Saturation
       RMT_BUTTON_PAIR_TO_CMD(EEMC_COLOR_VAL, RKEY_3, RKEY_6, 5)     //Color Value
     END_REMOTE()    
-    
+   */ 
   END_CONTROL_MAP()
       
 END_EFFECT_ENGINE() 

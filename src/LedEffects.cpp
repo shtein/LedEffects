@@ -38,6 +38,7 @@
 #include "Setup/Udalov.h"
 #include "Setup/Vadim.h"
 #include "Setup/Window.h"
+#include "Setup/AllPurpose.h"
 
 
 

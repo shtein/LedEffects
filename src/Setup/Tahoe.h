@@ -49,9 +49,27 @@ BEGIN_EFFECTS(EFF_RANDOM_START_EFFECT)
   
 END_EFFECTS()
 
+<<<<<<< HEAD
 
 //Effect Engine
 BEGIN_EFFECT_ENGINE("Tahoe")
+=======
+    BEGIN_MODE(July4, 2)      
+      ADD_EFFECT("Confetti-ind", EffectConfetti, &July4th )
+      ADD_EFFECT("Noise-ind", EffectNoise, &July4th )
+    END_MODE()
+/*
+    BEGIN_MODE(Ukraine, 3)      
+      //ADD_EFFECT("Confetti-ukr", EffectConfetti, &UkraineFlag )
+      ADD_EFFECT("Noise-ukr", EffectNoise, &UkraineFlag )
+      //ADD_EFFECT("Twinkle fox-ukr", EffectTwinkleFox, &UkraineFlag )
+    END_MODE()
+*/
+    BEGIN_MODE(Israel, 2)      
+      ADD_EFFECT("Confetti-isr", EffectConfetti, &IsraelFlag )    
+      ADD_EFFECT("Twinkle fox-isr", EffectTwinkleFox, &IsraelFlag )
+    END_MODE()
+>>>>>>> v1
 
   //Leds
   BEGIN_LEDS()

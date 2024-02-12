@@ -1,7 +1,7 @@
 #if defined(__CHRISTMAS_TREE_SETUP)
 
 ////////////////////////////////////////
-// WS2811 string, 150 LEDs, 1 push button, 1 potentiometer, 1 rotary encoder
+// WS2811 string, 150 LEDs, 1 push button, 1 potentiometer
 
 #pragma message "Compile for christmas tree"
 
