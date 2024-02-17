@@ -11,10 +11,22 @@
 
 void setRandomColor(CHSV &hsv);
 
+#ifdef NTF_ENABLED  
+  void putNtfObject(NtfBase &resp, const CHSV &data);
+#endif
+
+
+///////////////////////
+// Effect Config Flags
+#define ECF_NONE      0x00
+#define ECF_HSV       0x01
+#define ECF_RGB       0x02
+#define ECF_TRANSFORM 0x04
+
+
 
 ///////////////////
 // Basic effect
-
 class Effect{
   public:
     Effect();
@@ -75,9 +87,6 @@ class EffectColor: public Effect{
 #define MAX_PAL_CHANGES 24
 #define CHANGE_PAL_STEP 500
 
-
-
-//Default palette change routine
 
 class EffectPaletteTransform: public Effect{ 
 public:

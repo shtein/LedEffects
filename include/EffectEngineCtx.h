@@ -22,12 +22,13 @@
 #define EEMC_NUMLEDS     (EEMC_LED | EEMC_GET_NUMLEDS)    //Number of leds changed
 
 //Effect commands
-#define EEMC_GET_COLOR_HSV  0x01   //Get effect HSV
-#define EEMC_GET_COLOR_HUE  0x02   //Color hue 
-#define EEMC_GET_COLOR_SAT  0x03   //Color saturation 
-#define EEMC_GET_COLOR_VAL  0x04   //Color value 
-#define EEMC_GET_SPEED      0x05   //Speed
-#define EEMC_GET_TRANSFORM  0x06   //Paletter transform rutine
+#define EEMC_GET_CFG        0x01   //Get effect config
+#define EEMC_GET_COLOR_HSV  0x02   //Get effect HSV
+#define EEMC_GET_COLOR_HUE  0x03   //Color hue 
+#define EEMC_GET_COLOR_SAT  0x04   //Color saturation 
+#define EEMC_GET_COLOR_VAL  0x05   //Color value 
+#define EEMC_GET_SPEED      0x06   //Speed
+#define EEMC_GET_TRANSFORM  0x07   //Paletter transform rutine
 
 #define EEMC_COLOR_HUE   (EEMC_LED | EEMC_GET_COLOR_HUE)  //Color hue changed
 #define EEMC_COLOR_SAT   (EEMC_LED | EEMC_GET_COLOR_SAT)  //Color saturation changed

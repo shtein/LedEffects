@@ -4,40 +4,35 @@
 // WS2811 strip, 300 LEDs, 1 push button, 1 potentiometer
 #pragma message "Compile for All Purpose"
   
+//Effects   
+BEGIN_EFFECTS(0)
+  BEGIN_MODE("Effects")      
+    ADD_EFFECT(el_MeteorRain)
+    ADD_EFFECT(el_Plasma, tl_Plasma)
+    ADD_EFFECT(el_Confetti, tl_Confetti)
+    ADD_EFFECT(el_Blur)
+    ADD_EFFECT(el_Noise, tl_Default)            
+    ADD_EFFECT(el_MoodBlobs)  
+    ADD_EFFECT(el_TwinkleFox, tl_TwinkleFox)    
+  END_MODE()
+  BEGIN_MODE("Chrms")      
+    ADD_EFFECT(el_Confetti, tl_Christmas)
+    ADD_EFFECT(el_TwinkleFox, tl_SnowAndIce)    
+  END_MODE()
+  BEGIN_MODE("Hlwn")      
+    ADD_EFFECT(el_Confetti, tl_Autumn )
+    ADD_EFFECT(el_Noise, tl_Halloween )      
+  END_MODE()  
+  BEGIN_MODE("Lights")
+    ADD_EFFECT(el_Fire)
+    ADD_EFFECT(el_EmergencyLights)         
+  END_MODE()
   
-BEGIN_EFFECT_ENGINE(All purpose, 0) 
+END_EFFECTS()
   
-  //Effects   
-  BEGIN_EFFECTS()
-    BEGIN_MODE("Effects", 15)      
-      ADD_EFFECT("Meteor Rain", EffectMeteorRain<>)
-      ADD_EFFECT("Plazma", EffectPlasma)
-      ADD_EFFECT("Confetti", EffectConfetti)
-      ADD_EFFECT("Blur", EffectBlur)
-      ADD_EFFECT("Noise", EffectNoise)            
-      ADD_EFFECT("Mood blobs", EffectMoodBlobs)  
-      ADD_EFFECT("Twinke fox", EffectTwinkleFox)    
-    END_MODE()
-    BEGIN_MODE("Chrsitmas", 3)      
-      ADD_EFFECT("Confetti-crsm", EffectConfetti, &TransformChristmas)
-      ADD_EFFECT("Twinke fox-crsms", EffectTwinkleFox, &SnowAndIce)    
-    END_MODE()
-    BEGIN_MODE("Halloween", 3)      
-      ADD_EFFECT("Confetti-hlw", EffectConfetti, &TransformAutunm )
-      ADD_EFFECT("Noise-hlw", EffectNoise, &TransformHalloween )      
-    END_MODE()  
-    BEGIN_MODE("Emergency", 2)
-      ADD_EFFECT("Fire", EffectFire)
-      ADD_EFFECT("Emergency lights", EffectEmergencyLights)         
-    END_MODE()
-    BEGIN_MODE("Flags", 3)
-      ADD_EFFECT("Twinke fox-Isrl",  EffectTwinkleFox, &IsraelFlag )
-      ADD_EFFECT("Twinkle fox-urk", EffectTwinkleFox, &UkraineFlag )
-      ADD_EFFECT("Twinkle fox-us", EffectTwinkleFox, &July4th)
-    END_MODE()
-    
-  END_EFFECTS()
-  
+
+
+BEGIN_EFFECT_ENGINE() 
   //Leds
   BEGIN_LEDS()
     ADD_STRIP(WS2811, LED_PIN, BRG)

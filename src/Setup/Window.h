@@ -47,7 +47,7 @@ BEGIN_EFFECTS(0)
  END_EFFECTS()
 
 //Effect Engine
-BEGIN_EFFECT_ENGINE("Window") 
+BEGIN_EFFECT_ENGINE() 
   
   //Leds
   BEGIN_LEDS() 

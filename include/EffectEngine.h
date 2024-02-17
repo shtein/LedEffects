@@ -38,11 +38,6 @@ class EffectEngine{
     void onNumLedsChange(const struct CtrlQueueData &data);
     void onEffectChange(const struct CtrlQueueData &data); 
 
-    //Notifications    
-#ifdef NTF_ENABLED    
-    void ntf(uint8_t cmd, uint8_t error, NtfSet &ntf);
-#endif //NTF_ENABLED 
-
     //Internal routines
     void setMode(uint8_t mode);
     void setEffect(uint8_t effectNum);

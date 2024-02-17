@@ -116,6 +116,7 @@ enum TransformPalList{
   tl_Valentines,
   tl_UkrainianFlag,
   tl_PortugalFlag,
+  tl_IsraelFlag,
   tl_Total
 };
 

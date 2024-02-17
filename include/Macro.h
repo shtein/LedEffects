@@ -50,11 +50,15 @@
   #define _ENGINE_LOOP   loop
 #endif
 
+
+//This macro needs to defined at the begining of config 
+//#define SETUP_NAME xxx
+
 //Effect config
 #define BEGIN_EFFECTS(flg)\
 void _CFG_SETUP() { \
   DBG_INIT(); \
-  DBG_OUTLN("Config setup");  \
+  DBG_OUTLN("Config setup - " SETUP_NAME);  \
   prepareEngineConfig(flg); 
 
 #define END_EFFECTS() \
@@ -63,26 +67,22 @@ void _CFG_LOOP(){}
 
 #define BEGIN_MODE(modeName) \
   if(addModeConfig(PSTR(modeName))) {
-
   
-#define END_MODE()\        
+#define END_MODE() \
   }
-
 
 #define ADD_EFFECT(effect, ...) \
   addEffectConfig(effect, ##__VA_ARGS__);
 
-
 //Effect Engine
-#define BEGIN_EFFECT_ENGINE(name) \
+#define BEGIN_EFFECT_ENGINE() \
 static EffectEngine ee; \
 static CtrlPanel cp; \
 _NTF_INIT(); \
 \
 void _ENGINE_SETUP(){ \
   DBG_INIT(); \
-  DBG_OUTLN("Led effect started - " name);  
-
+  DBG_OUTLN("Engine started - " SETUP_NAME );  
 
 #define END_EFFECT_ENGINE() \
   ee.init(); \

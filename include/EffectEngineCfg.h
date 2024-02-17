@@ -66,7 +66,7 @@ struct EFFECT_DATA{
 
 
 struct EFFECT_CONFIG{  
-  uint8_t     effect;       //Effect id
+  uint8_t     effectId;     //Effect id
   uint8_t     speedDelay;   //Speed
   EFFECT_DATA data;         //Data
 };

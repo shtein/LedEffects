@@ -1,5 +1,6 @@
 #include "LedEffects.h"
 #include <Controls.h>
+#include <utils.h>
 #include "EffectsAll.h"
 
 //Effects
@@ -29,11 +30,16 @@
   #define _GET_EFFECT_NAME(ed, ename)
 #endif
 
+#define _EFFECT_FLAGS_NONE(flags, ...)
+#define _EFFECT_FLAGS_DEFINED(flags, ...) flags = ARG_NUM_1(__VA_ARGS__)
 
-#define GET_EFFECT(ed, EffectClass, ename) \
+#define _GET_EFFECT_FLAGS(flags, ...) ARG_NUM( NUM_ARGS(flags, ##__VA_ARGS__), _EFFECT_FLAGS_NONE, _EFFECT_FLAGS_DEFINED)(flags, __VA_ARGS__)
+
+#define GET_EFFECT(ed, EffectClass, ename, ...) \
   { \
     static EffectClass e; \
     ed.effect     = &e; \
+    _GET_EFFECT_FLAGS(ed.flags, ##__VA_ARGS__); \
     _GET_EFFECT_NAME(ed, ename); \
   }
 
@@ -59,18 +65,26 @@ DEFINE_STR_PROGMEM(rs_Effect_TwinkleFox,          "Twinkle fox")
 DEFINE_STR_PROGMEM(rs_Effect_Fire,                "Fire")
 
 
+uint8_t getEffectFlags(uint8_t effectId){
+  EFFECT_DESCRIPTION ed;
+  getEffect(effectId, ed);
+
+  return ed.flags;
+}
+
+
 bool getEffect(uint8_t effectId, EFFECT_DESCRIPTION &ed){
   
   ed.effectId   = effectId;
   ed.effect     = NULL;
+  ed.flags      = ECF_NONE;
 #ifdef NTF_ENABLED 
   ed.effectName = NULL;
 #endif  
 
-
   switch(effectId){
     case el_StaticColor:
-      GET_EFFECT(ed, EffectStatic, rs_Effect_StaticColor);
+      GET_EFFECT(ed, EffectStatic, rs_Effect_StaticColor, ECF_HSV);
     break;
     case el_Blur:
       GET_EFFECT(ed, EffectBlur, rs_Effect_Blur);
@@ -94,16 +108,16 @@ bool getEffect(uint8_t effectId, EFFECT_DESCRIPTION &ed){
       GET_EFFECT(ed, EffectMoodBlobs, rs_Effect_MoodBlobs);      
     break;        
     case el_PaletteTransform:
-      GET_EFFECT(ed, EffectPaletteTransformFast, rs_Effect_PaletteTransform);      
+      //GET_EFFECT(ed, EffectPaletteTransformFast, rs_Effect_PaletteTransform, ECF_TRANSFORM);      
     break;        
     case el_Noise:
-      GET_EFFECT(ed, EffectNoise, rs_Effect_Noise);      
+      GET_EFFECT(ed, EffectNoise, rs_Effect_Noise, ECF_TRANSFORM);      
     break;        
     case el_Plasma:
-      GET_EFFECT(ed, EffectPlasma, rs_Effect_Plasma);      
+      GET_EFFECT(ed, EffectPlasma, rs_Effect_Plasma, ECF_TRANSFORM);      
     break;        
     case el_Confetti:
-      GET_EFFECT(ed, EffectConfetti, rs_Effect_Confetti);      
+      GET_EFFECT(ed, EffectConfetti, rs_Effect_Confetti, ECF_TRANSFORM);      
     break;    
     case el_PacificOcean:
       GET_EFFECT(ed, EffectPacificOcean, rs_Effect_PacificOcean);      
@@ -124,7 +138,7 @@ bool getEffect(uint8_t effectId, EFFECT_DESCRIPTION &ed){
       GET_EFFECT(ed, EffectRunningLights, rs_Effect_RunningLigts);      
     break;
     case el_TwinkleFox:
-      GET_EFFECT(ed, EffectTwinkleFox, rs_Effect_TwinkleFox);      
+      GET_EFFECT(ed, EffectTwinkleFox, rs_Effect_TwinkleFox, ECF_TRANSFORM);      
     break;
     case el_Fire:
       GET_EFFECT(ed, EffectFire, rs_Effect_Fire);      

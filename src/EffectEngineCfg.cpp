@@ -238,10 +238,7 @@ bool addModeConfig(const char *modeName){
   }
 
   //Prepare and save mode config  
-  char tmp[16];
-  strncpy_P(tmp, modeName, sizeof(tmp) - 1);
-
-  copyStr(cfgMode.name, tmp, MODE_NAME_LEN - 1);
+  copyStr(cfgMode.name, Progmem2Str24(modeName), MODE_NAME_LEN - 1);
   cfgMode.numEffects  = 0;
   cfgMode.effectNum   = 0;
   cfgMode.effectFirst = firstEffect;
@@ -357,7 +354,7 @@ bool initEffectConfig(uint8_t effectId, EFFECT_CONFIG &cfg){
 
   ed.effect->reset();
 
-  cfg.effect     = effectId;
+  cfg.effectId   = effectId;
   cfg.speedDelay = ed.effect->getSpeedDelay();
 
   return true;

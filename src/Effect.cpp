@@ -16,20 +16,11 @@ void setRandomColor(CHSV &hsv){
 
 
 #ifdef NTF_ENABLED
-//Static effect color
-struct EEResp_Color{
-  CHSV hsv;
-}; 
 
  void putNtfObject(NtfBase &resp, const CHSV &data){
   resp.put_F(rs_Hue, data.h);
   resp.put_F(rs_Sat, data.s);
   resp.put_F(rs_Val, data.v);
-}
-
-
-void putNtfObject(NtfBase &resp, const EEResp_Color &data){
-  resp.put_F(rs_Hue, data.hsv);
 }
 
 
@@ -90,8 +81,10 @@ bool Effect::onCmd(const struct CtrlQueueItem &itm, NtfSet &ntf){
   switch(itm.cmd){    
     case EEMC_SPEED:      
     case EEMC_GET_SPEED:
-      { ntf.put(EECmdResponse<EEResp_EffectSpeed> {itm.cmd, { getSpeedDelay() }}); }
+    { ntf.put(EECmdResponse<EEResp_EffectSpeed> {itm.cmd, { getSpeedDelay() }}); }
     break;
+
+    break;    
   }    
 #endif         
 
@@ -154,7 +147,7 @@ bool EffectColor::onCmd(const struct CtrlQueueItem &itm, NtfSet &ntf){
     case EEMC_COLOR_SAT: 
     case EEMC_COLOR_VAL: 
     case EEMC_GET_COLOR_HSV:
-      { ntf.put(EECmdResponse<EEResp_Color>{ itm.cmd, { { _cfg.hsv } }}); }   
+      { ntf.put(EECmdResponse<CHSV>{ itm.cmd, {  _cfg.hsv } }); }   
     break;
   }    
 #endif

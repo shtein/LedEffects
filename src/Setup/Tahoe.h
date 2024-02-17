@@ -41,35 +41,24 @@ BEGIN_EFFECTS(EFF_RANDOM_START_EFFECT)
     ADD_EFFECT(el_TwinkleFox, tl_July_4th)
   END_MODE()
 
+/*
   BEGIN_MODE("Ukraine")      
     ADD_EFFECT(el_Confetti, tl_UkrainianFlag )
     ADD_EFFECT(el_Noise, tl_UkrainianFlag )
     ADD_EFFECT(el_TwinkleFox, tl_UkrainianFlag )
   END_MODE()
-  
+
+  BEGIN_MODE("Israel")      
+    ADD_EFFECT(el_Confetti, tl_IsraelFlag )
+    ADD_EFFECT(el_Noise, tl_IsraelFlag )
+    ADD_EFFECT(el_TwinkleFox, tl_IsraelFlag )
+  END_MODE()
+*/    
 END_EFFECTS()
 
-<<<<<<< HEAD
 
 //Effect Engine
-BEGIN_EFFECT_ENGINE("Tahoe")
-=======
-    BEGIN_MODE(July4, 2)      
-      ADD_EFFECT("Confetti-ind", EffectConfetti, &July4th )
-      ADD_EFFECT("Noise-ind", EffectNoise, &July4th )
-    END_MODE()
-/*
-    BEGIN_MODE(Ukraine, 3)      
-      //ADD_EFFECT("Confetti-ukr", EffectConfetti, &UkraineFlag )
-      ADD_EFFECT("Noise-ukr", EffectNoise, &UkraineFlag )
-      //ADD_EFFECT("Twinkle fox-ukr", EffectTwinkleFox, &UkraineFlag )
-    END_MODE()
-*/
-    BEGIN_MODE(Israel, 2)      
-      ADD_EFFECT("Confetti-isr", EffectConfetti, &IsraelFlag )    
-      ADD_EFFECT("Twinkle fox-isr", EffectTwinkleFox, &IsraelFlag )
-    END_MODE()
->>>>>>> v1
+BEGIN_EFFECT_ENGINE()
 
   //Leds
   BEGIN_LEDS()

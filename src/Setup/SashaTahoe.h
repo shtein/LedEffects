@@ -5,36 +5,38 @@
 #pragma message "Compile for Sasha at Tahoe"
 
 
-//Effect Engine
-BEGIN_EFFECT_ENGINE(Sasha Tahoe, 0) 
-  
   //Effects   
-  BEGIN_EFFECTS()
-    BEGIN_MODE(Effects, 15)
-      ADD_EFFECT("Meteor rain", EffectMeteorRain<>)
-      ADD_EFFECT("Ripple", EffectRipple<>)   
-      ADD_EFFECT("Plazma", EffectPlasma)
-      ADD_EFFECT("Confetti", EffectConfetti)
-      ADD_EFFECT("Blur", EffectBlur)
-      ADD_EFFECT("Theater rainbow", EffectTheaterChaseRainbow)
-      ADD_EFFECT("Rainbow move", EffectRainbowMove)
-      ADD_EFFECT("Noise", EffectNoise)            
-      ADD_EFFECT("Mood blobs", EffectMoodBlobs) 
-      ADD_EFFECT("Rainbow", EffectRainbow)
-      ADD_EFFECT("Fade in out", EffectFadeInOut)
-      ADD_EFFECT("Running lighs", EffectRunningLights)           
-      ADD_EFFECT("Juggle", EffectJuggle)
-      ADD_EFFECT("Twinkle fax", EffectTwinkleFox, TwinkleFox)
-      ADD_EFFECT("Pacific ocean", EffectPacificOcean)
+  BEGIN_EFFECTS(0)
+    BEGIN_MODE("Effects")
+      ADD_EFFECT(el_MeteorRain)
+      ADD_EFFECT(el_Ripple)   
+      ADD_EFFECT(el_Plasma, tl_Plasma)
+      ADD_EFFECT(el_Confetti, tl_Confetti)
+      ADD_EFFECT(el_Blur)
+      ADD_EFFECT(el_TheaterChaseRainbow)
+      ADD_EFFECT(el_RainbowMove)
+      ADD_EFFECT(el_Noise, tl_Default)            
+      ADD_EFFECT(el_MoodBlobs) 
+      ADD_EFFECT(el_Rainbow)
+      ADD_EFFECT(el_FadeInOut)
+      ADD_EFFECT(el_RunningLights)           
+      ADD_EFFECT(el_Juggle)
+      ADD_EFFECT(el_TwinkleFox, tl_TwinkleFox)
+      ADD_EFFECT(el_PacificOcean)
+    END_MODE()
 
+    BEGIN_MODE("Static")
+      ADD_EFFECT(el_StaticColor, CHSV(HUE_BLUE, 0xFF, 0xFF))        
+      ADD_EFFECT(el_StaticColor, CHSV(HUE_PURPLE, 0xFF, 0xFF))
+      ADD_EFFECT(el_StaticColor, CHSV(HUE_ORANGE, 0xFF, 0xFF))
     END_MODE()
-    BEGIN_MODE("Static", 3)
-      ADD_STATIC_COLOR("Static blue", HUE_BLUE)        
-      ADD_STATIC_COLOR("Static purple", HUE_PURPLE)
-      ADD_STATIC_COLOR("Static orange", HUE_ORANGE)
-    END_MODE()
-    BLACK_MODE()
+
   END_EFFECTS()
+
+
+//Effect Engine
+BEGIN_EFFECT_ENGINE() 
+  
   
   //Leds
   BEGIN_LEDS()

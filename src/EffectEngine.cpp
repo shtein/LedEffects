@@ -30,54 +30,103 @@ DEFINE_STR_PROGMEM(rs_Id,          "id")
 DEFINE_STR_PROGMEM(rs_Speed,       "speed")
 DEFINE_STR_PROGMEM(rs_Hue,         "hue")
 DEFINE_STR_PROGMEM(rs_Sat,         "sat")
-DEFINE_STR_PROGMEM(rs_Val,         "vale")
+DEFINE_STR_PROGMEM(rs_Val,         "val")
 DEFINE_STR_PROGMEM(rs_HSV,         "hsv")
 DEFINE_STR_PROGMEM(rs_Transforms,  "transforms")
 DEFINE_STR_PROGMEM(rs_Transform,   "transform")
+DEFINE_STR_PROGMEM(rs_Flags,       "flags")
+DEFINE_STR_PROGMEM(rs_Dsc,         "dsc")
+DEFINE_STR_PROGMEM(rs_Cfg,         "cfg")
 
 ////////////////////////////////////////////
 //Notifictaions serialization
 
 void putNtfObject(NtfBase &resp, const EFFECT_DESCRIPTION &data){
   resp.put_F(rs_Id, data.effectId);
-  resp.put_F(rs_Name, (const __FlashStringHelper *)data.effectName);
+  resp.put_FP(rs_Name, data.effectName);
+  resp.put_F(rs_Flags, data.flags);
 }
 
 void putNtfObject(NtfBase &resp, const TRANSFORM_DESCRIPTION &data){
-  resp.put_F(rs_Id, data.transformId);
-  resp.put_F(rs_Name, (const __FlashStringHelper *)data.transformName);
+  resp.put_F(rs_Id, data.transformId); 
+  resp.put_FP(rs_Name,  data.transformName);
+  
+}
+
+void putNtfObject(NtfBase &resp, const EFFECT_MODE_CONFIG &data){
+  resp.put_F(rs_Name, data.name);  
+  resp.put_F(rs_EffectCount, data.numEffects);
+  resp.put_F(rs_Effect, data.effectNum);
+}
+
+
+void putNtfEffectData(NtfBase &resp, uint8_t flags, const EFFECT_DATA &data){
+  //Do nothing if no data
+  if(!flags){
+    return; 
+  }
+
+  resp.begin_F(rs_Data);
+
+  if(flags & ECF_HSV){
+    resp.put_F(rs_HSV, data.hsv);
+  }
+  else if(flags & ECF_RGB){    
+  }
+  else if(flags & ECF_TRANSFORM){
+    TRANSFORM_DESCRIPTION td;
+    if(getPalTransform(data.byte, td)){
+      resp.put_F(rs_Transform, td);
+    }      
+  }
+
+  resp.end();
+  
+} 
+
+void putNtfObject(NtfBase &resp, const EFFECT_CONFIG &data){  
+  resp.put_F(rs_Speed, data.speedDelay);    
+  putNtfEffectData(resp, getEffectFlags(data.effectId), data.data);    
+}
+
+struct EEResp_Effect{
+  uint8_t            effectNum;
+  EFFECT_CONFIG      cfg;
+};
+
+void putNtfObject(NtfBase &resp, const EEResp_Effect &data){
+  resp.put_F(rs_Index, data.effectNum);
+
+  EFFECT_DESCRIPTION ed;
+  getEffect(data.cfg.effectId, ed);
+  resp.put_F(rs_Dsc, ed); 
+
+  resp.put_F(rs_Cfg, data.cfg); 
 }
 
 struct EEResp_Mode{
-  uint8_t            modeNum;
-  EFFECT_MODE_CONFIG cfg;
+  uint8_t             modeNum;
+  EFFECT_MODE_CONFIG  cfgMode;
 };
 
 void putNtfObject(NtfBase &resp, const EEResp_Mode &data){
   resp.put_F(rs_Index, data.modeNum);
-  resp.put_F(rs_Name, data.cfg.name);
-  resp.put_F(rs_EffectCount, data.cfg.numEffects);
-  resp.put_F(rs_Effect, data.cfg.effectNum);
+  resp.put_F(rs_Cfg, data.cfgMode);
+  
 
   resp.beginArray_F(rs_Effects); 
-  {
-    for(size_t i = 0; i < data.cfg.numEffects; i++){      
-      resp.begin_F(rs_Effect); 
-      {
-        EFFECT_CONFIG cfg;
-        EFFECT_DESCRIPTION ed;
 
-        getEffectConfig(data.modeNum, i, cfg);
-        getEffect(cfg.effect, ed);
-
-        resp.put_F(rs_Index, i);
-        putNtfObject(resp, ed);            
-      }
-      resp.end_F();
-    }
+  for(size_t i = 0; i < data.cfgMode.numEffects; i++){      
+    //Effect        
+    EEResp_Effect respEffect;
+    respEffect.effectNum = i;
+    if(getEffectConfig(data.modeNum, i, respEffect.cfg)){
+      resp.put_F(rs_Effect, respEffect);
+    }      
   }
   
-  resp.endArray_F();
+  resp.endArray();
+  
 }
 
 struct EEResp_ModeList{
@@ -91,12 +140,13 @@ void putNtfObject(NtfBase &resp, const EEResp_ModeList &data){
 
   EEResp_Mode mode;
   for(size_t i = 0; i < data.numModes; i++){
-    mode.modeNum = i;
-    getModeConfig(i, mode.cfg);
-    resp.put_F(rs_Mode, mode);
+    mode.modeNum = i;    
+    if(getModeConfig(i, mode.cfgMode)){
+      resp.put_F(rs_Mode, mode);
+    }
   }
   
-  resp.endArray_F();
+  resp.endArray();
 }
 
 
@@ -131,17 +181,6 @@ void putNtfObject(NtfBase &resp, const EEResp_TransformList &data){
 }
 
 
-//Getting/setting mode or effect - EEMC_MODE, EEMC_EFFECT...
-struct EEResp_ModeEffect{
-  uint8_t mode;
-  uint8_t effect;
-};
-
-void putNtfObject(NtfBase &resp, const EEResp_ModeEffect &data){
-   resp.put_F(rs_Mode, data.mode);
-   resp.put_F(rs_Effect, data.effect);
-}
-
 struct EEResp_NumLeds{  
   uint16_t maxLeds;
   uint16_t numLeds;
@@ -151,7 +190,6 @@ struct EEResp_NumLeds{
   resp.put_F(rs_MaxLeds, data.maxLeds);
   resp.put_F(rs_NumLeds, data.numLeds);
 }
-
 
 #endif
 
@@ -246,7 +284,7 @@ void EffectEngine::setEffect(uint8_t effectNum){
 
       //Get effect object
       EFFECT_DESCRIPTION ed;    
-      getEffect(cfgEffect.effect, ed);
+      getEffect(cfgEffect.effectId, ed);
      _curEffect = ed.effect;
      
       //Configure it
@@ -347,10 +385,21 @@ bool EffectEngine::onCmdEE(const struct CtrlQueueItem &itm, NtfSet &ntf){
 
   switch(itm.cmd){
     case EEMC_MODE:            
-    case EEMC_GET_MODE:
+    case EEMC_GET_MODE:{         
+      EECmdResponse<EEResp_Mode> resp{itm.cmd, {_cfgEngine.modeNum, _cfgMode}};      
+      ntf.put( resp ); 
+    }
+    break;
     case EEMC_EFFECT:  
-    case EEMC_GET_EFFECT:  
-      { ntf.put(EECmdResponse<EEResp_ModeEffect> {itm.cmd, {_cfgEngine.modeNum, _cfgMode.effectNum}}); }
+    case EEMC_GET_EFFECT:{
+      EECmdResponse<EEResp_Effect> resp{itm.cmd, {_cfgMode.effectNum }};
+      getEffectConfig(_cfgEngine.modeNum, _cfgMode.effectNum, resp.data.cfg);
+      if(_curEffect){
+        resp.data.cfg.speedDelay = _curEffect->getSpeedDelay();
+        _curEffect->getConfig(resp.data.cfg.data);        
+      }
+      ntf.put(resp);
+    }
     break;
 
     case EEMC_NUMLEDS:    
@@ -365,6 +414,7 @@ bool EffectEngine::onCmdEE(const struct CtrlQueueItem &itm, NtfSet &ntf){
     case EEMC_GET_EFFECT_LIST:
       { ntf.put(EECmdResponse<EEResp_EffectList>{itm.cmd}); }
     break; 
+
     case EEMC_GET_TRANSFORM_LIST:
       { ntf.put(EECmdResponse<EEResp_TransformList>{itm.cmd}); }
     break; 
@@ -484,8 +534,8 @@ void EffectEngine::preSaveConfig(){
 // Nothing fancy, enter from terminal if serial inteface is available
 DEFINE_STR_PROGMEM(rs_CmdParam_EffectList,    "effectlist|el")
 DEFINE_STR_PROGMEM(rs_CmdParam_TransformList, "tflist|tl")
+DEFINE_STR_PROGMEM(rs_CmdParam_ModeList,      "modelist|ml")
 DEFINE_STR_PROGMEM(rs_CmdParam_Mode,          "mode|m")
-DEFINE_STR_PROGMEM(rs_CmdParam_List,          "list|l")
 DEFINE_STR_PROGMEM(rs_CmdParam_Get,           "get|g|")
 DEFINE_STR_PROGMEM(rs_CmdParam_Set,           "set|s")
 DEFINE_STR_PROGMEM(rs_CmdParam_Next,          "next|n|")
@@ -503,27 +553,27 @@ DEFINE_STR_PROGMEM(rs_CmdParam_Leds,          "leds|l")
 BEGIN_PARSE_ROUTINE(parseCommandInput)  
   VALUE_IS_TOKEN(rs_CmdParam_EffectList, EEMC_GET_EFFECT_LIST)
   VALUE_IS_TOKEN(rs_CmdParam_TransformList, EEMC_GET_TRANSFORM_LIST)
+  VALUE_IS_TOKEN(rs_CmdParam_ModeList, EEMC_GET_MODE_LIST)
   
   BEGIN_GROUP_TOKEN(rs_CmdParam_Mode) //mode 
-    VALUE_IS_TOKEN(rs_CmdParam_List, EEMC_GET_MODE_LIST)
     VALUE_IS_TOKEN(rs_CmdParam_Get, EEMC_GET_MODE)
     BEGIN_GROUP_TOKEN(rs_CmdParam_Set) //sets     
-      VALUE_IS_TOKEN(rs_CmdParam_Next, EEMC_MODE, 0, CTF_VAL_NEXT) //next mode
+      VALUE_IS_TOKEN(rs_CmdParam_Next, EEMC_MODE, 0, CTF_VAL_NEXT)  //next mode
       VALUE_IS_TOKEN(rs_CmdParam_Prev, EEMC_MODE, 0, CTF_VAL_PREV)  //prev mode
-      VALUE_IS_NUMBER(EEMC_MODE, CTF_VAL_ABS)              //specific mode
+      VALUE_IS_NUMBER(EEMC_MODE, CTF_VAL_ABS)                       //specific mode
     END_GROUP_TOKEN()  
 
-    BEGIN_GROUP_TOKEN(rs_CmdParam_Effect) //effect
-      VALUE_IS_TOKEN(rs_CmdParam_Get, EEMC_GET_EFFECT)
-      BEGIN_GROUP_TOKEN(rs_CmdParam_Set) //sets     
-        VALUE_IS_TOKEN(rs_CmdParam_Next, EEMC_EFFECT, 0, CTF_VAL_NEXT) //next effect
-        VALUE_IS_TOKEN(rs_CmdParam_Prev, EEMC_EFFECT, 0, CTF_VAL_PREV)  //prev effect
-        VALUE_IS_NUMBER(EEMC_EFFECT, CTF_VAL_ABS)               //specific effect
-      END_GROUP_TOKEN()
-    END_GROUP_TOKEN()
+    
   END_GROUP_TOKEN() //mode
 
   BEGIN_GROUP_TOKEN(rs_CmdParam_Effect) //current effect
+    VALUE_IS_TOKEN(rs_CmdParam_Get, EEMC_GET_EFFECT)
+    BEGIN_GROUP_TOKEN(rs_CmdParam_Set) //sets     
+      VALUE_IS_TOKEN(rs_CmdParam_Next, EEMC_EFFECT, 0, CTF_VAL_NEXT)  //next effect
+      VALUE_IS_TOKEN(rs_CmdParam_Prev, EEMC_EFFECT, 0, CTF_VAL_PREV)  //prev effect
+      VALUE_IS_NUMBER(EEMC_EFFECT, CTF_VAL_ABS)                       //specific effect
+    END_GROUP_TOKEN()
+    
     BEGIN_GROUP_TOKEN(rs_CmdParam_Speed)
       VALUE_IS_TOKEN(rs_CmdParam_Get, EEMC_GET_SPEED)
       VALUE_IS_PAIR(rs_CmdParam_Set, EEMC_SPEED, CTF_VAL_ABS)      

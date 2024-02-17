@@ -430,6 +430,12 @@ BEGIN_TRANSFORM_SCHEMA_RGB16_PALETTE(getPal_PortugalFlag)
   TRANSOFRM_PALETTE(PortugalFlag_p)
 END_TRANSFORM_SCHEMA()
 
+///////////////////
+//Portugal Flag
+BEGIN_TRANSFORM_SCHEMA_RGB16_PALETTE(getPal_IsraelFlag)
+  TRANSOFRM_PALETTE(IsraelFlag_p)
+END_TRANSFORM_SCHEMA()
+
 //////////////////
 // Twincle Fox
 BEGIN_TRANSFORM_SCHEMA_RGB16_PALETTE(getPal_TwinkleFox)
@@ -514,6 +520,9 @@ bool getPalTransform(uint8_t transformId, TRANSFORM_DESCRIPTION &td){
     break;
     case tl_PortugalFlag:
       GET_PAL_TRANSFORM(td, getPal_PortugalFlag, PSTR("Portugal Flag"));
+    break;
+    case tl_IsraelFlag:
+      GET_PAL_TRANSFORM(td, getPal_IsraelFlag, PSTR("Israel Flag"));
     break;
     default:
     return false;

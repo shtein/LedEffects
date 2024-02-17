@@ -41,10 +41,14 @@
 #include "Setup/AllPurpose.h"
 
 
+#ifndef SETUP_NAME
+  #error "Setup name is not defined"
+#endif
 
 #if defined(__TEST)
-#pragma message "Compile for default"
+#pragma message "Compile for Test" 
 
+#define SETUP_NAME "Test"
 
 //Effects   
 BEGIN_EFFECTS(EFF_RANDOM_START_EFFECT)
@@ -92,7 +96,7 @@ BEGIN_EFFECTS(EFF_RANDOM_START_EFFECT)
 END_EFFECTS()
 
   //Effect Engine
-BEGIN_EFFECT_ENGINE("Test") 
+BEGIN_EFFECT_ENGINE() 
   //Leds
   BEGIN_LEDS()       
     ADD_STRIP(NEOPIXEL, 2)
