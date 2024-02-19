@@ -192,8 +192,8 @@ bool getModeConfigInt(EEPROMCfg &ee, uint8_t mode, EEFFECT_MODE_CONFIG_INTERNAL 
   if(mode >= MODES_MAX){
     return false;
   }
-
   ee.moveTo(EFFECT_MODE_OFFSET + mode * EFFECT_MODE_SIZE);
+  
   ee >> cfg;
 
   return true;
@@ -343,7 +343,7 @@ bool addEffectConfig(const EFFECT_CONFIG &cfg){
 }
 
 
-bool initEffectConfig(uint8_t effectId, EFFECT_CONFIG &cfg){  
+bool initEffectConfig(uint8_t effectId, EFFECT_CONFIG &cfg, uint8_t flags){  
   memset(&cfg, 0, sizeof(cfg));
 
   //Check ID 
@@ -356,31 +356,32 @@ bool initEffectConfig(uint8_t effectId, EFFECT_CONFIG &cfg){
 
   cfg.effectId   = effectId;
   cfg.speedDelay = ed.effect->getSpeedDelay();
+  cfg.data.flags = (flags | ed.flags);
 
   return true;
 }
 
-bool addEffectConfig(uint8_t effectId){
+bool addEffectConfig(uint8_t effectId, uint8_t flags){
   EFFECT_CONFIG cfg;
-  initEffectConfig(effectId, cfg);
+  initEffectConfig(effectId, cfg, flags);
   
   return addEffectConfig(cfg);  
 }
 
-bool addEffectConfig(uint8_t effectId, const CHSV &hsv){
+bool addEffectConfig(uint8_t effectId, const CHSV &hsv, uint8_t flags){
   EFFECT_CONFIG cfg;
-  initEffectConfig(effectId, cfg);
+  initEffectConfig(effectId, cfg, flags);
 
   cfg.data.hsv = hsv;
 
   return addEffectConfig(cfg);  
 }
 
-bool addEffectConfig(uint8_t effectId, enum TransformPalList tpl){
+bool addEffectConfig(uint8_t effectId, TransformPalList tpl, uint8_t flags){
   EFFECT_CONFIG cfg;
-  initEffectConfig(effectId, cfg);
+  initEffectConfig(effectId, cfg, flags);
 
-  cfg.data.byte = tpl;
+  EFFECT_PARAM_TRANSFORM(cfg.data) = tpl;
 
   return addEffectConfig(cfg);  
 }

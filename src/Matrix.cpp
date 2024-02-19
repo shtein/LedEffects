@@ -391,3 +391,19 @@ void XYDraw::mirrorRightTriangleButterfly(int16_t x0, int16_t y0,
 
 
 }
+
+
+///////////////////////////////////////
+// Kaleidoscope
+void kaleidoscope(CRGB *leds, uint16_t numLeds){        
+  XYDraw xy(leds, numLeds);
+
+  
+
+  xy.mirrorRightTriangleButterfly(0, xy.height() / 2 - 1, 
+                                  xy.width() / 2, -xy.height() / 2,
+                                  xy.width() / 2 - 1, -xy.height() / 2 + 1
+                                );
+  xy.mirrorRectangleHorizontally(0, 0, xy.width()/2, xy.height()/2, xy.width()/2, xy.width() % 2 - 1);
+  xy.mirrorRectangleVertically(0, 0, xy.width(), xy.height() / 2, xy.height() / 2, 0, xy.height() % 2 - 1);
+};

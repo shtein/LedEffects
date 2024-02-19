@@ -16,27 +16,28 @@
 DEFINE_STR_PROGMEM(rs_Cmd,         "cmd")
 DEFINE_STR_PROGMEM(rs_Data,        "data")
 DEFINE_STR_PROGMEM(rs_Error,       "error")
-DEFINE_STR_PROGMEM(rs_NumLeds,     "numLeds")
-DEFINE_STR_PROGMEM(rs_MaxLeds,     "maxLeds")
-DEFINE_STR_PROGMEM(rs_Index,       "idx")
-DEFINE_STR_PROGMEM(rs_ModeCount,   "modeCnt")
-DEFINE_STR_PROGMEM(rs_Modes,       "modes")
-DEFINE_STR_PROGMEM(rs_Mode,        "mode")
-DEFINE_STR_PROGMEM(rs_Name,        "name")
-DEFINE_STR_PROGMEM(rs_EffectCount, "effectCnt")
-DEFINE_STR_PROGMEM(rs_Effects,     "effects")
-DEFINE_STR_PROGMEM(rs_Effect,      "effect")
-DEFINE_STR_PROGMEM(rs_Id,          "id")
-DEFINE_STR_PROGMEM(rs_Speed,       "speed")
-DEFINE_STR_PROGMEM(rs_Hue,         "hue")
-DEFINE_STR_PROGMEM(rs_Sat,         "sat")
-DEFINE_STR_PROGMEM(rs_Val,         "val")
-DEFINE_STR_PROGMEM(rs_HSV,         "hsv")
-DEFINE_STR_PROGMEM(rs_Transforms,  "transforms")
-DEFINE_STR_PROGMEM(rs_Transform,   "transform")
-DEFINE_STR_PROGMEM(rs_Flags,       "flags")
-DEFINE_STR_PROGMEM(rs_Dsc,         "dsc")
-DEFINE_STR_PROGMEM(rs_Cfg,         "cfg")
+DEFINE_STR_PROGMEM(rs_NumLeds,      "numLeds")
+DEFINE_STR_PROGMEM(rs_MaxLeds,      "maxLeds")
+DEFINE_STR_PROGMEM(rs_Index,        "idx")
+DEFINE_STR_PROGMEM(rs_ModeCount,    "modeCnt")
+DEFINE_STR_PROGMEM(rs_Modes,        "modes")
+DEFINE_STR_PROGMEM(rs_Mode,         "mode")
+DEFINE_STR_PROGMEM(rs_Name,         "name")
+DEFINE_STR_PROGMEM(rs_EffectCount,  "effectCnt")
+DEFINE_STR_PROGMEM(rs_Effects,      "effects")
+DEFINE_STR_PROGMEM(rs_Effect,       "effect")
+DEFINE_STR_PROGMEM(rs_Id,           "id")
+DEFINE_STR_PROGMEM(rs_Speed,        "speed")
+DEFINE_STR_PROGMEM(rs_Hue,          "hue")
+DEFINE_STR_PROGMEM(rs_Sat,          "sat")
+DEFINE_STR_PROGMEM(rs_Val,          "val")
+DEFINE_STR_PROGMEM(rs_HSV,          "hsv")
+DEFINE_STR_PROGMEM(rs_Transforms,   "transforms")
+DEFINE_STR_PROGMEM(rs_Transform,    "transform")
+DEFINE_STR_PROGMEM(rs_Flags,        "flags")
+DEFINE_STR_PROGMEM(rs_Dsc,          "dsc")
+DEFINE_STR_PROGMEM(rs_Cfg,          "cfg")
+DEFINE_STR_PROGMEM(rs_Kaleidoscope, "kldsc")
 
 ////////////////////////////////////////////
 //Notifictaions serialization
@@ -60,33 +61,33 @@ void putNtfObject(NtfBase &resp, const EFFECT_MODE_CONFIG &data){
 }
 
 
-void putNtfEffectData(NtfBase &resp, uint8_t flags, const EFFECT_DATA &data){
+void putNtfObject(NtfBase &resp,  const EFFECT_DATA &data){
   //Do nothing if no data
-  if(!flags){
-    return; 
-  }
 
-  resp.begin_F(rs_Data);
-
-  if(flags & ECF_HSV){
+  resp.put_F(rs_Flags, data.flags);
+  
+  if(data.flags & ECF_HSV) {
     resp.put_F(rs_HSV, data.hsv);
   }
-  else if(flags & ECF_RGB){    
+  
+  if(data.flags & ECF_RGB){    
   }
-  else if(flags & ECF_TRANSFORM){
+
+  if(data.flags & ECF_TRANSFORM){
     TRANSFORM_DESCRIPTION td;
-    if(getPalTransform(data.byte, td)){
+    if(getPalTransform(EFFECT_PARAM_TRANSFORM(data), td)){
       resp.put_F(rs_Transform, td);
     }      
   }
-
-  resp.end();
   
+  if(data.flags & ECF_KALEYDOSCOPE){
+    resp.put_F(rs_Kaleidoscope, true);
+  }
 } 
 
 void putNtfObject(NtfBase &resp, const EFFECT_CONFIG &data){  
   resp.put_F(rs_Speed, data.speedDelay);    
-  putNtfEffectData(resp, getEffectFlags(data.effectId), data.data);    
+  resp.put_F(rs_Data, data.data);    
 }
 
 struct EEResp_Effect{
@@ -124,9 +125,8 @@ void putNtfObject(NtfBase &resp, const EEResp_Mode &data){
       resp.put_F(rs_Effect, respEffect);
     }      
   }
-  
+
   resp.endArray();
-  
 }
 
 struct EEResp_ModeList{
@@ -387,7 +387,7 @@ bool EffectEngine::onCmdEE(const struct CtrlQueueItem &itm, NtfSet &ntf){
     case EEMC_MODE:            
     case EEMC_GET_MODE:{         
       EECmdResponse<EEResp_Mode> resp{itm.cmd, {_cfgEngine.modeNum, _cfgMode}};      
-      ntf.put( resp ); 
+      ntf.put(resp); 
     }
     break;
     case EEMC_EFFECT:  
@@ -481,7 +481,8 @@ void EffectEngine::loop(const struct CtrlQueueItem &itm, NtfSet &ntf){
      if(_millis <= millis()){
 
         //Proceed
-        _curEffect->proceed(_leds, _cfgEngine.numLeds );
+        _curEffect->draw(_leds, _cfgEngine.numLeds );
+        
         
         //Remember when proceed next time
         _millis = millis() + _curEffect->getSpeedDelay();

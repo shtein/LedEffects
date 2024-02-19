@@ -9,7 +9,7 @@
 
 
 void setRandomColor(CHSV &hsv){
-  hsv.h = random8(0xFF);
+  hsv.h = random8();
   hsv.s = 0xFF;
   hsv.v = 0xFF;
 }
@@ -52,11 +52,18 @@ uint8_t Effect::_speedDelay = 0;
 EFFECT_DATA Effect::_cfg;
 Effect::EFFECT_CONTEXT Effect::_ctx;
 
-Effect::Effect(){
+//Draw 
+void  Effect::draw(CRGB *leds, uint16_t numLeds){
+  proceed(leds, numLeds);
+
+#ifdef USE_MATRIX
+  if(_cfg.flags & ECF_KALEYDOSCOPE){
+      kaleidoscope(leds, numLeds);
+  }
+#endif
+
 }
 
-Effect::~Effect(){
-}
 
 bool Effect::onCmd(const struct CtrlQueueItem &itm, NtfSet &ntf){ 
 
@@ -162,7 +169,7 @@ bool EffectColor::onCmd(const struct CtrlQueueItem &itm, NtfSet &ntf){
 void EffectPaletteTransform::updatePal(){
   //Retreive transformation schema
   TRANSFORM_DESCRIPTION td;
-  if(getPalTransform(_cfg.byte, td)){
+  if(getPalTransform(EFFECT_PARAM_TRANSFORM(_cfg), td)){
     td.tFunc(_ctx.palTarget);
   }
 }
@@ -217,7 +224,7 @@ bool EffectPaletteTransform::onCmd(const struct CtrlQueueItem &itm, NtfSet &ntf)
     case EEMC_TRANSFORM:{
       TRANSFORM_DESCRIPTION td;
       if(getPalTransform(itm.data.value, td)){
-        _cfg.byte = td.transformId;
+        EFFECT_PARAM_TRANSFORM(_cfg) = td.transformId;
       }
     }
     break;
@@ -236,7 +243,7 @@ bool EffectPaletteTransform::onCmd(const struct CtrlQueueItem &itm, NtfSet &ntf)
   switch(itm.cmd){
     case EEMC_GET_TRANSFORM: 
     case EEMC_TRANSFORM:     
-      { ntf.put(EECmdResponse<EEResp_EffectTransform>{ itm.cmd, { _cfg.byte } } ); }   
+      { ntf.put(EECmdResponse<EEResp_EffectTransform>{ itm.cmd, { EFFECT_PARAM_TRANSFORM(_cfg) } } ); }   
     break;
   }    
 #endif

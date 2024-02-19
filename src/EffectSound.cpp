@@ -1,5 +1,5 @@
 #include "LedEffects.h"
-
+/*
 #include <Fastled.h>
 #include <Controls.h>
 
@@ -323,3 +323,5 @@ void EffectSound::drawBoundary(CRGB *leds,
   leds[mapEx(lower, 0, 255, bottom, numLeds - 1 - bottom)] += clrLower;
   leds[mapEx(upper, 0, 255, bottom, numLeds - 1 - bottom)] += clrUpper;    
 }
+
+*/

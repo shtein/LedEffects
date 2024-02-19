@@ -5,36 +5,36 @@
 
 #pragma message "Compile for christmas tree"
 
+//Effects   
+BEGIN_EFFECTS(0)
+  BEGIN_MODE("Chrsms")   
+    ADD_EFFECT(el_Confetti, tl_Christmas )
+    ADD_EFFECT(el_Plasma, tl_Christmas )
+    ADD_EFFECT(el_Noise, tl_Christmas )
+    ADD_EFFECT(el_TwinkleFox, tl_SnowAndIce)
+  END_MODE() 
+  BEGIN_MODE("Hlwn")      
+    ADD_EFFECT(el_Confetti, tl_Halloween )
+    ADD_EFFECT(el_Plasma, tl_Autumn )
+    ADD_EFFECT(el_Noise, tl_Halloween )
+  END_MODE()
+  BEGIN_MODE("Other")        
+    ADD_EFFECT(el_Ripple)   
+    ADD_EFFECT(el_MeteorRain)
+    ADD_EFFECT(el_Plasma, tl_Plasma)
+    ADD_EFFECT(el_Confetti, tl_Confetti)        
+    ADD_EFFECT(el_Blur)
+    ADD_EFFECT(el_RainbowMove)
+    ADD_EFFECT(el_Noise, tl_Default)            
+    ADD_EFFECT(el_MoodBlobs) 
+    ADD_EFFECT(el_Rainbow)
+    ADD_EFFECT(el_TheaterChaseRainbow) 
+  END_MODE()    
+END_EFFECTS()
+
+
   //Effect Engine
-BEGIN_EFFECT_ENGINE(christmas tree, 0) 
-  
-  //Effects   
-  BEGIN_EFFECTS()
-    BEGIN_MODE("Christmas", 4)   
-      ADD_EFFECT("Confetti-crsm",  EffectConfetti, &TransformChristmas )
-      ADD_EFFECT("Plazma-crsm", EffectPlasma, &TransformChristmas )
-      ADD_EFFECT("Noise-crsm", EffectNoise, &TransformChristmas )
-      ADD_EFFECT("Twinkle fox-crsm", EffectTwinkleFox, &SnowAndIce)
-    END_MODE() 
-    BEGIN_MODE("Halloween", 3)      
-      ADD_EFFECT("Confetty-hlw", EffectConfetti, &TransformHalloween )
-      ADD_EFFECT("Plazma-hlw", EffectPlasma, &TransformAutunm )
-      ADD_EFFECT("Noise-hlw", EffectNoise, &TransformHalloween )
-    END_MODE()
-    BEGIN_MODE("Other", 10)        
-      ADD_EFFECT("Ripple", EffectRipple<>)   
-      ADD_EFFECT("Meteor rain", EffectMeteorRain<>)
-      ADD_EFFECT("Plazma", EffectPlasma)
-      ADD_EFFECT("Confetti", EffectConfetti)        
-      ADD_EFFECT("Blur", EffectBlur)
-      ADD_EFFECT("Rainbow move" ,EffectRainbowMove)
-      ADD_EFFECT("Noise", EffectNoise)            
-      ADD_EFFECT("Mood blobs", EffectMoodBlobs) 
-      ADD_EFFECT("Rainbow", EffectRainbow)
-      ADD_EFFECT("Theater rainbow", EffectTheaterChaseRainbow) 
-    END_MODE()    
-  END_EFFECTS()
-  
+BEGIN_EFFECT_ENGINE()   
   //Leds
   BEGIN_LEDS() 
     ADD_STRIP(WS2811, LED_PIN, RGB)  //First strip for Christmass Tree

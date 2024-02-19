@@ -28,13 +28,16 @@ enum EffectList{
   el_RunningLights, 
   el_TwinkleFox,
   el_Fire,
+  el_Maxtrix_Drops,
+  el_Matrix_Bouncing_Dots,
+  el_Matrix_Circles,
   el_Total
 };
 
 struct EFFECT_DESCRIPTION{ 
   uint8_t   effectId;
   uint8_t   flags;
-  Effect   *effect;       //Pointer to an effect  
+  Effect   *effect;        //Pointer to an effect  
 #ifdef NTF_ENABLED  
   const char *effectName;  //Name of the effect, this is PROGMEM
 #endif  

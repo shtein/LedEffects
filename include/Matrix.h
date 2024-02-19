@@ -170,7 +170,8 @@ protected:
 };
 
 
-
+//Kaleidoscope
+void kaleidoscope(CRGB *leds, uint16_t numLeds);
 
 
 #endif //__MATRIX_H

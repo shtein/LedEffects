@@ -5,24 +5,27 @@
 
 
 #pragma message "Compile for 16x16 matrix"
-  
+
+//Effects   
+BEGIN_EFFECTS(0)
+  BEGIN_MODE("Effects")
+    
+    ADD_EFFECT(el_Confetti, tl_Confetti, ECF_KALEYDOSCOPE)
+    ADD_EFFECT(el_TwinkleFox, tl_TwinkleFox, ECF_KALEYDOSCOPE)
+    ADD_EFFECT(el_MoodBlobs, ECF_KALEYDOSCOPE)
+    ADD_EFFECT(el_Plasma, tl_Plasma, ECF_KALEYDOSCOPE)
+    ADD_EFFECT(el_Blur, ECF_KALEYDOSCOPE)
+    ADD_EFFECT(el_TwinkleFox, tl_TwinkleFox)
+    ADD_EFFECT(el_PacificOcean)        
+    ADD_EFFECT(el_MoodBlobs) 
+    ADD_EFFECT(el_Maxtrix_Drops, tl_TwinkleFox)
+    ADD_EFFECT(el_Matrix_Bouncing_Dots)
+    ADD_EFFECT(el_Matrix_Circles, tl_Default)
+  END_MODE()
+END_EFFECTS()  
+
 //Effect Engine
-BEGIN_EFFECT_ENGINE(16x16 matrix, 0) 
-  //Effects   
-  BEGIN_EFFECTS()
-    BEGIN_MODE("Effects", 15)
-      ADD_EFFECT("Bouncing dots", EffectMatrixBounsingDots)
-      ADD_EFFECT("Kaledoscope - Confetti", EffectMatrixKaleidoscope<EffectConfetti>)
-      ADD_EFFECT("Kaledoscope - Twinkle fox", EffectMatrixKaleidoscope<EffectTwinkleFox>)
-      ADD_EFFECT("Kaledoscope - MoodBlobs", EffectMatrixKaleidoscope<EffectMoodBlobs >)
-      ADD_EFFECT("Kaledoscope - Plazma", EffectMatrixKaleidoscope<EffectPlasma >)
-      ADD_EFFECT("Twinkle Fox", EffectTwinkleFox)
-      ADD_EFFECT("Pacific ocean", EffectPacificOcean)        
-      ADD_EFFECT("Mood blobs", EffectMoodBlobs) 
-      ADD_EFFECT("Drops", EffectMatrixDrops<8>, TwinkleFox)
-      ADD_EFFECT("Circles", EffectMatrixCircles<2>)
-    END_MODE()
-  END_EFFECTS()
+BEGIN_EFFECT_ENGINE() 
   
   //Leds
   BEGIN_LEDS() 
@@ -32,11 +35,12 @@ BEGIN_EFFECT_ENGINE(16x16 matrix, 0)
 //Control    
 
   BEGIN_CONTROL_MAP()
-    
+    //SERIAL_INPUT()
+
     BEGIN_PUSH_BUTTON(MODE_PIN)    
       PUSH_BUTTON_TO_CMD(EEMC_EFFECT, PB_CONTROL_CLICK_SHORT)      
     END_PUSH_BUTTON() 
-    
+
   END_CONTROL_MAP()
       
 END_EFFECT_ENGINE() 

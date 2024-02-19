@@ -55,15 +55,22 @@ bool setModeConfig(uint8_t mode, const EFFECT_MODE_CONFIG &cfg);
 //Effect configuration
 #define EFFECT_DATA_LEN 7
 
+
+struct EFFECT_PARAMS{
+
+}; 
+
 struct EFFECT_DATA{
+  uint8_t    flags;
   union{
     CHSV     hsv;
     CRGB     rgb;
-    uint8_t  byte;
+    uint8_t  byte[3];
   }; 
-  uint8_t spare[4];
+  uint8_t spare[3];
 };
 
+#define EFFECT_PARAM_TRANSFORM(s) s.byte[0]
 
 struct EFFECT_CONFIG{  
   uint8_t     effectId;     //Effect id
@@ -71,11 +78,12 @@ struct EFFECT_CONFIG{
   EFFECT_DATA data;         //Data
 };
 
+
 //Effect config
 bool addEffectConfig(const EFFECT_CONFIG &cfg);
-bool addEffectConfig(uint8_t effectId);
-bool addEffectConfig(uint8_t effectId, const CHSV &hsv);
-bool addEffectConfig(uint8_t effectId, enum TransformPalList tpl);
+bool addEffectConfig(uint8_t effectId, uint8_t flags = 0);
+bool addEffectConfig(uint8_t effectId, const CHSV &hsv, uint8_t flags = 0);
+bool addEffectConfig(uint8_t effectId, TransformPalList tpl, uint8_t flags = 0);
 
 bool getEffectConfig(uint8_t mode, uint8_t effect, EFFECT_CONFIG &cfg);
 bool setEffectConfig(uint8_t mode, uint8_t effect, const EFFECT_CONFIG &cfg);

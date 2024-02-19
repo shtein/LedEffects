@@ -34,18 +34,17 @@ void moveGravity(Obj<T> &obj, int16_t t){
 ////////////////////////////////////////
 // EffectMatrixDrops
 
-template <const int MAX_OBJECTS = 5>
+#ifndef MAXTRIX_DROPS_MAX_OBJECTS
+  #define MAXTRIX_DROPS_MAX_OBJECTS 8
+#endif  
+
 class EffectMatrixDrops: public EffectPaletteTransform{
-public:
-  inline EffectMatrixDrops(FuncGetPalette_t getPal = &FuncGetPal_Default) __attribute__((always_inline)):
-    EffectPaletteTransform(getPal) {    
-  };
 
 protected:
-  void reset(){
+  inline void reset(){
     EffectPaletteTransform::reset();
 
-    for(int i = 0; i < MAX_OBJECTS; i++){
+    for(int i = 0; i < MAXTRIX_DROPS_MAX_OBJECTS; i++){
       _drops[i].obj.pos = Pnt8_t(127, 127);
       _drops[i].obj.vel = Pnt8_t(0, 1);
     }
@@ -63,7 +62,7 @@ protected:
     XYDraw xy(leds, numLeds, XY_DRAW_ADD_COLORS);
 
     //Proceed with objects
-    for(int i = 0; i < MAX_OBJECTS; i++){
+    for(int i = 0; i < MAXTRIX_DROPS_MAX_OBJECTS; i++){
       Drop  &drop  = _drops[i];
       Pnt8_t &pos  = drop.obj.pos;
 
@@ -72,7 +71,7 @@ protected:
       if(pos.y > random8(xy.height(), xy.height() + xy.height() / 4)){
 
         //Init
-        pos.x           = random8(i * xy.width() / MAX_OBJECTS, (i + 1) * xy.width() / MAX_OBJECTS );
+        pos.x           = random8(i * xy.width() / MAXTRIX_DROPS_MAX_OBJECTS, (i + 1) * xy.width() / MAXTRIX_DROPS_MAX_OBJECTS );
         pos.y           = random8(xy.height() / 2);
         drop.colorIndex = random8();
       }
@@ -91,25 +90,24 @@ protected:
   struct Drop{
     uint8_t         colorIndex;
     Obj8_t          obj;
-  } _drops[MAX_OBJECTS];
+  } _drops[MAXTRIX_DROPS_MAX_OBJECTS];
 };
+
 
 
 ////////////////////////////////////////
 // EffectMatrixCircles
-template <const int MAX_OBJECTS = 5>
+#ifndef MAXTRIX_CIRCLES_MAX_OBJECTS
+  #define MAXTRIX_CIRCLES_MAX_OBJECTS 2
+#endif  
+
 class EffectMatrixCircles: public EffectPaletteTransform{
 public:
-  inline EffectMatrixCircles(FuncGetPalette_t getPal = &FuncGetPal_Default) __attribute__((always_inline)):
-    EffectPaletteTransform(getPal) { 
-  }
-  
 
-protected:
   void reset(){
     EffectPaletteTransform::reset();
 
-    for(int i = 0; i < MAX_OBJECTS; i++){
+    for(int i = 0; i < MAXTRIX_CIRCLES_MAX_OBJECTS; i++){
         _circles[i].obj.pos = Pnt8_t(127, 127);
         _circles[i].obj.vel = Pnt8_t(1, 1);
         _circles[i].radius  = 127;
@@ -128,7 +126,7 @@ protected:
     XYDraw xy(leds, numLeds, XY_DRAW_ADD_COLORS);
 
     //Proceed with objects
-    for(int i = 0; i < MAX_OBJECTS; i++){
+    for(int i = 0; i < MAXTRIX_CIRCLES_MAX_OBJECTS; i++){
       
       Circle &circle  = _circles[i];
       Pnt8_t &pos     = circle.obj.pos;
@@ -161,41 +159,16 @@ protected:
     uint8_t colorIndex;
     uint8_t radius;
     Obj8_t  obj;    
-  } _circles[MAX_OBJECTS];
+  } _circles[MAXTRIX_CIRCLES_MAX_OBJECTS];
 };
 
-
-template <class T> 
-class EffectMatrixKaleidoscope: public T{
-
-protected:
-  inline void proceed(CRGB *leds, uint16_t numLeds){
-    T::proceed(leds, numLeds);
-    
-    XYDraw xy(leds, numLeds);
-
-    
-
-    xy.mirrorRightTriangleButterfly(0, xy.height() / 2 - 1, 
-                                    xy.width() / 2, -xy.height() / 2,
-                                    xy.width() / 2 - 1, -xy.height() / 2 + 1
-                                  );
-    xy.mirrorRectangleHorizontally(0, 0, xy.width()/2, xy.height()/2, xy.width()/2, xy.width() % 2 - 1);
-    xy.mirrorRectangleVertically(0, 0, xy.width(), xy.height() / 2, xy.height() / 2, 0, xy.height() % 2 - 1);
-  };
-
-};
 
 ///////////////////////////////////////////////
 //EffectMatrixBounsingDots
 
 class EffectMatrixBounsingDots: public Effect{
 public:
-  inline EffectMatrixBounsingDots() __attribute__((always_inline)) {      
-  };
 
-
-protected:
   void reset(){
     _obj.pos = Pnt32_t(0, 0);
     _obj.vel = Pnt32_t(1000, 0);
@@ -207,8 +180,6 @@ protected:
     fadeToBlackBy(leds, numLeds, MATRIX_OBJECTS_FADE/4 );
 
     XYDraw xy(leds, numLeds);
-
-    //DBG_OUTLN("%ld %ld", _obj.pos.x >> 16, _obj.pos.y >> 16);
 
     
     if(_obj.movesAwayLeft(0)){
@@ -226,8 +197,6 @@ protected:
     if(_obj.movesAwayDown((int32_t)xy.height() << 16)){
       _obj.vel.y = -_obj.vel.y;      
     }
-
-    //xy(_obj.pos.x >> 8, _obj.pos.y >> 8) = CRGB::Black;
 
     moveGravity(_obj, 20);
     //moveLinear(_obj, 20);

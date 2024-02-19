@@ -48,8 +48,6 @@
 #if defined(__TEST)
 #pragma message "Compile for Test" 
 
-#define SETUP_NAME "Test"
-
 //Effects   
 BEGIN_EFFECTS(EFF_RANDOM_START_EFFECT)
   BEGIN_MODE("Regular")        
@@ -99,7 +97,7 @@ END_EFFECTS()
 BEGIN_EFFECT_ENGINE() 
   //Leds
   BEGIN_LEDS()       
-    ADD_STRIP(NEOPIXEL, 2)
+    ADD_STRIP(NEOPIXEL, LED_PIN)
   END_LEDS()
 
 //Control    
