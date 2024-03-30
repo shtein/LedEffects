@@ -1,77 +1,66 @@
 #include "LedEffects.h"
 #include <EEPROMCfg.h>
 #include <Controls.h>
+#include "Effect.h"
 #include "EffectsAll.h"
 #include "EffectEngineCfg.h"
 
 
-//Utility functions for internal use
-
-void copyStr(uint8_t *dst, const char *src, size_t maxLen){
-  size_t nameLen = src ? min(strlen(src), maxLen) : 0;
-  memcpy(dst, src, nameLen);
-  memset(dst + nameLen, 0, maxLen - nameLen);
-}
 
 
-// Engine version structure
 
-//  version - 2 bytes  |
-// ---------------------
-// | verhigh | verlow  |
-// |  8 bit  | 8 bit   |
-// ---------------------
+// Config DB structure
 
+//  Engine Config  |   Spare  |        Offsets       |      Mode Config     |    Effects Configs   |      Mode Config     |    Effects Configs   |
+// ----------------|---------------------------------|----------------------|----------------------|----------------------|----------------------|
+//     7 bytes     |  4 bytes |  MAX_MODES * 1 bytes |        20 bytes      |  effects * 12 bytes  |         ...          |         ...          |
+// ----------------------------------------------------------------------------------------------------------------------------------------------|
 
 // Engine config structure
 
-// |              engine - 4 bytes                     |
-// -----------------------------------------|----------|
-// |  flags  | modes   |  mode   |        numLeds      |
-// |  8 bit  |  4 bit  | 4 bit   |        16 bit       |
-// -----------------------------------------|----------|
+//  version - 2 bytes  |              engine - 5 bytes                     |
+// -------------------------------------------------------------|----------|
+// | verhigh | verlow  |  flags  | modes   |  mode   |        numLeds      |
+// |  8 bit  | 8 bit   |  8 bit  |  8 bit  | 8 bit   |        16 bit       |
+// ------------------------------------------------------------------------|
+
 
 
 // Effect mode config structure
 
-// |                                           mode 11 bytes                                                     |
-// --------------------------------------------------------------------------------------------------------------|
-//                                    name 8 bytes                                 | effects | effect  | first   |
-// |         |         |         |         |         |         |         |         |  8 bit  |  8 bit  | 8 bit   |
-// --------------------------------------------------------------------------------------------------------------|
+// |                                  mode 18 bytes                                |
+// |-------------------------------------------------------------------------------|
+// |                    name 16 byte                           | effects | effect  |
+// |         |         |         |         |         |         |  8 bit  |  8 bit  |
+// |-------------------------------------------------------------------------------|
 
 
 // Effect config
 
-// |                             effect - 9 bytes                                            |
+// |                             effect - 10 bytes                                           |
 // -------------------------------------------------------------------------------------------
-// |   id    |  speed  |                      data 7 bytes                         |         |
-// |  8 bit  |  8 bit  |         |         |         |         |         |         |         |
+// |   id    |  speed  |  flags  |             data 9 bytes                        |         |
+// |  8 bit  |  8 bit  |  8 bit  |         |         |         |         |         |         |
 // -------------------------------------------------------------------------------------------
 
 
-//This is what it looks like together
-// |   version    |   engine    |    spare    |    modes    |   spare    |  effects  |
-// |   2 bytes    |   4 bytes   |   4 bytes   |   110 bytes |   4 bytes  |    360    |
-
-
-// Config db max size
-#define CONFIG_SIZE 512
+//Sizes
+#define EFFECT_ENGINE_SIZE           sizeof(EFFECT_ENGINE_CONFIG)
+#define EFFECT_ENGINE_SPARE_SIZE     4 //4 spare bytes
+#define INDEX_SIZE                   MODES_MAX
+#define EFFECT_MODE_SIZE             sizeof(EFFECT_MODE_CONFIG)
+#define EFFECT_SIZE                  sizeof(EFFECT_CONFIG)
 
 // Offsets 
-#define EFFECT_ENGINE_VERSION_OFFSET 0
-#define EFFECT_ENGINE_OFFSET         sizeof(EFFECT_ENGINE_VERSION)
-#define EFFECT_ENGINE_SIZE           sizeof(EFFECT_ENGINE_CONFIG_INTERNAL)
-#define EFFECT_ENGINE_SPARE          4 //4 spare bytes
+#define EFFECT_ENGINE_VERSION_OFFSET            0
+#define EFFECT_ENGINE_OFFSET                    (EFFECT_ENGINE_VERSION_OFFSET + sizeof(EFFECT_ENGINE_VERSION))
+#define INDEX_OFFSET                            (EFFECT_ENGINE_OFFSET + EFFECT_ENGINE_SIZE + EFFECT_ENGINE_SPARE_SIZE)
+#define EFFECT_MODE_OFFSET(mode, indexValue)    (INDEX_OFFSET +  INDEX_SIZE + mode * EFFECT_MODE_SIZE + indexValue * EFFECT_SIZE) 
+#define EFFECT_OFFSET(mode, indexValue, effect) (EFFECT_MODE_OFFSET(mode, indexValue) + EFFECT_MODE_SIZE + effect * EFFECT_SIZE) 
 
-#define EFFECT_MODE_OFFSET           (EFFECT_ENGINE_OFFSET + EFFECT_ENGINE_SIZE + EFFECT_ENGINE_SPARE) 
-#define EFFECT_MODE_SIZE             sizeof(EEFFECT_MODE_CONFIG_INTERNAL)
-#define EFFECT_MODE_BLOCK_SIZE       (EFFECT_MODE_SIZE * MODES_MAX)                // 10 modes * 11 bytes
-#define EFFECT_MODE_SPARE            4 //4 spare bytes
+// Config db max size
+#define CONFIG_SIZE 1024
 
-#define EFFECT_OFFSET                (EFFECT_MODE_OFFSET + EFFECT_MODE_BLOCK_SIZE + EFFECT_MODE_SPARE) 
-#define EFFECT_SIZE                  sizeof(EFFECT_CONFIG)
-#define EFFECT_BLOCK_SIZE            (EFFECT_CONFIG * EFFECTS_MAX)
 
 //////////////////////////////////////////////
 // Engine version
@@ -96,21 +85,15 @@ bool checkConfigVersion(){
 //////////////////////////////////////////////
 // Engine 
 
-struct EFFECT_ENGINE_CONFIG_INTERNAL{
-  uint8_t  flags;
-  uint8_t  numModes:4;
-  uint8_t  modeNum:4;
-  uint16_t numLeds;
-};
 
-bool getEngineConfigInt(EEPROMCfg &ee, EFFECT_ENGINE_CONFIG_INTERNAL &cfg){
+bool getEngineConfigInt(EEPROMCfg &ee, EFFECT_ENGINE_CONFIG &cfg){
   ee.moveTo(EFFECT_ENGINE_OFFSET);
   ee >> cfg;
 
   return true;
 }
 
-bool setEngineConfigInt(EEPROMCfg &ee, const EFFECT_ENGINE_CONFIG_INTERNAL &cfg){
+bool setEngineConfigInt(EEPROMCfg &ee, const EFFECT_ENGINE_CONFIG &cfg){
   ee.moveTo(EFFECT_ENGINE_OFFSET);
   ee << cfg;
 
@@ -122,13 +105,13 @@ bool prepareEngineConfig(uint8_t flags){
   //Erase config    
   EEPROMCfg ee(EFFECT_ENGINE_VERSION_OFFSET);
   for(size_t i = 0; i < CONFIG_SIZE; i++)
-    ee.write(0);  
+    ee.write((uint8_t)0);  
 
   //Write config version
   ee.moveTo(EFFECT_ENGINE_VERSION_OFFSET);  
   ee << (uint8_t)EFFECT_ENGINE_VERSION_HIGH << (uint8_t)EFFECT_ENGINE_VERSION_LOW;
 
-  EFFECT_ENGINE_CONFIG_INTERNAL cfgEng;
+  EFFECT_ENGINE_CONFIG cfgEng;
   cfgEng.flags    = flags;
   cfgEng.numLeds  = 0;
   cfgEng.numModes = 0;
@@ -142,27 +125,14 @@ bool prepareEngineConfig(uint8_t flags){
 
 
 bool getEngineConfig(EFFECT_ENGINE_CONFIG &cfg){
-  
   EEPROMCfg ee;
-  EFFECT_ENGINE_CONFIG_INTERNAL cfgInt;
   
-  //Retrieve internal configuration
-  if(!getEngineConfigInt(ee, cfgInt)){
-    return false;
-  }
-
-  //Convert data
-  cfg.flags    = cfgInt.flags;
-  cfg.numModes = cfgInt.numModes;
-  cfg.modeNum  = cfgInt.modeNum;
-  cfg.numLeds  = cfgInt.numLeds;
-
-  return true;
+  return getEngineConfigInt(ee, cfg);
 }
 
 bool setEngineConfig(const EFFECT_ENGINE_CONFIG &cfg){
   EEPROMCfg ee;
-  EFFECT_ENGINE_CONFIG_INTERNAL cfgInt;
+  EFFECT_ENGINE_CONFIG cfgInt;
 
   //Retrieve internal configuration
   if(!getEngineConfigInt(ee, cfgInt)){
@@ -180,31 +150,40 @@ bool setEngineConfig(const EFFECT_ENGINE_CONFIG &cfg){
 
 //////////////////////////////////////////////
 // Mode
-struct EEFFECT_MODE_CONFIG_INTERNAL {
-  uint8_t name[MODE_NAME_LEN - 1];
-  uint8_t numEffects;
-  uint8_t effectNum;
-  uint8_t effectFirst;
-};
 
-bool getModeConfigInt(EEPROMCfg &ee, uint8_t mode, EEFFECT_MODE_CONFIG_INTERNAL &cfg){
-
-  if(mode >= MODES_MAX){
+bool getModeIndexInt(EEPROMCfg &ee, uint8_t mode, uint8_t &value){
+  if(mode >= MODES_MAX)
     return false;
-  }
-  ee.moveTo(EFFECT_MODE_OFFSET + mode * EFFECT_MODE_SIZE);
-  
-  ee >> cfg;
+
+  ee.moveTo(INDEX_OFFSET + mode);
+  ee >> value;
 
   return true;
 }
 
-bool setModeConfigInt(EEPROMCfg &ee, uint8_t mode, const EEFFECT_MODE_CONFIG_INTERNAL &cfg){
-  if(mode >= MODES_MAX){
+bool setModeIndexInt(EEPROMCfg &ee, uint8_t mode, uint8_t value){
+  if(mode >= MODES_MAX)
     return false;
-  }
 
-  ee.moveTo(EFFECT_MODE_OFFSET + mode * EFFECT_MODE_SIZE);
+  ee.moveTo(INDEX_OFFSET + mode);
+  ee << value;
+
+  return true;
+}
+
+
+bool getModeConfigInt(EEPROMCfg &ee, uint8_t mode, uint8_t index, EFFECT_MODE_CONFIG &cfg){  
+  //Read config after marker
+  ee.moveTo( EFFECT_MODE_OFFSET(mode, index) );
+  ee >>  cfg;
+
+  return true;
+}
+
+bool setModeConfigInt(EEPROMCfg &ee, uint8_t mode, uint8_t index, const EFFECT_MODE_CONFIG &cfg){  
+
+  //Write marker and config
+  ee.moveTo(EFFECT_MODE_OFFSET(mode, index));
   ee << cfg;
 
   return true;
@@ -213,36 +192,43 @@ bool setModeConfigInt(EEPROMCfg &ee, uint8_t mode, const EEFFECT_MODE_CONFIG_INT
 
 bool addModeConfig(const char *modeName){
   EEPROMCfg ee;
-  EFFECT_ENGINE_CONFIG_INTERNAL cfgEng;
-  
-  //Retrieve internal configuration
-  if(!getEngineConfigInt(ee, cfgEng)){
+
+  //Ger engine config
+  EFFECT_ENGINE_CONFIG cfgEng;
+  if(!getEngineConfigInt(ee, cfgEng))
     return false;
-  }
 
-  //Check if number of modes reached its limit
-  if(cfgEng.numModes == MODES_MAX){
-    return false;
-  }
-
-  //If this is not first mode, need to find out where the last effect is
-  uint8_t firstEffect = 0;
-  EEFFECT_MODE_CONFIG_INTERNAL cfgMode;
-
+  //Copy index from prev mode if it is not first mode
+  uint8_t index  = 0;
+  EFFECT_MODE_CONFIG cfgMode;
   if(cfgEng.numModes != 0){
-    if(!getModeConfigInt(ee, cfgEng.numModes - 1, cfgMode)){
+    
+    if(!getModeIndexInt(ee, cfgEng.numModes - 1, index)){
       return false;
     }
 
-    firstEffect = cfgMode.effectFirst + cfgMode.numEffects;
+    //Get previouse mode config
+    if(!getModeConfigInt(ee, cfgEng.numModes - 1, index, cfgMode)){
+      return false;
+    }
+
+    index += cfgMode.numEffects;
+
+    //Save index for new mode
+    if(!setModeIndexInt(ee, cfgEng.numModes, index)){
+      return false;
+    }
   }
 
-  //Prepare and save mode config  
-  copyStr(cfgMode.name, Progmem2Str24(modeName), MODE_NAME_LEN - 1);
-  cfgMode.numEffects  = 0;
-  cfgMode.effectNum   = 0;
-  cfgMode.effectFirst = firstEffect;
-  if(!setModeConfigInt(ee, cfgEng.numModes, cfgMode))
+  
+  
+  //Save mode data
+  strncpy_P(cfgMode.name, modeName, sizeof(cfgMode.name));
+  cfgMode.effectNum  = 0;
+  cfgMode.numEffects = 0;
+  
+  //Prepare and save mode config
+  if(!setModeConfigInt(ee, cfgEng.numModes, index, cfgMode))
     return false;
 
   cfgEng.numModes ++;
@@ -251,61 +237,45 @@ bool addModeConfig(const char *modeName){
 
 bool getModeConfig(uint8_t mode, EFFECT_MODE_CONFIG &cfg){
   EEPROMCfg ee;
-  EEFFECT_MODE_CONFIG_INTERNAL cfgInt;
   
-  //Retrieve internal configuration
-  if(!getModeConfigInt(ee, mode, cfgInt)){
+  uint8_t index = 0;
+  if(!getModeIndexInt(ee, mode, index)){
     return false;
-  }
+  } 
 
-  //Convert data
-  memcpy(cfg.name, cfgInt.name, MODE_NAME_LEN - 1);
-  cfg.name[MODE_NAME_LEN - 1] = 0;
-  cfg.numEffects = cfgInt.numEffects;
-  cfg.effectNum  = cfgInt.effectNum;
-
-  return true;
+  //Retrieve internal configuration
+  return  getModeConfigInt(ee, mode, index, cfg);
 }
 
 bool setModeConfig(uint8_t mode, const EFFECT_MODE_CONFIG &cfg){
   EEPROMCfg ee;
-  EEFFECT_MODE_CONFIG_INTERNAL cfgInt;
-  
-  //Retrieve internal configuration
-  if(!getModeConfigInt(ee, mode, cfgInt)){
+
+  uint8_t index = 0;
+  if(!getModeIndexInt(ee, mode, index)){
     return false;
   }
 
-  //Convert data
-  copyStr(cfgInt.name, cfg.name, MODE_NAME_LEN - 1);
-  cfgInt.effectNum  = cfg.effectNum;
-
-  //Retrieve internal configuration
-  return setModeConfigInt(ee, mode, cfgInt);
+  return setModeConfigInt(ee, mode, index, cfg);
 }
 
 
 /////////////////////////
 //Effect
-bool getEffectConfigInt(EEPROMCfg &ee, uint8_t slot, EFFECT_CONFIG &cfg){
+bool getEffectConfigInt(EEPROMCfg &ee, uint8_t mode, uint8_t index, uint8_t effect, EFFECT_CONFIG &cfg){
 
-  if(slot >= EFFECTS_MAX){
-    return false;
-  }
-
-  ee.moveTo(EFFECT_OFFSET + slot * EFFECT_SIZE);
+  ee.moveTo(EFFECT_OFFSET(mode, index, effect));
   ee >> cfg;
+
 
   return true;
 }
 
-bool setEffectConfigInt(EEPROMCfg &ee, uint8_t slot, const EFFECT_CONFIG &cfg){
-  if(slot >= EFFECTS_MAX){
-    return false;
-  }
+bool setEffectConfigInt(EEPROMCfg &ee, uint8_t mode, uint8_t index, uint8_t effect, const EFFECT_CONFIG &cfg){
 
-  ee.moveTo(EFFECT_OFFSET + slot * EFFECT_SIZE);
+  ee.moveTo(EFFECT_OFFSET(mode, index, effect));
   ee << cfg;
+  
+
   
   return true;
 }
@@ -313,9 +283,9 @@ bool setEffectConfigInt(EEPROMCfg &ee, uint8_t slot, const EFFECT_CONFIG &cfg){
 
 bool addEffectConfig(const EFFECT_CONFIG &cfg){
   EEPROMCfg ee;
-  EFFECT_ENGINE_CONFIG_INTERNAL cfgEng;
-
+  
   //Get Engine config
+  EFFECT_ENGINE_CONFIG cfgEng;
   if(!getEngineConfigInt(ee, cfgEng)){
     return false;
   }
@@ -325,25 +295,44 @@ bool addEffectConfig(const EFFECT_CONFIG &cfg){
     return false;
   }
 
+  //Get index of the last mode
+  uint8_t index = 0;
+  if(!getModeIndexInt(ee, cfgEng.numModes - 1, index)){
+    return false;
+  }
+  
   //Get the last mode configuiration
-  EEFFECT_MODE_CONFIG_INTERNAL cfgMode;
-
-  if(!getModeConfigInt(ee, cfgEng.numModes - 1, cfgMode)){
+  EFFECT_MODE_CONFIG cfgMode;
+  if(!getModeConfigInt(ee, cfgEng.numModes - 1, index, cfgMode)){
     return false;
   }
 
   //Add new effect 
-  if(!setEffectConfigInt(ee, cfgMode.effectFirst + cfgMode.numEffects, cfg)){
+  if(!setEffectConfigInt(ee, cfgEng.numModes - 1, index, cfgMode.numEffects, cfg)){
     return false;
   }  
 
   //Increase number of effects
   cfgMode.numEffects ++;
-  return setModeConfigInt(ee, cfgEng.numModes - 1, cfgMode);
+  if(setModeConfigInt(ee, cfgEng.numModes - 1, index, cfgMode)){
+    return false;
+  }
+
+  //Increment index
+  index++;
+  if(!setModeIndexInt(ee, cfgEng.numModes - 1, index)){
+    return false;
+  }
+
+  return true;
 }
 
 
-bool initEffectConfig(uint8_t effectId, EFFECT_CONFIG &cfg, uint8_t flags){  
+
+
+bool addEffectConfig(uint8_t effectId,  const EFFECT_DATA &data){
+  EFFECT_CONFIG cfg;
+
   memset(&cfg, 0, sizeof(cfg));
 
   //Check ID 
@@ -354,45 +343,26 @@ bool initEffectConfig(uint8_t effectId, EFFECT_CONFIG &cfg, uint8_t flags){
 
   ed.effect->reset();
 
-  cfg.effectId   = effectId;
-  cfg.speedDelay = ed.effect->getSpeedDelay();
-  cfg.data.flags = (flags | ed.flags);
-
-  return true;
-}
-
-bool addEffectConfig(uint8_t effectId, uint8_t flags){
-  EFFECT_CONFIG cfg;
-  initEffectConfig(effectId, cfg, flags);
-  
-  return addEffectConfig(cfg);  
-}
-
-bool addEffectConfig(uint8_t effectId, const CHSV &hsv, uint8_t flags){
-  EFFECT_CONFIG cfg;
-  initEffectConfig(effectId, cfg, flags);
-
-  cfg.data.hsv = hsv;
+  cfg.effectId    = effectId;
+  cfg.speedDelay  = ed.effect->getSpeedDelay();
+  cfg.data        = data;
+  cfg.data.flags |= ed.flags; 
 
   return addEffectConfig(cfg);  
 }
-
-bool addEffectConfig(uint8_t effectId, TransformPalList tpl, uint8_t flags){
-  EFFECT_CONFIG cfg;
-  initEffectConfig(effectId, cfg, flags);
-
-  EFFECT_PARAM_TRANSFORM(cfg.data) = tpl;
-
-  return addEffectConfig(cfg);  
-}
-
 
 bool getEffectConfig(uint8_t mode, uint8_t effect, EFFECT_CONFIG &cfg){
   EEPROMCfg ee;
-  EEFFECT_MODE_CONFIG_INTERNAL cfgMode;
+  
+  //Get mode index
+  uint8_t index = 0;
+  if(!getModeIndexInt(ee, mode, index)){
+    return false;
+  }
 
   //Get Mode configuartion
-  if(!getModeConfigInt(ee, mode, cfgMode) ){
+  EFFECT_MODE_CONFIG cfgMode;
+  if(!getModeConfigInt(ee, mode, index, cfgMode) ){
     return false;
   }
 
@@ -402,15 +372,21 @@ bool getEffectConfig(uint8_t mode, uint8_t effect, EFFECT_CONFIG &cfg){
   }
 
   
-  return getEffectConfigInt(ee, cfgMode.effectFirst + effect, cfg);
+  return getEffectConfigInt(ee, mode, index, effect, cfg);
 }
 
 bool setEffectConfig(uint8_t mode, uint8_t effect, const EFFECT_CONFIG &cfg){
   EEPROMCfg ee;
-  EEFFECT_MODE_CONFIG_INTERNAL cfgMode;
+
+  //Get mode index
+  uint8_t index = 0;
+  if(!getModeIndexInt(ee, mode, index)){
+    return false;
+  }
 
   //Get Mode configuartion
-  if(!getModeConfigInt(ee, mode, cfgMode) ){
+  EFFECT_MODE_CONFIG cfgMode;
+  if(!getModeConfigInt(ee, mode, index, cfgMode) ){
     return false;
   }
 
@@ -420,12 +396,5 @@ bool setEffectConfig(uint8_t mode, uint8_t effect, const EFFECT_CONFIG &cfg){
   }
 
   //Retreieve the data
-  return setEffectConfigInt(ee, cfgMode.effectFirst + effect, cfg);
+  return setEffectConfigInt(ee, mode, index, effect, cfg);
 }
-
-
-
-
-
-
-

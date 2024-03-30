@@ -71,8 +71,11 @@ void _CFG_LOOP(){}
 #define END_MODE() \
   }
 
-#define ADD_EFFECT(effect, ...) \
-  addEffectConfig(effect, ##__VA_ARGS__);
+#define _ADD_EFFECT(effect, flags, ...) \
+  addEffectConfig(effect, EFFECT_DATA(flags, ##__VA_ARGS__));
+  
+#define ADD_EFFECT(effect, ...) _ADD_EFFECT(effect, 0, ##__VA_ARGS__)
+#define ADD_EFFECT_KALEYDOSCOPE(effect, ...) _ADD_EFFECT(effect, ECF_KALEYDOSCOPE, ##__VA_ARGS__)
 
 //Effect Engine
 #define BEGIN_EFFECT_ENGINE() \
@@ -113,21 +116,19 @@ void _ENGINE_LOOP() \
 
 ///////////////////////////////////////
 //Control map
-#define BEGIN_CONTROL_MAP() \
-  BaseInput *ai = NULL;
+#define BEGIN_CONTROL_MAP()  
 
-#define END_CONTROL_MAP() \
-  ai = NULL;
+#define END_CONTROL_MAP()
 
 #define BEGIN_PUSH_BUTTON(pin) \
-  static PushButton BTN(pin); \
-  ai = &BTN;  
+  { \
+    static PushButton pb(pin);     
 
 #define END_PUSH_BUTTON() \
-  ai = NULL;  
+  }
 
 #define PUSH_BUTTON_TO_CMD(cmd, ...) \
-  static CtrlItemPb<__VA_ARGS__> BTN_CTRL(cmd, (PushButton *)ai); \
+  static CtrlItemPb<__VA_ARGS__> BTN_CTRL(cmd, &pb); \
   cp.addControl(&BTN_CTRL);
 
 
@@ -155,18 +156,18 @@ void _ENGINE_LOOP() \
 #ifdef USE_IR_REMOTE
 
 #define BEGIN_REMOTE(pin) \
-  static IRRemoteRecv IR_NAME(pin); \
-  ai = &IR_NAME;
+  { \
+    static IRRemoteRecv ir(pin);   
   
 #define END_REMOTE() \
-  ai = NULL;
+  }
 
 #define RMT_BUTTON_TO_CMD(cmd, code) \
-  static CtrlItemIRBtn<code> IR_CTRL(cmd, (IRRemoteRecv *)ai); \
+  static CtrlItemIRBtn<code> IR_CTRL(cmd, &ir); \
   cp.addControl(&IR_CTRL);
 
 #define RMT_BUTTON_PAIR_TO_CMD(cmd, code1, code2, repeat) \
-  static CtrlItemIRBtn<code1, true, repeat> IR_CTRL_UP(cmd, (IRRemoteRecv *)ai); \
+  static CtrlItemIRBtn<code1, true, repeat> IR_CTRL_UP(cmd, &ir); \
   cp.addControl(&IR_CTRL_UP); \
   static CtrlItemIRBtn<code2, false, repeat> IR_CTRL_DOWN(cmd, (IRRemoteRecv *)ai); \
   cp.addControl(&IR_CTRL_DOWN);

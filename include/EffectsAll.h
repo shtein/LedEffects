@@ -2,7 +2,7 @@
 #define __EFFECTS_ALL_H
 
 #include "EffectEngineCtx.h"
-#include "Effect.h"
+class Effect;
 
 /////////////////////////
 //List of all effects

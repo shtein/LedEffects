@@ -1,6 +1,7 @@
 #include "LedEffects.h"
 #include <Controls.h>
 #include <utils.h>
+#include "Effect.h"
 #include "EffectsAll.h"
 
 //Effects
@@ -68,7 +69,7 @@ DEFINE_STR_PROGMEM(rs_Effect_TwinkleFox,           "Twinkle fox")
 DEFINE_STR_PROGMEM(rs_Effect_Fire,                 "Fire")
 DEFINE_STR_PROGMEM(rs_Effect_Matrix_Drops,         "Matrix drops")
 DEFINE_STR_PROGMEM(rs_Effect_Matrix_Bouncing_Dots, "Matrix bouncing dots")
-DEFINE_STR_PROGMEM(rs_Effect_Matrix_Circles,        "Matrix circles")
+DEFINE_STR_PROGMEM(rs_Effect_Matrix_Circles,       "Matrix circles")
 
 uint8_t getEffectFlags(uint8_t effectId){
   EFFECT_DESCRIPTION ed;
@@ -106,13 +107,12 @@ bool getEffect(uint8_t effectId, EFFECT_DESCRIPTION &ed){
     break;    
 #endif
 
-#ifndef NO_EFFECT_EMERGANCY_LIGHTS    
+#ifndef NO_EFFECT_EMERGENCY_LIGHTS    
     case el_EmergencyLights:
       GET_EFFECT(ed, EffectEmergencyLights, rs_Effect_EmergencyLights);
     break;
 #endif //NO_EFFECT_EMERGANCY_LIGHTS
 
-/*
     case el_FadeInOut:
       GET_EFFECT(ed, EffectFadeInOut, rs_Effect_FadeInOut);
     break;
@@ -122,7 +122,7 @@ bool getEffect(uint8_t effectId, EFFECT_DESCRIPTION &ed){
     case el_MeteorRain:
       GET_EFFECT(ed, EffectMeteorRain, rs_Effect_MeteorRain);      
     break;    
-*/    
+
     case el_MoodBlobs:
       GET_EFFECT(ed, EffectMoodBlobs, rs_Effect_MoodBlobs);      
     break;        
@@ -198,7 +198,6 @@ bool getEffect(uint8_t effectId, EFFECT_DESCRIPTION &ed){
     case el_Matrix_Circles:
       GET_EFFECT(ed, EffectMatrixCircles, rs_Effect_Matrix_Circles, ECF_TRANSFORM);
     break;
-  
 #endif //USE_MATRIX
 
     default:

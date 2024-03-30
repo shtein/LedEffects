@@ -21,16 +21,6 @@ void setRandomColor(CHSV &hsv);
 #endif
 
 
-///////////////////////
-// Effect Config Flags
-#define ECF_NONE          0x00
-#define ECF_HSV           0x01
-#define ECF_RGB           0x02
-#define ECF_TRANSFORM     0x04
-#define ECF_KALEYDOSCOPE  (uint8_t)0x08
-
-
-
 ///////////////////
 // Basic effect
 class Effect{

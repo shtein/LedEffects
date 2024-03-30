@@ -11,11 +11,9 @@
 
 #ifdef NTF_ENABLED  
 
-
 //String resources to be stored in flash memory
-DEFINE_STR_PROGMEM(rs_Cmd,         "cmd")
-DEFINE_STR_PROGMEM(rs_Data,        "data")
-DEFINE_STR_PROGMEM(rs_Error,       "error")
+DEFINE_STR_PROGMEM(rs_VerCfg,       "verCfg")
+DEFINE_STR_PROGMEM(rs_VerEng,       "verEng")
 DEFINE_STR_PROGMEM(rs_NumLeds,      "numLeds")
 DEFINE_STR_PROGMEM(rs_MaxLeds,      "maxLeds")
 DEFINE_STR_PROGMEM(rs_Index,        "idx")
@@ -189,6 +187,22 @@ struct EEResp_NumLeds{
  void putNtfObject(NtfBase &resp, const EEResp_NumLeds &data){
   resp.put_F(rs_MaxLeds, data.maxLeds);
   resp.put_F(rs_NumLeds, data.numLeds);
+}
+
+struct EEResp_Version{  
+};
+
+void putNtfObject(NtfBase &resp, const EEResp_Version &data){
+  EFFECT_ENGINE_VERSION ver;
+  getConfigVersion(ver);
+
+  char verStr[8];
+
+  sprintf(verStr, "%d.%d", ver.verHigh, ver.verLow);
+  resp.put_F(rs_VerCfg, verStr);
+
+  sprintf(verStr, "%d.%d", EFFECT_ENGINE_VERSION_HIGH,  EFFECT_ENGINE_VERSION_LOW);
+  resp.put_F(rs_VerEng, verStr);
 }
 
 #endif
@@ -373,6 +387,7 @@ bool EffectEngine::onCmdEE(const struct CtrlQueueItem &itm, NtfSet &ntf){
     case EEMC_GET_MODE_LIST:
     case EEMC_GET_EFFECT_LIST:
     case EEMC_GET_TRANSFORM_LIST:
+    case EEMC_GET_VERSION:
     break;
 #endif
     
@@ -386,13 +401,13 @@ bool EffectEngine::onCmdEE(const struct CtrlQueueItem &itm, NtfSet &ntf){
   switch(itm.cmd){
     case EEMC_MODE:            
     case EEMC_GET_MODE:{         
-      EECmdResponse<EEResp_Mode> resp{itm.cmd, {_cfgEngine.modeNum, _cfgMode}};      
+      CmdResponse<EEResp_Mode> resp{itm.cmd, {_cfgEngine.modeNum, _cfgMode}};      
       ntf.put(resp); 
     }
     break;
     case EEMC_EFFECT:  
     case EEMC_GET_EFFECT:{
-      EECmdResponse<EEResp_Effect> resp{itm.cmd, {_cfgMode.effectNum }};
+      CmdResponse<EEResp_Effect> resp{itm.cmd, {_cfgMode.effectNum }};
       getEffectConfig(_cfgEngine.modeNum, _cfgMode.effectNum, resp.data.cfg);
       if(_curEffect){
         resp.data.cfg.speedDelay = _curEffect->getSpeedDelay();
@@ -404,20 +419,24 @@ bool EffectEngine::onCmdEE(const struct CtrlQueueItem &itm, NtfSet &ntf){
 
     case EEMC_NUMLEDS:    
     case EEMC_GET_NUMLEDS:       
-      { ntf.put(EECmdResponse<EEResp_NumLeds>{ itm.cmd, { MAX_LEDS, (uint16_t)_cfgEngine.numLeds }}); }
+      { ntf.put(CmdResponse<EEResp_NumLeds>{ itm.cmd, { MAX_LEDS, (uint16_t)_cfgEngine.numLeds }}); }
     break;
       
     case EEMC_GET_MODE_LIST:               
-      { ntf.put(EECmdResponse<EEResp_ModeList>{itm.cmd, {_cfgEngine.numModes }}); }
+      { ntf.put(CmdResponse<EEResp_ModeList>{itm.cmd, {_cfgEngine.numModes }}); }
     break;       
 
     case EEMC_GET_EFFECT_LIST:
-      { ntf.put(EECmdResponse<EEResp_EffectList>{itm.cmd}); }
+      { ntf.put(CmdResponse<EEResp_EffectList>{itm.cmd}); }
     break; 
 
     case EEMC_GET_TRANSFORM_LIST:
-      { ntf.put(EECmdResponse<EEResp_TransformList>{itm.cmd}); }
+      { ntf.put(CmdResponse<EEResp_TransformList>{itm.cmd}); }
     break; 
+
+    case EEMC_GET_VERSION:
+      { ntf.put(CmdResponse<EEResp_Version>{itm.cmd}); }
+    break;
   }
 #endif
 
@@ -430,7 +449,7 @@ bool EffectEngine::onCmd(const struct CtrlQueueItem &itm, NtfSet &ntf){
   //Process error
   if(itm.cmd == EEMC_ERROR) {
 #ifdef NTF_ENABLED    
-    ntf.put(EECmdResponse<>{ itm.cmd, EEER_INVALID } );
+    ntf.put(CmdResponse<>{ itm.cmd, EEER_INVALID } );
 #endif    
     return true;
   }
@@ -455,7 +474,7 @@ bool EffectEngine::onCmd(const struct CtrlQueueItem &itm, NtfSet &ntf){
   //Report of not processed
 #ifdef NTF_ENABLED    
   if(!processed){
-    ntf.put(EECmdResponse<>{ itm.cmd, EEER_UNHANDLED } );
+    ntf.put(CmdResponse<>{ itm.cmd, EEER_UNHANDLED } );
   }
 #endif
 
@@ -533,6 +552,7 @@ void EffectEngine::preSaveConfig(){
 /////////////////////////////
 // parseSerialInput
 // Nothing fancy, enter from terminal if serial inteface is available
+DEFINE_STR_PROGMEM(rs_CmdParam_Version,       "version|v")
 DEFINE_STR_PROGMEM(rs_CmdParam_EffectList,    "effectlist|el")
 DEFINE_STR_PROGMEM(rs_CmdParam_TransformList, "tflist|tl")
 DEFINE_STR_PROGMEM(rs_CmdParam_ModeList,      "modelist|ml")
@@ -552,6 +572,7 @@ DEFINE_STR_PROGMEM(rs_CmdParam_Leds,          "leds|l")
 
 
 BEGIN_PARSE_ROUTINE(parseCommandInput)  
+  VALUE_IS_TOKEN(rs_CmdParam_Version, EEMC_GET_VERSION)
   VALUE_IS_TOKEN(rs_CmdParam_EffectList, EEMC_GET_EFFECT_LIST)
   VALUE_IS_TOKEN(rs_CmdParam_TransformList, EEMC_GET_TRANSFORM_LIST)
   VALUE_IS_TOKEN(rs_CmdParam_ModeList, EEMC_GET_MODE_LIST)

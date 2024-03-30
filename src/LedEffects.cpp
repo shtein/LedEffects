@@ -14,9 +14,7 @@
 #include "EffectEngine.h"
 #include "EffectEngineCtx.h"
 #include "EffectSound.h"
-
 #include "Matrix.h"
-
 #include "Macro.h"
 #include "Pins.h"
 
@@ -24,6 +22,10 @@
 #include "EffectsAll.h"
 
 //Setups
+#ifndef SETUP_NAME
+  #error "Setup name is not defined"
+#endif
+
 #include "Setup/ChristmasTree.h"
 #include "Setup/David.h"
 #include "Setup/Deck.h"
@@ -41,16 +43,15 @@
 #include "Setup/AllPurpose.h"
 
 
-#ifndef SETUP_NAME
-  #error "Setup name is not defined"
-#endif
+
 
 #if defined(__TEST)
 #pragma message "Compile for Test" 
 
+
 //Effects   
 BEGIN_EFFECTS(EFF_RANDOM_START_EFFECT)
-  BEGIN_MODE("Regular")        
+  BEGIN_MODE("Regular")            
     ADD_EFFECT(el_Ripple)
     ADD_EFFECT(el_Plasma, tl_Plasma)        
     ADD_EFFECT(el_Confetti, tl_Confetti)
@@ -61,18 +62,21 @@ BEGIN_EFFECTS(EFF_RANDOM_START_EFFECT)
     ADD_EFFECT(el_PacificOcean)
     ADD_EFFECT(el_StaticColor, CHSV(HUE_RED, 0xFF, 0xFF))
   END_MODE()
+
+
+  BEGIN_MODE("Halloween")      
+    ADD_EFFECT(el_Confetti, tl_Autumn )
+    ADD_EFFECT(el_Noise, tl_Halloween )  
+  END_MODE()
+
+
+  BEGIN_MODE("Chrsitmas")   
+    ADD_EFFECT(el_Confetti, tl_Christmas)
+    ADD_EFFECT(el_Plasma, tl_Christmas)
+    ADD_EFFECT(el_TwinkleFox, tl_TwinkleFox)
+  END_MODE()
+
 /*
-  BEGIN_MODE("Halloween", 2)      
-    ADD_EFFECT("Confetti-hlw", EffectConfetti, &TransformAutunm )
-    ADD_EFFECT("Noise-hlw", EffectNoise, &TransformHalloween )
-  END_MODE()
-
-  BEGIN_MODE("Chrsitmas", 3)      
-    ADD_EFFECT("Confetti-crsm", EffectConfetti, &TransformChristmas)
-    ADD_EFFECT("Plazma-crsm", EffectPlasma, &TransformChristmas )
-    ADD_EFFECT("Twinkle fox-crsm", EffectTwinkleFox, &SnowAndIce)
-  END_MODE()
-
   BEGIN_MODE("Valentines", 3)      
     ADD_EFFECT("Confetti-vlnt", EffectConfetti, &ValentinesDay )
     ADD_EFFECT("Noise-vlnt", EffectNoise, &ValentinesDay )
@@ -84,13 +88,13 @@ BEGIN_EFFECTS(EFF_RANDOM_START_EFFECT)
     ADD_EFFECT("Noise-ind", EffectNoise, &July4th )
   END_MODE()
 
-  BEGIN_MODE(Ukraine, 3)      
+  BEGIN_MODE(Ukraine)     
     ADD_EFFECT("Confetti-ukr", EffectConfetti, &UkraineFlag )
     ADD_EFFECT("Noise-ukr", EffectNoise, &UkraineFlag )
     ADD_EFFECT("Twinkle fox-ukr", EffectTwinkleFox, &UkraineFlag )
   END_MODE()
+*/
 
-*/    
 END_EFFECTS()
 
   //Effect Engine

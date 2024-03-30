@@ -16,6 +16,7 @@
 #define EEMC_GET_MODE_LIST       0x24   //Available modes
 #define EEMC_GET_EFFECT_LIST     0x25   //Available effects
 #define EEMC_GET_TRANSFORM_LIST  0x26   //Available pallete transforms
+#define EEMC_GET_VERSION         0x27   //Get version
 
 #define EEMC_MODE        (EEMC_LED | EEMC_GET_MODE)       //Mode changed
 #define EEMC_EFFECT      (EEMC_LED | EEMC_GET_EFFECT)     //Effect changed
@@ -74,12 +75,40 @@
 //Timeout to save config
 #define SAVE_CONFIG_TIMEOUT 30000
 
+#ifdef NTF_ENABLED
 
-//String resources
-#define DEFINE_STR_PROGMEM(k, v) const char k[] PROGMEM = v;
-#define DECLARE_STR_PROGMEM(k) extern const char k[] PROGMEM;
+#include <Notification.h>
 
-#include "Ntf.h"
+//////////////////////////////////////
+// Set of notifiers
+#ifndef MAX_NTF
+  #define MAX_NTF 2
+#endif //MAX_NTF
+
+typedef NtfBaseSet<MAX_NTF> NtfSet;
+
+///////////////////////////////////////
+// Serialization for command responses
+DECLARE_STR_PROGMEM(rs_Mode)
+DECLARE_STR_PROGMEM(rs_Effect)
+DECLARE_STR_PROGMEM(rs_NumLeds)
+DECLARE_STR_PROGMEM(rs_MaxLeds)
+DECLARE_STR_PROGMEM(rs_Speed)
+DECLARE_STR_PROGMEM(rs_Hue)
+DECLARE_STR_PROGMEM(rs_Sat)
+DECLARE_STR_PROGMEM(rs_Val)
+DECLARE_STR_PROGMEM(rs_HSV)
+DECLARE_STR_PROGMEM(rs_Transforms)
+DECLARE_STR_PROGMEM(rs_Transform)
+DECLARE_STR_PROGMEM(rs_Flags)
+DECLARE_STR_PROGMEM(rs_Cfg)
+DECLARE_STR_PROGMEM(rs_Dsc)
+
+#else 
+
+typedef void *NtfSet;
+
+#endif //NTF_ENABLED
 
 
 #endif //__EFFECTENGINECTX_H

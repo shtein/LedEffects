@@ -41,7 +41,7 @@ bool WiFiConnection::onCmd(struct CtrlQueueItemEx &itm){
 
   switch(itm.cmd){
     case EEMC_WIFI_STATUS: // Retreieve current wifi status
-      itm.ntf.put(EECmdResponse<WIFI_STATUS>{itm.cmd});      
+      itm.ntf.put(CmdResponse<WIFI_STATUS>{itm.cmd});      
     break;
 
     case EEMC_WIFI_STATUS_CHANGE: { //Change of WiFi status 
@@ -50,46 +50,46 @@ bool WiFiConnection::onCmd(struct CtrlQueueItemEx &itm){
         writeConfig();
       }
 
-      itm.ntf.put(EECmdResponse<WIFI_STATUS_STATION>{itm.cmd});  
+      itm.ntf.put(CmdResponse<WIFI_STATUS_STATION>{itm.cmd});  
     }
     break;
 
     case EEMC_WIFI_CONNECT:{ //Connect to WiFi network                
       _wcn.wifiConnect = *(WIFI_CONNECT *)itm.data.str;          
       connectWiFi(_wcn.wifiConnect);
-      itm.ntf.put(EECmdResponse<>{itm.cmd, EEER_DELAYED});     
+      itm.ntf.put(CmdResponse<>{itm.cmd, EEER_DELAYED});     
     }    
     break;
 
     case EEMC_WIFI_DISCONNECT: //Disconnect 
       WiFi.disconnect(true);    
-      itm.ntf.put(EECmdResponse<>{itm.cmd, EEER_DELAYED});        
+      itm.ntf.put(CmdResponse<>{itm.cmd, EEER_DELAYED});        
     break;
     
     case EEMC_WIFI_AP_ON:{ //Connect AP                                 
       connectWiFiAP(_wcn.wifiAP);
       enableCaptivePortalDNS(true);      
-      itm.ntf.put(EECmdResponse<WIFI_STATUS_AP>{itm.cmd}); 
+      itm.ntf.put(CmdResponse<WIFI_STATUS_AP>{itm.cmd}); 
     }
     break;
 
     case EEMC_WIFI_AP_OFF: //Disconnect AP 
       enableCaptivePortalDNS(false);
       WiFi.softAPdisconnect(true);
-      itm.ntf.put(EECmdResponse<WIFI_STATUS_AP>{itm.cmd});       
+      itm.ntf.put(CmdResponse<WIFI_STATUS_AP>{itm.cmd});       
     break;
     
     case EEMC_WIFI_SCAN:{
       switch(WiFi.scanComplete()){
         case WIFI_SCAN_FAILED:
           WiFi.scanNetworks(true, true);
-          itm.ntf.put(EECmdResponse<>{itm.cmd, EEER_DELAYED});    
+          itm.ntf.put(CmdResponse<>{itm.cmd, EEER_DELAYED});    
         break;
         case WIFI_SCAN_RUNNING:
-          itm.ntf.put(EECmdResponse<>{itm.cmd, EEER_DELAYED});    
+          itm.ntf.put(CmdResponse<>{itm.cmd, EEER_DELAYED});    
         break;
         default:
-          itm.ntf.put(EECmdResponse<WIFI_SCAN>{itm.cmd});        
+          itm.ntf.put(CmdResponse<WIFI_SCAN>{itm.cmd});        
           WiFi.scanDelete();
         break;
       }
@@ -98,7 +98,7 @@ bool WiFiConnection::onCmd(struct CtrlQueueItemEx &itm){
 
     case EEMC_WIFI_CFG_GET: {      
       //Send reponse      
-      EECmdResponse<const WIFI_CONFIG_ALL &> resp{itm.cmd, _wcn};
+      CmdResponse<const WIFI_CONFIG_ALL &> resp{itm.cmd, _wcn};
       itm.ntf.put(resp);              
     }
     break;      
@@ -109,7 +109,7 @@ bool WiFiConnection::onCmd(struct CtrlQueueItemEx &itm){
       readConfig();
 
       //Send reponse      
-      EECmdResponse<const WIFI_CONFIG_ALL &> resp{itm.cmd, _wcn};
+      CmdResponse<const WIFI_CONFIG_ALL &> resp{itm.cmd, _wcn};
       itm.ntf.put(resp);              
     }
     break;

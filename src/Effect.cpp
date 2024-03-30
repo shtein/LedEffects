@@ -88,7 +88,7 @@ bool Effect::onCmd(const struct CtrlQueueItem &itm, NtfSet &ntf){
   switch(itm.cmd){    
     case EEMC_SPEED:      
     case EEMC_GET_SPEED:
-    { ntf.put(EECmdResponse<EEResp_EffectSpeed> {itm.cmd, { getSpeedDelay() }}); }
+    { ntf.put(CmdResponse<EEResp_EffectSpeed> {itm.cmd, { getSpeedDelay() }}); }
     break;
 
     break;    
@@ -154,7 +154,7 @@ bool EffectColor::onCmd(const struct CtrlQueueItem &itm, NtfSet &ntf){
     case EEMC_COLOR_SAT: 
     case EEMC_COLOR_VAL: 
     case EEMC_GET_COLOR_HSV:
-      { ntf.put(EECmdResponse<CHSV>{ itm.cmd, {  _cfg.hsv } }); }   
+      { ntf.put(CmdResponse<CHSV>{ itm.cmd, {  _cfg.hsv } }); }   
     break;
   }    
 #endif
@@ -243,7 +243,7 @@ bool EffectPaletteTransform::onCmd(const struct CtrlQueueItem &itm, NtfSet &ntf)
   switch(itm.cmd){
     case EEMC_GET_TRANSFORM: 
     case EEMC_TRANSFORM:     
-      { ntf.put(EECmdResponse<EEResp_EffectTransform>{ itm.cmd, { EFFECT_PARAM_TRANSFORM(_cfg) } } ); }   
+      { ntf.put(CmdResponse<EEResp_EffectTransform>{ itm.cmd, { EFFECT_PARAM_TRANSFORM(_cfg) } } ); }   
     break;
   }    
 #endif

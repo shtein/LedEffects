@@ -10,11 +10,11 @@
 BEGIN_EFFECTS(0)
   BEGIN_MODE("Effects")
     
-    ADD_EFFECT(el_Confetti, tl_Confetti, ECF_KALEYDOSCOPE)
-    ADD_EFFECT(el_TwinkleFox, tl_TwinkleFox, ECF_KALEYDOSCOPE)
-    ADD_EFFECT(el_MoodBlobs, ECF_KALEYDOSCOPE)
-    ADD_EFFECT(el_Plasma, tl_Plasma, ECF_KALEYDOSCOPE)
-    ADD_EFFECT(el_Blur, ECF_KALEYDOSCOPE)
+    ADD_EFFECT_KALEYDOSCOPE(el_Confetti, tl_Confetti)
+    ADD_EFFECT_KALEYDOSCOPE(el_TwinkleFox, tl_TwinkleFox)
+    ADD_EFFECT_KALEYDOSCOPE(el_MoodBlobs)
+    ADD_EFFECT_KALEYDOSCOPE(el_Plasma, tl_Plasma)
+    ADD_EFFECT_KALEYDOSCOPE(el_Blur)
     ADD_EFFECT(el_TwinkleFox, tl_TwinkleFox)
     ADD_EFFECT(el_PacificOcean)        
     ADD_EFFECT(el_MoodBlobs) 
@@ -22,6 +22,7 @@ BEGIN_EFFECTS(0)
     ADD_EFFECT(el_Matrix_Bouncing_Dots)
     ADD_EFFECT(el_Matrix_Circles, tl_Default)
   END_MODE()
+
 END_EFFECTS()  
 
 //Effect Engine
