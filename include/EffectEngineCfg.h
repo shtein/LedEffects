@@ -70,9 +70,9 @@ bool setModeConfig(uint8_t mode, const EFFECT_MODE_CONFIG &cfg);
 
 struct EFFECT_DATA{
   uint8_t    flags;
-  union{        
+  union{            
     CHSV     hsv;
-    CRGB     rgb;    
+    CRGB     rgb;        
     uint8_t  byte;
   }; 
   uint8_t spare[3];

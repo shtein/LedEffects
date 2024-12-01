@@ -51,10 +51,10 @@ class EffectEngine{
     EFFECT_MODE_CONFIG   _cfgMode;        //Current mode config
     Effect              *_curEffect;      //Current Effect
 
-    EELEDS         _leds;                 //Leds  
+    EELEDS              _leds;            //Leds  
    
-    unsigned long _millis;                //Processing
-    unsigned long _millisToSaveCfg;       //When to safe config
+    uint16_t            _millis;          //Processing
+    uint16_t            _millisToSaveCfg; //When to safe config
 
 #if defined(ESP8266) || defined(ESP32)
     WiFiConnection   _wifi;               //WiFi connectivity

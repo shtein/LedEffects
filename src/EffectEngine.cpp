@@ -497,14 +497,13 @@ void EffectEngine::loop(const struct CtrlQueueItem &itm, NtfSet &ntf){
   if(_curEffect != NULL){
 
     //Is it time to process ?
-     if(_millis <= millis()){
+     if(DELTA_MILLS(_millis) >= _curEffect->getSpeedDelay()){
 
         //Proceed
         _curEffect->draw(_leds, _cfgEngine.numLeds );
-        
-        
+
         //Remember when proceed next time
-        _millis = millis() + _curEffect->getSpeedDelay();
+        SET_MILLIS(_millis);
         
         updateLeds = true;
      }
@@ -516,12 +515,14 @@ void EffectEngine::loop(const struct CtrlQueueItem &itm, NtfSet &ntf){
   }
 
   //See if we need to safe config
-  if(_millisToSaveCfg != 0 && _millisToSaveCfg < millis()){
-    //Reset
-    _millisToSaveCfg = 0;
+  if(_millisToSaveCfg != 0 && DELTA_MILLS(_millisToSaveCfg) >= SAVE_CONFIG_TIMEOUT){
     
     //Safe config
     saveConfig();
+    DBG_OUTLN("Config saved");
+
+    //Reset
+    _millisToSaveCfg = 0;    
   }
 }
 
@@ -546,7 +547,7 @@ void EffectEngine::saveConfig(){
 }
 
 void EffectEngine::preSaveConfig(){
-  _millisToSaveCfg = millis() + SAVE_CONFIG_TIMEOUT;
+  SET_MILLIS(_millisToSaveCfg);
 }
 
 /////////////////////////////

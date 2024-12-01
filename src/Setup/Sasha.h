@@ -48,21 +48,26 @@ BEGIN_EFFECT_ENGINE(Sasha, 0)
   BEGIN_CONTROL_MAP()
     
     BEGIN_PUSH_BUTTON(MODE_PIN)    
-      PUSH_BUTTON_TO_CMD(EEMC_MODE, PB_CONTROL_PUSH_LONG)
-      PUSH_BUTTON_TO_CMD(EEMC_EFFECT, PB_CONTROL_CLICK_SHORT)      
+      PUSH_BUTTON_TO_CMD(PB_CONTROL_PUSH_LONG, EEMC_MODE)
+      PUSH_BUTTON_TO_CMD(PB_CONTROL_CLICK_SHORT, EEMC_EFFECT)      
     END_PUSH_BUTTON()     
   
-  /*
+  
     //Make sure ir remote receiver is wired and connected properly to arduino otherwise the program misbehaves: stops, slows down, etc      
     BEGIN_REMOTE(REMOTE_PIN)  //Remote
-      RMT_BUTTON_TO_CMD(EEMC_MODE, RKEY_OK)                         //Mode
-      RMT_BUTTON_PAIR_TO_CMD(EEMC_EFFECT, RKEY_UP, RKEY_DOWN, 0)    //Effect
-      RMT_BUTTON_PAIR_TO_CMD(EEMC_SPEED, RKEY_LEFT, RKEY_RIGHT, 5)  //Speed
-      RMT_BUTTON_PAIR_TO_CMD(EEMC_COLOR_HUE, RKEY_1, RKEY_4, 5)     //Color Hue
-      RMT_BUTTON_PAIR_TO_CMD(EEMC_COLOR_SAT, RKEY_2, RKEY_5, 5)     //Color Saturation
-      RMT_BUTTON_PAIR_TO_CMD(EEMC_COLOR_VAL, RKEY_3, RKEY_6, 5)     //Color Value
+      RMT_BUTTON_TO_CMD(RKEY_OK, EEMC_MODE)                            //Mode
+      RMT_BUTTON_PAIR_TO_CMD(RKEY_UP, EEMC_EFFECT, 0, CTF_VAL_NEXT)    //Effect
+      RMT_BUTTON_PAIR_TO_CMD(RKEY_DONW, EEMC_EFFECT, 0, CTF_VAL_PREV)  //Effect
+      RMT_BUTTON_PAIR_TO_CMD(RKEY_LEFT, EEMC_SPEED, 5)                 //Speed
+      RMT_BUTTON_PAIR_TO_CMD(RKEY_RIGHT, EEMC_SPEED, -5)               //Speed
+      RMT_BUTTON_PAIR_TO_CMD(RKEY_1, EEMC_COLOR_HUE, 5)                //Color Hue
+      RMT_BUTTON_PAIR_TO_CMD(RKEY_4, EEMC_COLOR_HUE, -5)               //Color Hue
+      RMT_BUTTON_PAIR_TO_CMD(RKEY_2, EEMC_COLOR_SAT , 5)               //Color Saturation
+      RMT_BUTTON_PAIR_TO_CMD(RKEY_5, EEMC_COLOR_SAT ,-5)               //Color Saturation
+      RMT_BUTTON_PAIR_TO_CMD(RKEY_3, EEMC_COLOR_VAL, 5)                //Color Value
+      RMT_BUTTON_PAIR_TO_CMD(RKEY_6, EEMC_COLOR_VAL, -5)               //Color Value
     END_REMOTE()    
-   */ 
+   
   END_CONTROL_MAP()
       
 END_EFFECT_ENGINE() 
