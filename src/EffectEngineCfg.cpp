@@ -5,10 +5,6 @@
 #include "EffectsAll.h"
 #include "EffectEngineCfg.h"
 
-
-
-
-
 // Config DB structure
 
 //  Engine Config  |   Spare  |        Offsets       |      Mode Config     |    Effects Configs   |      Mode Config     |    Effects Configs   |
@@ -39,7 +35,7 @@
 
 // |                             effect - 10 bytes                                           |
 // -------------------------------------------------------------------------------------------
-// |   id    |  speed  |  flags  |             data 9 bytes                        |         |
+// |   id    |  speed  |  flags  |             data 6 bytes                                  |
 // |  8 bit  |  8 bit  |  8 bit  |         |         |         |         |         |         |
 // -------------------------------------------------------------------------------------------
 
@@ -266,7 +262,6 @@ bool getEffectConfigInt(EEPROMCfg &ee, uint8_t mode, uint8_t index, uint8_t effe
   ee.moveTo(EFFECT_OFFSET(mode, index, effect));
   ee >> cfg;
 
-
   return true;
 }
 
@@ -274,8 +269,6 @@ bool setEffectConfigInt(EEPROMCfg &ee, uint8_t mode, uint8_t index, uint8_t effe
 
   ee.moveTo(EFFECT_OFFSET(mode, index, effect));
   ee << cfg;
-  
-
   
   return true;
 }
@@ -327,9 +320,6 @@ bool addEffectConfig(const EFFECT_CONFIG &cfg){
   return true;
 }
 
-
-
-
 bool addEffectConfig(uint8_t effectId,  const EFFECT_DATA &data){
   EFFECT_CONFIG cfg;
 
@@ -337,7 +327,7 @@ bool addEffectConfig(uint8_t effectId,  const EFFECT_DATA &data){
 
   //Check ID 
   EFFECT_DESCRIPTION ed;
-  if(!getEffect(effectId, ed)){
+  if(!getEffect(effectId, ed)){       
     return false;
   }
 
@@ -348,6 +338,7 @@ bool addEffectConfig(uint8_t effectId,  const EFFECT_DATA &data){
   cfg.data        = data;
   cfg.data.flags |= ed.flags; 
 
+  
   return addEffectConfig(cfg);  
 }
 

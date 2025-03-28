@@ -3,25 +3,29 @@
 
 //////////////////////////////
 // Color Wipe Effect
+
+#define COLOR_WIPE_RGB _ctx.rgb
+
 class EffectColorWipe: public Effect{
 protected:
   void proceed(CRGB *leds, uint16_t numLeds){
-    leds[_ctx.step % numLeds] =  _ctx.hsv;
 
+    leds[_ctx.step % numLeds] =  COLOR_WIPE_RGB;
     _ctx.step++;
 
     if((uint16_t)_ctx.step == numLeds) { //wipe colors
-      _ctx.hsv = CHSV(0, 0, 0);
+      COLOR_WIPE_RGB = CRGB::Black;
     }
-    else if ((uint16_t)_ctx.step == (2 * numLeds) ) { //set color
+    else if ((uint16_t)_ctx.step == (2 * numLeds) ) { //set colors
       _ctx.step = 0;
-      setRandomColor(_ctx.hsv);
+      COLOR_WIPE_RGB.setHue(random8());
     }
   } 
   
   void reset(){
     _ctx.step = 0;
-    setRandomColor(_ctx.hsv);
+    COLOR_WIPE_RGB.setHue(random8());
+    
     setSpeedDelay(25);
   }
 };

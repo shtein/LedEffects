@@ -4,37 +4,37 @@
 // WS2812B strip, 88 LEDs, remote control
 
 #pragma message "Compile for Igor"
+
+//Effects   
+BEGIN_EFFECTS(0)
+  BEGIN_MODE("Effects")
+    ADD_EFFECT(el_Fire)
+    ADD_EFFECT(el_MeteorRain)
+    ADD_EFFECT(el_Plasma)
+    ADD_EFFECT(el_Confetti)
+    ADD_EFFECT(el_PaletteTransform) 
+    ADD_EFFECT(el_Blur)
+    ADD_EFFECT(el_RainbowMove)
+    ADD_EFFECT(el_Noise)            
+    ADD_EFFECT(el_MoodBlobs) 
+    ADD_EFFECT(el_Rainbow)
+    ADD_EFFECT(el_FadeInOut)
+    ADD_EFFECT(el_RunningLights)
+    ADD_EFFECT(el_ColorWipe) 
+    ADD_EFFECT(el_TheaterChaseRainbow) 
+  END_MODE()
+  BEGIN_MODE("Static")
+    ADD_EFFECT(el_StaticColor, CHSV(HUE_RED, 255, 255))
+    ADD_EFFECT(el_StaticColor, CHSV(HUE_GREEN, 255, 255))
+    ADD_EFFECT(el_StaticColor, CHSV(HUE_BLUE, 255, 255))
+  END_MODE()
+END_EFFECTS()
+  
   
 //Effect Engine
-BEGIN_EFFECT_ENGINE(Igor, 0) 
-  
-  //Effects   
-  BEGIN_EFFECTS()
-    BEGIN_MODE("Effects", 15)
-      ADD_EFFECT("Fire", EffectFire)
-      ADD_EFFECT("Meteor rain", EffectMeteorRain<>)
-      ADD_EFFECT("Plazma", EffectPlasma)
-      ADD_EFFECT("Confetti", EffectConfetti)
-      ADD_EFFECT("Transform fast", EffectPaletteTransformFast) 
-      ADD_EFFECT("Blur", EffectBlur)
-      ADD_EFFECT("Rainbow move", EffectRainbowMove)
-      ADD_EFFECT("Noise", EffectNoise)            
-      ADD_EFFECT("Mood blobs", EffectMoodBlobs) 
-      ADD_EFFECT("Rainbow", EffectRainbow)
-      ADD_EFFECT("Fade in out", EffectFadeInOut)
-      ADD_EFFECT("Running lights", EffectRunningLights)           //Single color
-      ADD_EFFECT("Color wipe", EffectColorWipe)                   //Not intersting
-      ADD_EFFECT("Theater rainbow", EffectTheaterChaseRainbow) 
-    END_MODE()
-    BEGIN_MODE(Static, 3)
-      ADD_STATIC_COLOR("Static red", HUE_RED)
-      ADD_STATIC_COLOR("Static green", HUE_GREEN)
-      ADD_STATIC_COLOR("Static blue", HUE_BLUE)
-    END_MODE()
-    BLACK_MODE()
-  END_EFFECTS()
-  
-  //Leds
+BEGIN_EFFECT_ENGINE() 
+
+//Leds
   BEGIN_LEDS() 
     ADD_STRIP(NEOPIXEL, LED_PIN)
   END_LEDS()
@@ -43,12 +43,12 @@ BEGIN_EFFECT_ENGINE(Igor, 0)
   BEGIN_CONTROL_MAP()
     //Make sure ir remote receiver is wired and connected properly to arduino otherwise the program misbehaves: stops, slows down, etc      
     BEGIN_REMOTE(REMOTE_PIN)  //Remote
-      RMT_BUTTON_TO_CMD(EEMC_MODE, RKEY_OK)                         //Mode
-      RMT_BUTTON_PAIR_TO_CMD(EEMC_EFFECT, RKEY_UP, RKEY_DOWN, 0)    //Effect
-      RMT_BUTTON_PAIR_TO_CMD(EEMC_SPEED, RKEY_LEFT, RKEY_RIGHT, 5)  //Speed
-      RMT_BUTTON_PAIR_TO_CMD(EEMC_COLOR_HUE, RKEY_1, RKEY_4, 5)     //Color Hue
-      RMT_BUTTON_PAIR_TO_CMD(EEMC_COLOR_SAT, RKEY_2, RKEY_5, 5)     //Color Saturation
-      RMT_BUTTON_PAIR_TO_CMD(EEMC_COLOR_VAL, RKEY_3, RKEY_6, 5)     //Color Value
+      RMT_BUTTON_TO_CMD(R_DEC_KEY_OK, EEMC_MODE)                                   //Mode
+      RMT_BUTTON_PAIR_PREV_NEXT_TO_CMD(EEMC_EFFECT, R_DEC_KEY_UP, R_DEC_KEY_DOWN)  //Effect
+      RMT_BUTTON_PAIR_DELTA_TO_CMD(R_DEC_KEY_LEFT, R_DEC_KEY_RIGHT, EEMC_SPEED, 5) //Speed
+      RMT_BUTTON_PAIR_DELTA_TO_CMD(R_DEC_KEY_1, R_DEC_KEY_4, EEMC_COLOR_HUE, 5)    //Color Hue
+      RMT_BUTTON_PAIR_DELTA_TO_CMD(R_DEC_KEY_2, R_DEC_KEY_5, EEMC_COLOR_SAT, 5)    //Color Saturation
+      RMT_BUTTON_PAIR_DELTA_TO_CMD(R_DEC_KEY_3, R_DEC_KEY_6, EEMC_COLOR_VAL, 5)    //Color Value
     END_REMOTE()          
   END_CONTROL_MAP()
       

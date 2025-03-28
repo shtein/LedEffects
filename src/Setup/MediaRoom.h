@@ -3,54 +3,49 @@
 //////////////////////////////////////////
 // 
 
-#include <SoundCapture.h>
+//#include <SoundCapture.h>
 
 #pragma message "Compile for media room"
 
-void setup() {
-  DBG_INIT();
-  DBG_OUTLN("Led effect started - media room");  
-
-  INIT_SOUND_CAPTURE(SoundCaptureMSGEQ7, MSGEQ7_ANALOG_PIN, MSGEQ7_STROBE_PIN, MSGEQ7_RESET_PIN)    
+BEGIN_EFFECTS(0)
+  BEGIN_MODE("Sound")
+    ADD_EFFECT(el_Sound, EFFECT_SOUND_DATA{ SC_MAP_ABOVE_NOISE | SC_MAP_SENSITIVITY | SC_MAP_USE_MAX | SC_MAP_USE_MIN| SC_MAP_LOG, SOUND_LOWER_MIN, SOUND_UPPER_MAX, SOUND_SENSITIVITY_DEFAULT })
+  END_MODE()
+  //BEGIN_MODE("Effects")                        
+  //  ADD_EFFECT(el_Juggle)
+  //  ADD_EFFECT(el_TwinkleFox, tl_TwinkleFox)        
+  //  ADD_EFFECT(el_PacificOcean)         
+  //END_MODE()      
+END_EFFECTS()
   
-  //Effect Engine
-  BEGIN_EFFECT_ENGINE(0) 
-    //Effects   
-    BEGIN_EFFECTS()
-      BEGIN_MODE("Sound", 2)
-        ADD_EFFECT("Sound", EffectSound)
-      END_MODE()
-      BEGIN_MODE("Effects", 10)                        
-        ADD_EFFECT("Juggle", EffectJuggle)
-        ADD_EFFECT("Twinkle fox", EffectTwinkleFox, TwinkleFox)        
-        ADD_EFFECT("Pacific ocean", EffectPacificOcean)         
-      END_MODE()      
-    END_EFFECTS()
+//Effect Engine
+BEGIN_EFFECT_ENGINE() 
+  //Leds
+  BEGIN_LEDS() 
+    ADD_STRIP(NEOPIXEL, LED_PIN)
+  END_LEDS()
+
+  //Control    
+
+  BEGIN_CONTROL_MAP()        
+
+    BEGIN_PUSH_BUTTON(MODE_PIN)    
+      PUSH_BUTTON_TO_CMD(PB_CONTROL_PUSH_LONG, EEMC_MODE)
+      PUSH_BUTTON_TO_CMD(PB_CONTROL_CLICK_SHORT, EEMC_EFFECT)      
+    END_PUSH_BUTTON() 
+
+    SW2POS_TO_CMD(7, EEMC_SOUND_LOG)
+    SW2POS_TO_CMD(6, EEMC_SOUND_USE_MAX)
+    SW2POS_TO_CMD(5, EEMC_SOUND_USE_MIN)
+    POT_TO_CMD(SOUND_LOW_PIN, EEMC_SOUND_LOW, POT_NOISE_THRESHOLD, 10)
+    POT_TO_CMD(SOUND_HIGH_PIN, EEMC_SOUND_HIGH, POT_NOISE_THRESHOLD, 10)
     
-    //Leds
-    BEGIN_LEDS() 
-      ADD_STRIP(NEOPIXEL, LED_PIN)
-    END_LEDS()
+    SERIAL_INPUT()
 
-    //Control    
- 
-    BEGIN_CONTROL_MAP()
-     
-      BEGIN_PUSH_BUTTON(MODE_PIN)    
-        PUSH_BUTTON_TO_CMD(PB_CONTROL_PUSH_LONG, EEMC_MODE)
-        PUSH_BUTTON_TO_CMD(PB_CONTROL_CLICK_SHORT, EEMC_EFFECT)      
-      END_PUSH_BUTTON() 
+    INIT_SOUND_CAPTURE(SoundCaptureMSGEQ7, MSGEQ7_ANALOG_PIN, MSGEQ7_STROBE_PIN, MSGEQ7_RESET_PIN) 
 
-      SW2POS_TO_CMD(EEMC_SOUND_LOG, 7)
-      SW2POS_TO_CMD(EEMC_SOUND_USE_MAX, 6)
-      SW2POS_TO_CMD(EEMC_SOUND_USE_MIN, 5)
-      POT_TO_CMD(EEMC_SOUND_LOW, SOUND_LOW_PIN, POT_NOISE_THRESHOLD, 100)
-      POT_TO_CMD(EEMC_SOUND_SENSITIVITY, SOUND_HIGH_PIN, POT_NOISE_THRESHOLD, 300)
-     
-
-    END_CONTROL_MAP()
-       
-  END_EFFECT_ENGINE() 
-}
+  END_CONTROL_MAP()
+      
+END_EFFECT_ENGINE() 
 
 #endif //__MEDIA_ROOM_SETUP

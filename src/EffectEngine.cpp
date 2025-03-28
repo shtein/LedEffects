@@ -36,6 +36,17 @@ DEFINE_STR_PROGMEM(rs_Flags,        "flags")
 DEFINE_STR_PROGMEM(rs_Dsc,          "dsc")
 DEFINE_STR_PROGMEM(rs_Cfg,          "cfg")
 DEFINE_STR_PROGMEM(rs_Kaleidoscope, "kldsc")
+#ifdef USE_SOUND
+DEFINE_STR_PROGMEM(rs_Sound,        "sound")
+DEFINE_STR_PROGMEM(rs_SndLower,     "lower")
+DEFINE_STR_PROGMEM(rs_SndUpper,     "upper")
+DEFINE_STR_PROGMEM(rs_SndMin,       "min")  
+DEFINE_STR_PROGMEM(rs_SndMax,       "max")  
+DEFINE_STR_PROGMEM(rs_SndAverage,   "avg")  
+DEFINE_STR_PROGMEM(rs_SndStdDev,    "stddev")
+DEFINE_STR_PROGMEM(rs_SoundVIM,     "vim")
+#endif
+
 
 ////////////////////////////////////////////
 //Notifictaions serialization
@@ -58,14 +69,13 @@ void putNtfObject(NtfBase &resp, const EFFECT_MODE_CONFIG &data){
   resp.put_F(rs_Effect, data.effectNum);
 }
 
-
-void putNtfObject(NtfBase &resp,  const EFFECT_DATA &data){
+void putNtfObject(NtfBase &resp, const EFFECT_DATA &data){
   //Do nothing if no data
 
   resp.put_F(rs_Flags, data.flags);
   
   if(data.flags & ECF_HSV) {
-    resp.put_F(rs_HSV, data.hsv);
+    resp.put_F(rs_HSV, EFFECT_PARAM_HSV(data));
   }
   
   if(data.flags & ECF_RGB){    
@@ -81,6 +91,18 @@ void putNtfObject(NtfBase &resp,  const EFFECT_DATA &data){
   if(data.flags & ECF_KALEYDOSCOPE){
     resp.put_F(rs_Kaleidoscope, true);
   }
+
+#ifdef USE_SOUND
+  if(data.flags & ECF_SOUND){
+    resp.put_F(rs_Sound, true);
+  }
+
+  if(data.flags & ECF_SOUND_VIM){
+    resp.put_F(rs_SoundVIM, EFFECT_PARAM_SOUNDVIM(data));
+  }
+
+#endif
+
 } 
 
 void putNtfObject(NtfBase &resp, const EFFECT_CONFIG &data){  
@@ -369,44 +391,17 @@ bool EffectEngine::onCmdEE(const struct CtrlQueueItem &itm, NtfSet &ntf){
   switch(itm.cmd){
     case EEMC_MODE:            
       onModeChange(itm.data);
+#ifdef NTF_ENABLED
+    //All get commands to process with NTF
+    case EEMC_GET_MODE:      
+      ntf.put(CmdResponse<EEResp_Mode> {itm.cmd, {_cfgEngine.modeNum, _cfgMode}} );       
+#endif
     break;
 
     case EEMC_EFFECT:    
       onEffectChange(itm.data);    
-    break;
-
-    case EEMC_NUMLEDS:
-      onNumLedsChange(itm.data);    
-    break;
-
 #ifdef NTF_ENABLED
-    //All get commands to process with NTF
-    case EEMC_GET_MODE:
-    case EEMC_GET_EFFECT:
-    case EEMC_GET_NUMLEDS:
-    case EEMC_GET_MODE_LIST:
-    case EEMC_GET_EFFECT_LIST:
-    case EEMC_GET_TRANSFORM_LIST:
-    case EEMC_GET_VERSION:
-    break;
-#endif
-    
-    default: 
-    return false;
-  };
-
-//Notifications
-#ifdef NTF_ENABLED
-
-  switch(itm.cmd){
-    case EEMC_MODE:            
-    case EEMC_GET_MODE:{         
-      CmdResponse<EEResp_Mode> resp{itm.cmd, {_cfgEngine.modeNum, _cfgMode}};      
-      ntf.put(resp); 
-    }
-    break;
-    case EEMC_EFFECT:  
-    case EEMC_GET_EFFECT:{
+    case EEMC_GET_EFFECT: {
       CmdResponse<EEResp_Effect> resp{itm.cmd, {_cfgMode.effectNum }};
       getEffectConfig(_cfgEngine.modeNum, _cfgMode.effectNum, resp.data.cfg);
       if(_curEffect){
@@ -414,14 +409,22 @@ bool EffectEngine::onCmdEE(const struct CtrlQueueItem &itm, NtfSet &ntf){
         _curEffect->getConfig(resp.data.cfg.data);        
       }
       ntf.put(resp);
-    }
+    }    
+#endif       
     break;
 
-    case EEMC_NUMLEDS:    
+    case EEMC_NUMLEDS:
+      onNumLedsChange(itm.data); 
+#ifdef NTF_ENABLED
     case EEMC_GET_NUMLEDS:       
       { ntf.put(CmdResponse<EEResp_NumLeds>{ itm.cmd, { MAX_LEDS, (uint16_t)_cfgEngine.numLeds }}); }
     break;
-      
+
+#endif         
+    break;
+
+//Other get commands
+#ifdef NTF_ENABLED
     case EEMC_GET_MODE_LIST:               
       { ntf.put(CmdResponse<EEResp_ModeList>{itm.cmd, {_cfgEngine.numModes }}); }
     break;       
@@ -437,11 +440,13 @@ bool EffectEngine::onCmdEE(const struct CtrlQueueItem &itm, NtfSet &ntf){
     case EEMC_GET_VERSION:
       { ntf.put(CmdResponse<EEResp_Version>{itm.cmd}); }
     break;
-  }
 #endif
+    
+    default: 
+    return false;
+  };
 
   return true;
-
 }
 
 bool EffectEngine::onCmd(const struct CtrlQueueItem &itm, NtfSet &ntf){
@@ -489,7 +494,7 @@ void EffectEngine::loop(const struct CtrlQueueItem &itm, NtfSet &ntf){
   
   //See if there were changes
   bool updateLeds = (itm.cmd & EEMC_LED) != EEMC_NONE;
-  if(updateLeds){
+  if(updateLeds){  
     preSaveConfig(); 
   }
 
@@ -571,6 +576,34 @@ DEFINE_STR_PROGMEM(rs_CmdParam_Val,           "sat|v")
 DEFINE_STR_PROGMEM(rs_CmdParam_Trans,         "transpal|t")
 DEFINE_STR_PROGMEM(rs_CmdParam_Leds,          "leds|l")
 
+#ifdef USE_SOUND
+DEFINE_STR_PROGMEM(rs_CmdParam_Snd,           "snd")
+DEFINE_STR_PROGMEM(rs_CmdParam_UseLog,        "ulog")
+DEFINE_STR_PROGMEM(rs_CmdParam_UseMax,        "umax")
+DEFINE_STR_PROGMEM(rs_CmdParam_UseMin,        "umin")
+DEFINE_STR_PROGMEM(rs_CmdParam_UseNoise,      "unoise")
+DEFINE_STR_PROGMEM(rs_CmdParam_Lower,         "lwr")
+DEFINE_STR_PROGMEM(rs_CmdParam_Upper,         "upr")
+
+BEGIN_PARSE_ROUTINE(parseSoundCommandInput)
+  BEGIN_GROUP_TOKEN(rs_CmdParam_Snd) 
+    VALUE_IS_TOKEN(rs_CmdParam_Get, EEMC_GET_SOUND)  
+    BEGIN_GROUP_TOKEN(rs_CmdParam_Set)
+      VALUE_IS_PAIR(rs_CmdParam_UseLog, EEMC_SOUND_LOG, CTF_VAL_ABS)
+      VALUE_IS_PAIR(rs_CmdParam_UseMin, EEMC_SOUND_USE_MIN, CTF_VAL_ABS)
+      VALUE_IS_PAIR(rs_CmdParam_UseMax, EEMC_SOUND_USE_MAX, CTF_VAL_ABS)
+      VALUE_IS_PAIR(rs_CmdParam_UseNoise, EEMC_SOUND_NOISE, CTF_VAL_ABS)
+      VALUE_IS_PAIR(rs_CmdParam_Lower, EEMC_SOUND_LOW, CTF_VAL_ABS)
+      VALUE_IS_PAIR(rs_CmdParam_Upper, EEMC_SOUND_HIGH, CTF_VAL_ABS)
+    END_GROUP_TOKEN()               
+  END_GROUP_TOKEN()
+END_PARSE_ROUTINE()
+
+#define SOUND_COMMANDS() PARSE_SUB_ROUTINE(parseSoundCommandInput) 
+#else 
+#define SOUND_COMMANDS()
+#endif
+
 
 BEGIN_PARSE_ROUTINE(parseCommandInput)  
   VALUE_IS_TOKEN(rs_CmdParam_Version, EEMC_GET_VERSION)
@@ -613,8 +646,10 @@ BEGIN_PARSE_ROUTINE(parseCommandInput)
 
     BEGIN_GROUP_TOKEN(rs_CmdParam_Trans) //set palette transform
       VALUE_IS_TOKEN(rs_CmdParam_Get, EEMC_GET_TRANSFORM)
-      VALUE_IS_PAIR(rs_CmdParam_Set, EEMC_TRANSFORM, CTF_VAL_ABS)      
+      VALUE_IS_PAIR(rs_CmdParam_Set, EEMC_TRANSFORM, CTF_VAL_ABS)                  
     END_GROUP_TOKEN()
+
+    SOUND_COMMANDS()
 
   END_GROUP_TOKEN() //effect
 

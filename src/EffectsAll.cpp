@@ -21,11 +21,15 @@
 #include "Effects/Juggle.h"
 #include "Effects/TwinkleFox.h"
 #include "Effects/PacificOcean.h"
+
 #ifdef USE_MATRIX
   #include "Matrix.h"
   #include "Effects/MatrixAnimation.h"
 #endif
-//#include "Effects/Sound.h"
+
+#ifdef USE_SOUND
+  #include "Effects/Sound.h"
+#endif
 
 #ifdef NTF_ENABLED
   #define _GET_EFFECT_NAME(ed, ename) \
@@ -46,6 +50,31 @@
     _GET_EFFECT_FLAGS(ed.flags, ##__VA_ARGS__); \
     _GET_EFFECT_NAME(ed, ename); \
   }
+
+#ifdef SOUND_ONLY
+  #define NO_EFFECT_PALLETE_TRANSFORM
+  #define NO_EFFECT_RAINBOW
+  #define NO_EFFECT_RAINBOW_MOVE
+  #define NO_THEATER_CHASE_RAINBOW
+  #define NO_EFFECT_RUNNING_LIGHTS
+  #define NO_EFFECT_EMERGENCY_LIGHTS  
+  #define NO_EFFECT_FIRE
+  #define NO_EFFECT_STATIC_COLOR
+  #define NO_EFFECT_COLOR_WIPE
+  #define NO_EFFECT_RIPPLE
+  #define NO_EFFECT_FADE_INOUT
+  #define NO_EFFECT_METEOR_RAIN
+  #define NO_EFFECT_JUGGLE
+  #define NO_EFFECT_TWINKLE_FOX
+  #define NO_EFFECT_NOISE
+  #define NO_EFFECT_MOOD_BLOBS
+  #define NO_EFFECT_PLAZMA
+  #define NO_EFFECT_CONFETTI
+  #define NO_EFFECT_PACIFIC_OCEAN
+  #define NO_EFFECT_MATRIX_DROPS
+  #define NO_EFFECT_MATRIX_BOUNCING_DOTS
+  #define NO_EFFECT_MATRIX_CIRCLES
+#endif
 
 DEFINE_STR_PROGMEM(rs_Effect_StaticColor,          "Static color")
 DEFINE_STR_PROGMEM(rs_Effect_Blur,                 "Blur")
@@ -70,6 +99,10 @@ DEFINE_STR_PROGMEM(rs_Effect_Fire,                 "Fire")
 DEFINE_STR_PROGMEM(rs_Effect_Matrix_Drops,         "Matrix drops")
 DEFINE_STR_PROGMEM(rs_Effect_Matrix_Bouncing_Dots, "Matrix bouncing dots")
 DEFINE_STR_PROGMEM(rs_Effect_Matrix_Circles,       "Matrix circles")
+#ifdef USE_SOUND
+DEFINE_STR_PROGMEM(rs_Effect_SoundVUM,             "Sound VUM")
+DEFINE_STR_PROGMEM(rs_Effect_SoundMatrixRGB,       "Sound matrix RGB")
+#endif
 
 uint8_t getEffectFlags(uint8_t effectId){
   EFFECT_DESCRIPTION ed;
@@ -113,19 +146,29 @@ bool getEffect(uint8_t effectId, EFFECT_DESCRIPTION &ed){
     break;
 #endif //NO_EFFECT_EMERGANCY_LIGHTS
 
+#ifndef NO_EFFECT_FADE_INOUT
     case el_FadeInOut:
       GET_EFFECT(ed, EffectFadeInOut, rs_Effect_FadeInOut);
     break;
+#endif //NO_EFFECT_FADE_INOUT    
+
+#ifndef NO_EFFECT_JUGGLE
     case el_Juggle:
       GET_EFFECT(ed, EffectJuggle, rs_Effect_Juggle);
     break;
+#endif //NO_EFFECT_JUGGLE    
+
+#ifndef  NO_EFFECT_METEOR_RAIN
     case el_MeteorRain:
       GET_EFFECT(ed, EffectMeteorRain, rs_Effect_MeteorRain);      
     break;    
+#endif //NO_EFFECT_METEOR_RAIN    
 
+#ifndef NO_EFFECT_MOOD_BLOBS
     case el_MoodBlobs:
       GET_EFFECT(ed, EffectMoodBlobs, rs_Effect_MoodBlobs);      
     break;        
+#endif //NO_EFFECT_MOOD_BLOBS
 
 #ifndef NO_EFFECT_PALLETE_TRANSFORM    
     case el_PaletteTransform:
@@ -133,18 +176,29 @@ bool getEffect(uint8_t effectId, EFFECT_DESCRIPTION &ed){
     break;        
 #endif //NO_EFFECT_PALLETE_TRANSFORM  
 
+#ifndef NO_EFFECT_NOISE
     case el_Noise:
       GET_EFFECT(ed, EffectNoise, rs_Effect_Noise, ECF_TRANSFORM);      
     break;        
+#endif //NO_EFFECT_NOISE    
+
+#ifndef NO_EFFECT_PLAZMA
     case el_Plasma:
       GET_EFFECT(ed, EffectPlasma, rs_Effect_Plasma, ECF_TRANSFORM);      
     break;        
+#endif //NO_EFFECT_PLAZMA
+
+#ifndef NO_EFFECT_CONFETTI
     case el_Confetti:
       GET_EFFECT(ed, EffectConfetti, rs_Effect_Confetti, ECF_TRANSFORM);      
     break;    
+#endif //NO_EFFECT_CONFETTI
+
+#ifndef NO_EFFECT_PACIFIC_OCEAN
     case el_PacificOcean:
       GET_EFFECT(ed, EffectPacificOcean, rs_Effect_PacificOcean);      
     break;    
+#endif //NO_EFFECT_PACIFIC_OCEAN    
 
 #ifndef NO_EFFECT_RAINBOW
     case el_Rainbow:
@@ -176,9 +230,11 @@ bool getEffect(uint8_t effectId, EFFECT_DESCRIPTION &ed){
     break;
 #endif //NO_EFFECT_RUNNING_LIGHTS
 
+#ifdef NO_EFFECT_TWINKLE_FOX
     case el_TwinkleFox:
       GET_EFFECT(ed, EffectTwinkleFox, rs_Effect_TwinkleFox, ECF_TRANSFORM);      
     break;
+#endif //NO_EFFECT_TWINKLE_FOX    
 
 #ifndef NO_EFFECT_FIRE    
     case el_Fire:
@@ -187,23 +243,50 @@ bool getEffect(uint8_t effectId, EFFECT_DESCRIPTION &ed){
 #endif //NO_EFFECT_FIRE    
     
 #ifdef USE_MATRIX
+
+#ifndef NO_EFFECT_MATRIX_DROPS
     case el_Maxtrix_Drops:
       GET_EFFECT(ed, EffectMatrixDrops, rs_Effect_Matrix_Drops, ECF_TRANSFORM);
     break;
+#endif //NO_EFFECT_MATRIX_DROPS
 
+#ifndef NO_EFFECT_MATRIX_BOUNCING_DOTS
     case el_Matrix_Bouncing_Dots:
       GET_EFFECT(ed, EffectMatrixBounsingDots, rs_Effect_Matrix_Bouncing_Dots);
     break;
+#endif //NO_EFFECT_MATRIX_BOUNCING_DOTS
 
+#ifndef NO_EFFECT_MATRIX_CIRCLES
     case el_Matrix_Circles:
       GET_EFFECT(ed, EffectMatrixCircles, rs_Effect_Matrix_Circles, ECF_TRANSFORM);
     break;
+#endif //NO_EFFECT_MATRIX_CIRCLES
+
+#ifdef USE_SOUND
+
+#ifndef NO_EFFECT_SOUND_MATRIX_RGB    
+    case el_SoundMatrixRGB:
+      GET_EFFECT(ed, EffectSoundRGB, rs_Effect_SoundMatrixRGB, ECF_SOUND);
+    break;
+#endif    
+
+#endif //USE_SOUND
+
 #endif //USE_MATRIX
+
+#ifdef USE_SOUND
+
+#ifndef NO_EFFECT_SOUND_VUM
+    case el_SoundVUM:      
+      GET_EFFECT(ed, EffectSoundVUM, rs_Effect_SoundVUM, ECF_SOUND | ECF_SOUND_VIM);      
+    break;
+#endif 
+
+#endif //USE_SOUND
 
     default:
     return false;
   }
-
 
   return true;
 }

@@ -4,21 +4,20 @@
 #include "Palette.h"
 #include "EffectEngineCtx.h"
 #include "EffectEngineCfg.h"
+
 #ifdef USE_MATRIX
   #include "Matrix.h"
 #endif 
 
+#ifdef USE_SOUND
+  #include "SoundUtils.h"
 
+  class SoundCapture;
+#endif
 
 ///////////////////
 // Helpers
 #define qsuba(x, b)  ((x > b) ? x - b : 0) 
-
-void setRandomColor(CHSV &hsv);
-
-#ifdef NTF_ENABLED  
-  void putNtfObject(NtfBase &resp, const CHSV &data);
-#endif
 
 
 ///////////////////
@@ -32,9 +31,6 @@ class Effect{
     //Init
     virtual void reset() = 0;
     
-    //Process
-    virtual void proceed(CRGB *leds, uint16_t numLeds) = 0;
-
     //Command processing
     virtual bool onCmd(const struct CtrlQueueItem &itm, NtfSet &ntf);
    
@@ -45,8 +41,23 @@ class Effect{
     void setConfig(const EFFECT_DATA &cfg);
     void getConfig(EFFECT_DATA &cfg);
 
+#ifdef USE_SOUND
+    //Sound
+    static void initSoundCapture(SoundCapture *sc);
+#endif    
+
   protected:
-  
+    //Process
+    virtual void proceed(CRGB *leds, uint16_t numLeds) = 0;
+    
+#ifdef USE_SOUND
+    //Sound
+    void getSoundBands(uint8_t *bands, size_t numBands);
+    bool onCmdSound(const struct CtrlQueueItem &itm, NtfSet &ntf);
+#endif    
+
+  protected:  
+
     ///////////////////
     //Structure to support real-time processing elements to save some memory
     struct EFFECT_CONTEXT {       
@@ -54,21 +65,45 @@ class Effect{
 
       CRGBPalette16  palCurrent;  //palette 1
       CRGBPalette16  palTarget;   //palette 2      
-
-      union{                      //Reusable data items
-        CHSV     hsv;
-        CRGB     rgb;
+      
+      union{                      //Reusable data items        
+        CRGB     rgb;        
         uint8_t  byte;
         int8_t   ch;
         uint16_t word;
         int16_t  value;       
       };
     };
-  
+    
     static uint8_t        _speedDelay; //Speed
     static EFFECT_DATA    _cfg;        //Config
     static EFFECT_CONTEXT _ctx;        //Runtime context
+
+#ifdef USE_SOUND
+    struct EFFECT_SOUND_CONTEXT{
+      uint8_t  flags;       //Flags how to scale sound capture
+      uint8_t  lower;       //Lower boundary from 0 to upper
+      uint8_t  upper;       //Upper boundary from lower to 255
+    };
+
+    static EFFECT_SOUND_CONTEXT _ctxSound;       //Sound context    
+    static SoundStats           _statsSound;     //Max, min, average
+    static SoundCapture        *_sc;             //Sound capture  
+
+#endif    
 };
+
+#ifdef USE_SOUND
+
+#define SOUND_MIN() (_statsSound.get(SoundStatGet::ssgMin).getAverage() - _statsSound.get(SoundStatGet::ssgMin).getStdDev())
+#define SOUND_MAX() (_statsSound.get(SoundStatGet::ssgMax).getAverage() + _statsSound.get(SoundStatGet::ssgMax).getStdDev())
+#define SOUND_AVERAGE() _statsSound.get(SoundStatGet::ssgAverage).getAverage()
+#define SOUND_STDDEV()  _statsSound.get(SoundStatGet::ssgAverage).getStdDev()
+
+#define SCALE_SOUND(bands, numBands) \
+  scaleSound(bands, numBands, _ctxSound.flags, _ctxSound.lower, _ctxSound.upper, SOUND_MIN(), SOUND_MAX(), SOUND_AVERAGE(), SOUND_STDDEV())
+
+#endif
 
 /////////////////////////////////////////
 // Single Color Effect
@@ -78,7 +113,7 @@ class EffectColor: public Effect{
   //Command processing
     virtual bool onCmd(const struct CtrlQueueItem &itm, NtfSet &ntf);
 };
-
+  
 /////////////////////////////////////////
 // Effect Palette Transform - basic palette transformation
 #define MAX_PAL_CHANGES 24
@@ -98,6 +133,7 @@ public:
     CRGB getCurrentPalColor(uint8_t index, uint8_t brightness = 255, TBlendType blendType = LINEARBLEND) const;    
     void updatePal();  
 };
+
 
 
 

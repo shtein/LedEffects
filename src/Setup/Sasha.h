@@ -5,39 +5,32 @@
 #pragma message "Compile for Sasha"
 
 
-//Effect Engine
-BEGIN_EFFECT_ENGINE(Sasha, 0) 
-  
-  //Effects   
-  BEGIN_EFFECTS()
-    BEGIN_MODE("Effects", 15)
-      ADD_EFFECT("Meteor rain", EffectMeteorRain<>)
-      ADD_EFFECT("Plazma", EffectPlasma)
-      ADD_EFFECT("Confetti", EffectConfetti)  
-      ADD_EFFECT("Blur", EffectBlur)
-      ADD_EFFECT("Rainbow move", EffectRainbowMove)
-      ADD_EFFECT("Noise", EffectNoise)            
-      ADD_EFFECT("Mood blobs", EffectMoodBlobs) 
-      ADD_EFFECT("Rainbow", EffectRainbow)
-      ADD_EFFECT("Fade in out", EffectFadeInOut)
-      ADD_EFFECT("Running lights", EffectRunningLights)           
-      ADD_EFFECT("Color wipe", EffectColorWipe)               
-      ADD_EFFECT("Theater rainbow", EffectTheaterChaseRainbow) 
-      ADD_EFFECT("Twinkle fox", EffectTwinkleFox) 
-    END_MODE()
-    BEGIN_MODE("Flags", 3)
-      ADD_EFFECT("Twinke fox-Isrl",  EffectTwinkleFox, &IsraelFlag )
-      ADD_EFFECT("Twinkle fox-urk", EffectTwinkleFox, &UkraineFlag )
-      ADD_EFFECT("Twinkle fox-us", EffectTwinkleFox, &July4th)
-    END_MODE()
+//Effects   
+BEGIN_EFFECTS(0)
+  BEGIN_MODE("Effects")
+    ADD_EFFECT(el_MeteorRain)
+    ADD_EFFECT(el_Plasma)
+    ADD_EFFECT(el_Confetti)  
+    ADD_EFFECT(el_Blur)
+    ADD_EFFECT(el_RainbowMove)
+    ADD_EFFECT(el_Noise)            
+    ADD_EFFECT(el_MoodBlobs) 
+    ADD_EFFECT(el_Rainbow)
+    ADD_EFFECT(el_FadeInOut)
+    ADD_EFFECT(el_RunningLights)           
+    ADD_EFFECT(el_ColorWipe)               
+    ADD_EFFECT(el_TheaterChaseRainbow) 
+    ADD_EFFECT(el_TwinkleFox) 
+  END_MODE()
 
-    BEGIN_MODE("Static", 3)
-      ADD_STATIC_COLOR("Static blue", HUE_BLUE)        
-      ADD_STATIC_COLOR("Static purple" ,HUE_PURPLE)
-      ADD_STATIC_COLOR("Static orange", HUE_ORANGE)
-    END_MODE()
-    BLACK_MODE()
-  END_EFFECTS()
+  BEGIN_MODE("Static")    
+    ADD_EFFECT(el_StaticColor, CHSV(HUE_PURPLE, 0xFF, 0xFF))
+  END_MODE()
+
+END_EFFECTS()
+
+
+BEGIN_EFFECT_ENGINE() 
   
   //Leds
   BEGIN_LEDS()
@@ -55,17 +48,13 @@ BEGIN_EFFECT_ENGINE(Sasha, 0)
   
     //Make sure ir remote receiver is wired and connected properly to arduino otherwise the program misbehaves: stops, slows down, etc      
     BEGIN_REMOTE(REMOTE_PIN)  //Remote
-      RMT_BUTTON_TO_CMD(RKEY_OK, EEMC_MODE)                            //Mode
-      RMT_BUTTON_PAIR_TO_CMD(RKEY_UP, EEMC_EFFECT, 0, CTF_VAL_NEXT)    //Effect
-      RMT_BUTTON_PAIR_TO_CMD(RKEY_DONW, EEMC_EFFECT, 0, CTF_VAL_PREV)  //Effect
-      RMT_BUTTON_PAIR_TO_CMD(RKEY_LEFT, EEMC_SPEED, 5)                 //Speed
-      RMT_BUTTON_PAIR_TO_CMD(RKEY_RIGHT, EEMC_SPEED, -5)               //Speed
-      RMT_BUTTON_PAIR_TO_CMD(RKEY_1, EEMC_COLOR_HUE, 5)                //Color Hue
-      RMT_BUTTON_PAIR_TO_CMD(RKEY_4, EEMC_COLOR_HUE, -5)               //Color Hue
-      RMT_BUTTON_PAIR_TO_CMD(RKEY_2, EEMC_COLOR_SAT , 5)               //Color Saturation
-      RMT_BUTTON_PAIR_TO_CMD(RKEY_5, EEMC_COLOR_SAT ,-5)               //Color Saturation
-      RMT_BUTTON_PAIR_TO_CMD(RKEY_3, EEMC_COLOR_VAL, 5)                //Color Value
-      RMT_BUTTON_PAIR_TO_CMD(RKEY_6, EEMC_COLOR_VAL, -5)               //Color Value
+      RMT_BUTTON_TO_CMD(R_DEC_KEY_OK, EEMC_MODE)                                  //Mode                       
+      RMT_BUTTON_PAIR_PREV_NEXT_TO_CMD(R_DEC_KEY_UP, R_DEC_KEY_DOWN, EEMC_EFFECT)      //Effect
+      RMT_BUTTON_PAIR_DELTA_TO_CMD(R_DEC_KEY_RIGHT, R_DEC_KEY_LEFT, EEMC_SPEED, 5)     //Speed
+      RMT_BUTTON_PAIR_DELTA_TO_CMD(R_DEC_KEY_1, R_DEC_KEY_4, EEMC_COLOR_HUE, 5)          //Color Hue
+      RMT_BUTTON_PAIR_DELTA_TO_CMD(R_DEC_KEY_2, R_DEC_KEY_5, EEMC_COLOR_SAT , 5)       //Color Saturation    
+      RMT_BUTTON_PAIR_DELTA_TO_CMD(R_DEC_KEY_3, R_DEC_KEY_6, EEMC_COLOR_VAL, 5)        //Color Value
+      
     END_REMOTE()    
    
   END_CONTROL_MAP()

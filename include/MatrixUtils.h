@@ -2,6 +2,15 @@
 #define __MATRIXUTILS_H
 
 //////////////////////////////
+// Swap
+#define SWAPIF(a, b) \
+  if(a > b){ \
+    auto c = a; \
+    a = b; \
+    b = c; \
+  }
+
+//////////////////////////////
 // Mirror
 #define MIRROR(p, m) (2 * (m) - (p))
 

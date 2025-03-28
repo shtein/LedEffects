@@ -73,6 +73,7 @@ void _CFG_LOOP(){}
   
 #define ADD_EFFECT(effect, ...) _ADD_EFFECT(effect, 0, ##__VA_ARGS__)
 #define ADD_EFFECT_KALEYDOSCOPE(effect, ...) _ADD_EFFECT(effect, ECF_KALEYDOSCOPE, ##__VA_ARGS__)
+#define ADD_EFFECT_SOUND(effect, ...) _ADD_EFFECT(effect, ECF_SOUND, ##__VA_ARGS__)
 
 //Effect Engine
 #define BEGIN_EFFECT_ENGINE() \
@@ -91,10 +92,8 @@ void _ENGINE_SETUP(){ \
 void _ENGINE_LOOP() \
 { \
   CtrlQueueItem itm; \
-  for( ;; ){ \
-    cp.loop(itm); \
-    ee.loop(itm, ntf); \
-  } \
+  cp.loop(itm); \
+  ee.loop(itm, ntf); \
 }
 
 #define BEGIN_LEDS() \
@@ -109,7 +108,7 @@ void _ENGINE_LOOP() \
 //Sound capture
 #define INIT_SOUND_CAPTURE(className, ...) \
   static className snd(__VA_ARGS__); \
-  EffectSound::initSoundCapture(&snd); 
+  Effect::initSoundCapture(&snd); 
 
 ///////////////////////////////////////
 //Control map
@@ -149,21 +148,21 @@ void _ENGINE_LOOP() \
 
 //////////////////////
 // Two position switch
-#define SW2POS_TO_CMD(cmd, pin) \
+#define SW2POS_TO_CMD(pin, cmd) \
   static Switch2Pos SW2POS_NAME(pin); \
   static CtrlSwicth2Pos SW2POS_CTRL(cmd, &SW2POS_NAME); \
   cp.addControl(&SW2POS_CTRL);
 
 //////////////////////
 // Potentiometer 
-#define POT_TO_CMD(cmd, pin, ...) \
+#define POT_TO_CMD(pin, cmd, ...) \
   static AnalogInput POT_NAME(pin); \
-  static CtrlItemPtmtr<__VA_ARGS__> POT_CTRL(cmd, &POT_NAME); \
+  static CtrlItemPtmtr POT_CTRL(cmd, &POT_NAME, ##__VA_ARGS__); \
   cp.addControl(&POT_CTRL);
 
 ////////////////////
 // Rotery enconder
-#define ROTENC_TO_CMD(cmd, pinData, pinClock) \
+#define ROTENC_TO_CMD(pinData, cmd, pinClock) \
   static RotaryEncoder ROT_NAME(pinData, pinClock); \
   static CtrlItemRotEnc ROT_CTRL(cmd, &ROT_NAME); \
   cp.addControl(&ROT_CTRL);
@@ -192,8 +191,19 @@ void _ENGINE_LOOP() \
   break;
   
 
+#define RMT_BUTTON_PAIR_PREV_NEXT_TO_CMD(btn1, btn2, cmd) \
+  RMT_BUTTON_TO_CMD(btn1, cmd, 0, CTF_VAL_NEXT) \
+  RMT_BUTTON_TO_CMD(btn2, cmd, 0, CTF_VAL_PREV)
+
+#define RMT_BUTTON_PAIR_DELTA_TO_CMD(btn1, btn2, cmd, value) \
+  RMT_BUTTON_TO_CMD(btn1, cmd, value, CTF_VAL_DELTA) \
+  RMT_BUTTON_TO_CMD(btn2, cmd, -value, CTF_VAL_DELTA)
+
+
 #endif //USE_IR_REMOTE
 
+
+//Serial input
 #define SERIAL_INPUT() \
   static SerialInput inSer; \
   static CtrlItemSerial<parseCommandInput> ctrlSer(&inSer); \

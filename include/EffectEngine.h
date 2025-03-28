@@ -5,11 +5,6 @@
 #include "EffectEngineCfg.h"
 #include "WiFiConnect.h"
 
-
-class CtrlQueueItemEx;
-class Effect;
-class EEPROMCfg;
-
 //Engine flags
 #define EFF_RANDOM_START_MODE     0x01
 #define EFF_RANDOM_START_EFFECT   0x02
@@ -65,5 +60,7 @@ class EffectEngine{
 //////////////////////////////////
 // Serial command line
 uint8_t parseCommandInput(const char *tokens[], CtrlQueueData &data);
+
+
 
 #endif //__EFFECTENGINE_H

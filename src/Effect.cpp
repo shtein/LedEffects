@@ -7,12 +7,40 @@
 #include "effectenginectx.h"
 #include "effect.h"
 
+#ifdef USE_SOUND  
+#include <SoundCapture.h>
 
-void setRandomColor(CHSV &hsv){
-  hsv.h = random8();
-  hsv.s = 0xFF;
-  hsv.v = 0xFF;
+#ifdef NTF_ENABLED
+
+
+
+//Getting/setting effect speed
+struct EEResp_EffectSound{  
+  uint8_t flags;
+  uint8_t lower;
+  uint8_t upper;
+  const RunningStats &min;
+  const RunningStats &max;
+  const RunningStats &average;
+};
+
+void putNtfObject(NtfBase &resp, const RunningStats &data){
+  resp.put_F(rs_SndAverage, data.getAverage());
+  resp.put_F(rs_SndStdDev, data.getStdDev());
+} 
+
+void putNtfObject(NtfBase &resp, const EEResp_EffectSound &data){
+  resp.put_F(rs_Flags, data.flags);
+  resp.put_F(rs_SndLower, data.lower);
+  resp.put_F(rs_SndUpper, data.upper);
+  
+  resp.put_F(rs_SndMin, data.min);
+  resp.put_F(rs_SndMax, data.max);
+  resp.put_F(rs_SndAverage, data.average);
 }
+#endif //NTF_ENABLED
+
+#endif //USE_SOUND
 
 
 #ifdef NTF_ENABLED
@@ -52,16 +80,24 @@ uint8_t Effect::_speedDelay = 0;
 EFFECT_DATA Effect::_cfg;
 Effect::EFFECT_CONTEXT Effect::_ctx;
 
+#ifdef USE_SOUND
+//Sound specific
+SoundCapture *Effect::_sc = NULL;
+SoundStats    Effect::_statsSound;
+Effect::EFFECT_SOUND_CONTEXT Effect::_ctxSound = { SC_MAP_ABOVE_NOISE, SOUND_LOWER_MIN, SOUND_UPPER_MAX };
+#endif
+
+
 //Draw 
-void  Effect::draw(CRGB *leds, uint16_t numLeds){
+void Effect::draw(CRGB *leds, uint16_t numLeds){
   proceed(leds, numLeds);
 
+//Matrix effect
 #ifdef USE_MATRIX
   if(_cfg.flags & ECF_KALEYDOSCOPE){
       kaleidoscope(leds, numLeds);
   }
 #endif
-
 }
 
 
@@ -71,29 +107,22 @@ bool Effect::onCmd(const struct CtrlQueueItem &itm, NtfSet &ntf){
   switch(itm.cmd){    
     case EEMC_SPEED:
       setSpeedDelay(itm.data.translate(getSpeedDelay(), SPEED_DELAY_MIN, SPEED_DELAY_MAX));
-    break;
-
-#ifdef NTF_ENABLED  
-    //All get commands
+      //Notification
+#ifdef NTF_ENABLED      
     case EEMC_GET_SPEED:
-    break;
+    { ntf.put(CmdResponse<EEResp_EffectSpeed> {itm.cmd, { getSpeedDelay() }}); }
 #endif     
+    break;
 
     default:
+    #ifdef USE_SOUND
+      if(_cfg.flags & ECF_SOUND){
+        return onCmdSound(itm, ntf);
+      }
+    #endif
     return false;
   } 
 
-  //Notifications
-#ifdef NTF_ENABLED  
-  switch(itm.cmd){    
-    case EEMC_SPEED:      
-    case EEMC_GET_SPEED:
-    { ntf.put(CmdResponse<EEResp_EffectSpeed> {itm.cmd, { getSpeedDelay() }}); }
-    break;
-
-    break;    
-  }    
-#endif         
 
   return true;
 }
@@ -114,6 +143,72 @@ void Effect::getConfig(EFFECT_DATA &cfg){
   cfg = _cfg;
 }
     
+#ifdef USE_SOUND    
+
+void Effect::initSoundCapture(SoundCapture *sc){
+    //Remember instances
+    _sc = sc;
+    //Init instance
+    _sc->init();
+}
+
+void Effect::getSoundBands(uint8_t *bands, size_t numBands){
+  //Get band data
+  _sc->getData(bands, numBands);
+
+  //Calculate stat
+  _statsSound.process(bands, numBands);
+}
+
+
+bool Effect::onCmdSound(const struct CtrlQueueItem &itm, NtfSet &ntf){  
+  
+  switch(itm.cmd){    
+    case EEMC_SOUND_LOW:
+      _ctxSound.lower = itm.data.translate(_ctxSound.lower, SOUND_LOWER_MIN, SOUND_UPPER_MAX);
+    break;
+
+    case EEMC_SOUND_HIGH:
+      _ctxSound.upper = itm.data.translate(_ctxSound.upper, SOUND_LOWER_MIN, SOUND_UPPER_MAX);
+    break;
+    
+    case EEMC_SOUND_LOG:
+      _ctxSound.flags = itm.data.value == 0 ? _ctxSound.flags & ~SC_MAP_LOG : _ctxSound.flags | SC_MAP_LOG; 
+    break;
+
+    case EEMC_SOUND_USE_MAX:
+      _ctxSound.flags = itm.data.value == 0 ? _ctxSound.flags & ~SC_MAP_USE_MAX : _ctxSound.flags | SC_MAP_USE_MAX; 
+    break;
+
+    case EEMC_SOUND_USE_MIN:
+      _ctxSound.flags = itm.data.value == 0 ? _ctxSound.flags & ~SC_MAP_USE_MIN : _ctxSound.flags | SC_MAP_USE_MIN; 
+    break;
+
+    case EEMC_SOUND_NOISE:
+      _ctxSound.flags = itm.data.value == 0 ? _ctxSound.flags & ~SC_MAP_ABOVE_NOISE : _ctxSound.flags | SC_MAP_ABOVE_NOISE;
+    break;
+
+    case EEMC_GET_SOUND:
+    break;
+
+    default:
+    return false;
+  }
+
+#ifdef NTF_ENABLED    
+  ntf.put(CmdResponse<EEResp_EffectSound> { itm.cmd, {_ctxSound.flags, _ctxSound.lower, _ctxSound.upper,
+                                                      _statsSound.get(SoundStatGet::ssgMin), 
+                                                      _statsSound.get(SoundStatGet::ssgMax),
+                                                      _statsSound.get(SoundStatGet::ssgAverage)                                                          
+                                                    } 
+                                               }); 
+#endif
+
+  return true;
+}
+
+
+#endif //USE_SOUND
 
 
 //////////////////////////////////////
@@ -125,39 +220,19 @@ bool EffectColor::onCmd(const struct CtrlQueueItem &itm, NtfSet &ntf){
   switch(itm.cmd){
     case EEMC_COLOR_HUE: 
     case EEMC_COLOR_SAT: 
-    case EEMC_COLOR_VAL: {
-      //Get effect color
-      CHSV hsv = _cfg.hsv;
-
+    case EEMC_COLOR_VAL:
       //Update corresponding color value
-      hsv.raw[itm.cmd - EEMC_COLOR_HUE] = (uint8_t)itm.data.translate( (int)hsv.raw[itm.cmd - EEMC_COLOR_HUE], 0, 255);
-  
-      //Set effect color
-      _cfg.hsv = hsv;       
-    }   
-    break;
-
+      _cfg.bytes[itm.cmd - EEMC_COLOR_HUE] = (uint8_t)itm.data.translate( (int)_cfg.bytes[itm.cmd - EEMC_COLOR_HUE], 0, 255);
 #ifdef NTF_ENABLED
-  //All get commands
+    //Notfification
     case EEMC_GET_COLOR_HSV:
+      { ntf.put(CmdResponse<CHSV>{ itm.cmd, {  CHSV(_cfg.bytes[0], _cfg.bytes[1], _cfg.bytes[2]) } }); }   
+#endif    
     break;
-#endif
 
     default:
     return Effect::onCmd(itm, ntf);    
   }    
-
-#ifdef NTF_ENABLED
-//Notification
-  switch(itm.cmd){
-    case EEMC_COLOR_HUE: 
-    case EEMC_COLOR_SAT: 
-    case EEMC_COLOR_VAL: 
-    case EEMC_GET_COLOR_HSV:
-      { ntf.put(CmdResponse<CHSV>{ itm.cmd, {  _cfg.hsv } }); }   
-    break;
-  }    
-#endif
 
   return true;
 }
@@ -207,7 +282,7 @@ void EffectPaletteTransform::proceed(CRGB *leds, uint16_t numLeds){
   nblendPaletteTowardPalette(_ctx.palCurrent, _ctx.palTarget, MAX_PAL_CHANGES); 
 
   //Prepare for the next move                                        
-  _ctx.step--;              
+  _ctx.step --;              
 }
 
 int EffectPaletteTransform::getMaxStep() const{
@@ -219,6 +294,7 @@ CRGB EffectPaletteTransform::getCurrentPalColor(uint8_t index, uint8_t brightnes
 }
 
 bool EffectPaletteTransform::onCmd(const struct CtrlQueueItem &itm, NtfSet &ntf){
+  
   switch(itm.cmd){
   //All get commands
     case EEMC_TRANSFORM:{
@@ -227,26 +303,15 @@ bool EffectPaletteTransform::onCmd(const struct CtrlQueueItem &itm, NtfSet &ntf)
         EFFECT_PARAM_TRANSFORM(_cfg) = td.transformId;
       }
     }
-    break;
-    
 #ifdef NTF_ENABLED    
     case EEMC_GET_TRANSFORM: 
-    break;    
+      { ntf.put(CmdResponse<EEResp_EffectTransform>{ itm.cmd, { EFFECT_PARAM_TRANSFORM(_cfg) } } ); }   
 #endif
+    break;    
 
     default:
     return Effect::onCmd(itm, ntf);    
   }    
-
-#ifdef NTF_ENABLED
-//Notification
-  switch(itm.cmd){
-    case EEMC_GET_TRANSFORM: 
-    case EEMC_TRANSFORM:     
-      { ntf.put(CmdResponse<EEResp_EffectTransform>{ itm.cmd, { EFFECT_PARAM_TRANSFORM(_cfg) } } ); }   
-    break;
-  }    
-#endif
 
   return true;
 

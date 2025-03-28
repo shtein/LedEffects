@@ -3,8 +3,6 @@
 
 
 
-
-
 /////////////////////////////////////////////////
 // Configuration DB in flash memory
 // All functions below return true/false
@@ -56,6 +54,9 @@ bool getModeConfig(uint8_t mode, EFFECT_MODE_CONFIG &cfg);
 bool setModeConfig(uint8_t mode, const EFFECT_MODE_CONFIG &cfg);
 
 //Effect configuration
+//Configuration for sound effects
+
+
 
 ///////////////////////
 // Effect Config Flags
@@ -64,18 +65,21 @@ bool setModeConfig(uint8_t mode, const EFFECT_MODE_CONFIG &cfg);
 #define ECF_RGB           0x02
 #define ECF_TRANSFORM     0x04
 #define ECF_KALEYDOSCOPE  0x08
+#define ECF_SOUND         0x10
+#define ECF_SOUND_VIM     0x20
 
 
-#define EFFECT_PARAM_TRANSFORM(s) s.byte
+////////////////////////////////////
+// Effect data
+
+#define EFFECT_PARAM_TRANSFORM(s) s.bytes[0]
+#define EFFECT_PARAM_HSV(s) (*(CHSV *)s.bytes)
+#define EFFECT_PARAM_SOUNDVIM(s) s.bytes[1]
+
 
 struct EFFECT_DATA{
-  uint8_t    flags;
-  union{            
-    CHSV     hsv;
-    CRGB     rgb;        
-    uint8_t  byte;
-  }; 
-  uint8_t spare[3];
+  uint8_t  flags;      //Flags  
+  uint8_t  bytes[6];   //Data    
 
   inline EFFECT_DATA() __attribute__((always_inline)) = default;
 
@@ -85,28 +89,42 @@ struct EFFECT_DATA{
     flags = f;    
   }
 
-  inline EFFECT_DATA(uint8_t f, const CHSV &h) __attribute__((always_inline)){
-    flags = f | ECF_HSV;
-    hsv = h;
+  inline EFFECT_DATA(uint8_t f, const CHSV &hsv) __attribute__((always_inline)){
+    flags = f | ECF_HSV;    
+    EFFECT_PARAM_HSV((*this)) = hsv;
   }
 
   inline EFFECT_DATA(uint8_t f, TransformPalList t) __attribute__((always_inline)){
     flags = f | ECF_TRANSFORM;
     EFFECT_PARAM_TRANSFORM((*this)) = t;
   }
+
+  inline EFFECT_DATA(uint8_t f, SoundVUMType t) __attribute__((always_inline)){
+    flags = f | ECF_SOUND_VIM;
+    EFFECT_PARAM_SOUNDVIM((*this)) = t;    
+  }
+
 };
 
+
+
+//////////////////////////////
+// Effect config
 struct EFFECT_CONFIG{  
   uint8_t     effectId;     //Effect id
   uint8_t     speedDelay;   //Speed
   EFFECT_DATA data;         //Data    
 };
 
-//Effect config
+//Effect config functions
 bool addEffectConfig(uint8_t effectId, const EFFECT_DATA &data);
-
 bool getEffectConfig(uint8_t mode, uint8_t effect, EFFECT_CONFIG &cfg);
 bool setEffectConfig(uint8_t mode, uint8_t effect, const EFFECT_CONFIG &cfg);
+
+
+#ifdef NTF_ENABLED  
+  void putNtfObject(NtfBase &resp, const CHSV &data);
+#endif
 
 
 #endif //__EFFECT_ENGINE_CFG_H

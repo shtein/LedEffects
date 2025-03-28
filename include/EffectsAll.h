@@ -1,8 +1,6 @@
 #ifndef __EFFECTS_ALL_H
 #define __EFFECTS_ALL_H
 
-#include "EffectEngineCtx.h"
-class Effect;
 
 /////////////////////////
 //List of all effects
@@ -31,6 +29,8 @@ enum EffectList{
   el_Maxtrix_Drops,
   el_Matrix_Bouncing_Dots,
   el_Matrix_Circles,
+  el_SoundVUM,
+  el_SoundMatrixRGB,
   el_Total
 };
 

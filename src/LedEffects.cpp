@@ -3,23 +3,25 @@
 
 #include "LedEffects.h"
 
+//Controls
 #include <AnalogInput.h>
 #include <Controls.h>
 #include <CtrlSerial.h>
 #include <CtrlWiFi.h>
 #include <CtrlWebSrv.h>
 #include <SoundCapture.h>
-
-#include "Effect.h"
-#include "EffectEngine.h"
-#include "EffectEngineCtx.h"
-#include "EffectSound.h"
-#include "Matrix.h"
-#include "Macro.h"
 #include "Pins.h"
 
+
 //Effects
+#include "Effect.h"
 #include "EffectsAll.h"
+
+//Effect Engine 
+#include "EffectEngine.h"
+#include "Macro.h"
+
+
 
 //Setups
 #ifndef SETUP_NAME

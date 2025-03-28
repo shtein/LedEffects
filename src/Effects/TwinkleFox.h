@@ -7,14 +7,8 @@
 // EffectTwinkleFox
 
 //Whtever it function does
-inline uint8_t attackDecayWave8( uint8_t i){
-  if( i < 86) {
-    return i * 3;
-  } 
-  else {
-    i -= 86;
-    return 255 - (i + (i / 2));
-  }
+inline uint8_t attackDecayWave8( uint8_t i){  
+  return (i < 86) ? i * 3 : 255 - ((i - 86) + ((i - 86) / 2));
 }
 
 //Whtever it function does
@@ -54,16 +48,7 @@ protected:
 
       //Check how bright background is
       uint8_t bglight = bg.getAverageLight();
-
-      if( bglight > 64) {
-        bg.nscale8_video(16); // very bright
-      } 
-      else if( bglight > 16) {
-        bg.nscale8_video(64); // not that bright
-      } 
-      else {
-        bg.nscale8_video(86); // dim
-      }       
+      bg.nscale8_video(bglight > 64 ? 16 : bglight > 16 ? 64 : 86);      
     }
     
     if(_ctx.rgb != bg){
@@ -85,21 +70,11 @@ protected:
       uint8_t speedMultiplier =  ((((rnd & 0xFF) >> 4) + (rnd & 0x0F)) & 0x0F) + 0x08;
 
       //Get new color
-      CRGB color = computeOneTwinkle( (uint32_t)((clk * speedMultiplier) >> 3) + clkOffs, 
-                                      rnd >> 8
-                                    );
+      CRGB color = computeOneTwinkle( (uint32_t)((clk * speedMultiplier) >> 3) + clkOffs, rnd >> 8);
 
       //Proceed with setting color to current led
       int16_t deltabright = color.getAverageLight() - bg.getAverageLight();
-
-      if( deltabright >= 32 || (!bg)) {
-        leds[i] = color;
-      } else 
-      if( deltabright > 0 ) {
-        leds[i] = blend( bg, color, deltabright * 8);
-      } else { 
-        leds[i] = bg;
-      }
+      leds[i] = deltabright >= 32 || (!bg) ? color : deltabright > 0 ? blend( bg, color, deltabright * 8) : bg;
     }
 
   }

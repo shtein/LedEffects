@@ -1,6 +1,8 @@
 #ifndef __MATRIX_H
 #define __MATRIX_H
 
+#ifdef USE_MATRIX
+
 #include "MatrixUtils.h"
 
 //////////////////////////////////////////////////////////////
@@ -104,7 +106,7 @@ public:
 
   //Drawing functions
   void pixel(int16_t x, int16_t y, const CRGB &col);
-
+  
   void line(int16_t x0, int16_t y0, int16_t x1, int16_t y1, const CRGB &col);
 
   void circle(int16_t xc, int16_t yc, int16_t r, const CRGB &col);
@@ -112,16 +114,15 @@ public:
   
   void rectangle(int16_t x0, int16_t y0, int16_t x1, int16_t y1, const CRGB &col);
   void fillRectangle(int16_t x0, int16_t y0, int16_t x1, int16_t y1, const CRGB &col);
-
-
+  void fadeToBlackRectangle(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint8_t fade);
   
   void mirrorRectangle(int16_t x0, int16_t y0,          //Left-top corner
                       uint16_t width, uint16_t height,  //Width and height
-                      int16_t mx, int16_t my,           //Morror point
+                      int16_t mx, int16_t my,           //Mirror point
                       int16_t shiftx = 0,               //Horizontal shift
                       int16_t shifty = 0                //Vertical shift
                       );
-  void mirrorRectangleHorizontally(int16_t x0, int16_t y0,         //Left-top corner
+  void mirrorRectangleHorizontally(int16_t x0, int16_t y0,          //Left-top corner
                                    uint16_t width, uint16_t height, //Width and height
                                    int16_t mx,                      //Mirror x coordinate
                                    int16_t shiftx = 0,              //Horizontal shift
@@ -145,22 +146,23 @@ public:
                             int16_t shiftx = 0, 
                             int16_t shifty = 0
                           );                                
-void mirrorRightTriangleHorizontally( int16_t x0, int16_t y0,   //Coordinates of right angle
+  void mirrorRightTriangleHorizontally( int16_t x0, int16_t y0,   //Coordinates of right angle
+                                        int16_t dx, int16_t dy,   //Vertical and horizontal cathetus
+                                        int16_t mx,               //Reflection x coordinate
+                                        int16_t shiftx = 0, 
+                                        int16_t shifty = 0
+                                      );                                                                                             
+  void mirrorRightTriangleVertically( int16_t x0, int16_t y0,   //Coordinates of right angle
                                       int16_t dx, int16_t dy,   //Vertical and horizontal cathetus
-                                      int16_t mx,               //Reflection x coordinate
+                                      int16_t my,               //Reflection y coordinate
                                       int16_t shiftx = 0, 
                                       int16_t shifty = 0
-                                    );                                                                                             
-void mirrorRightTriangleVertically( int16_t x0, int16_t y0,   //Coordinates of right angle
+                                    ); 
+  void mirrorRightTriangleButterfly(int16_t x0, int16_t y0,   //Coordinates of right angle
                                     int16_t dx, int16_t dy,   //Vertical and horizontal cathetus
-                                    int16_t my,               //Reflection y coordinate
                                     int16_t shiftx = 0, 
-                                    int16_t shifty = 0
-                                  ); 
-void mirrorRightTriangleButterfly(int16_t x0, int16_t y0,   //Coordinates of right angle
-                                  int16_t dx, int16_t dy,   //Vertical and horizontal cathetus
-                                  int16_t shiftx = 0, 
-                                  int16_t shifty = 0 );
+                                    int16_t shifty = 0 );
+                                
 
 protected:
   CRGB   *_leds;      //leds array
@@ -170,8 +172,10 @@ protected:
 };
 
 
+
+
 //Kaleidoscope
 void kaleidoscope(CRGB *leds, uint16_t numLeds);
 
-
+#endif //USE_MATRIX
 #endif //__MATRIX_H

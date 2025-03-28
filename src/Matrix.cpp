@@ -1,9 +1,7 @@
+#ifdef USE_MATRIX
+
 #include "LEdEffects.h"
-
 #include "Matrix.h"
-
-
-
 
 ////////////////////////////////
 // XYDraw
@@ -13,8 +11,6 @@ XYDraw::XYDraw(CRGB *leds, int16_t numLeds, uint8_t flags){
   _numLeds  = numLeds;
   _flags    = flags;
 }
-
-
 
 XYDraw::~XYDraw(){ 
 }
@@ -29,7 +25,6 @@ uint8_t XYDraw::getFlags() const{
 
 
 CRGB & XYDraw::operator()(int16_t x, int16_t y){
-
   int16_t index = xy(x, y);
 
   if( x >= 0 && x < width() && 
@@ -51,67 +46,81 @@ void XYDraw::pixel(int16_t x, int16_t y, const CRGB &col){
   }
 }
 
-void XYDraw::line(int16_t x0, int16_t y0, int16_t x1, int16_t y1, const CRGB &col){
+void XYDraw::line(int16_t x0, int16_t y0, int16_t x1, int16_t y1, const CRGB &col) {
+  //Bresenham's line algorithm
+  int16_t dx = abs(x1 - x0);
+  int16_t dy = -abs(y1 - y0);
+  int16_t sx = x0 < x1 ? 1 : -1;
+  int16_t sy = y0 < y1 ? 1 : -1;
+  int16_t err = dx + dy;  // error value e_xy 
+  int16_t e2;
 
-  int16_t dx = x1 - x0;
-  int16_t dy = y1 - y0;
-  if (abs(dx) >= abs(dy)){
+  for(;;){  
 
-    int32_t y = ((int32_t)y0 << 16) + 32768;
+    pixel(x0, y0, col);
 
-    if (!dx) {
-      pixel(x0, y >> 16, col);
-    } else {
-
-      int32_t f = ((int32_t)dy << 16) / (int32_t)abs(dx);
-
-      if (dx >= 0){
-
-        for (; x0<=x1; ++x0,y+=f)
-          pixel(x0, y >> 16, col);
-      }
-      else{
-        
-        for (; x0>=x1; --x0,y+=f)
-          pixel(x0, y >> 16, col);
-      }
+    if (x0 == x1 && y0 == y1) 
+      break;
+      
+    e2 = 2 * err;
+    if (e2 >= dy) { // e_xy+e_x > 0 
+      err += dy;
+      x0 += sx;
+    }
+    
+    if (e2 <= dx) { // e_xy+e_y < 0 
+      err += dx;
+      y0 += sy;
     }
   }
-  else{
 
-    int32_t f = ((int32_t)dx << 16) / (int32_t)abs(dy);
-    int32_t x = ((int32_t)x0 << 16) + 32768;
-
-    if (dy >= 0){
-
-      for (; y0<=y1; ++y0,x+=f)      
-        pixel(x >> 16, y0, col);
-    }
-    else{
-
-      for (; y0>=y1; --y0,x+=f)
-        pixel(x >> 16, y0, col);
-    }
-  }
 }
 
 void XYDraw::rectangle(int16_t x0, int16_t y0, int16_t x1, int16_t y1, const CRGB &col){
-  line(x0, y0, x0, y1, col);
-  line(x0, y1, x1, y1, col);
-  line(x1, y1, x1, y0, col);
-  line(x1, y0, x0, y0, col);
+  SWAPIF(x0, x1);
+  SWAPIF(y0, y1);
+
+  //Horizontal
+  for(int x = x0; x <= x1; x++){
+    pixel(x, y0, col);
+    pixel(x, y1, col);
+  }
+
+  //Vertical
+  for(int y = y0 + 1; y <= y1 - 1; y++){
+    pixel(x0, y, col);
+    pixel(x1, y, col);
+  }
 }
 
 void XYDraw::fillRectangle(int16_t x0, int16_t y0, int16_t x1, int16_t y1, const CRGB &col)
 {
-  int16_t y = min(y0, y1);
-  for (int16_t c=abs(y1-y0); c>=0; --c,++y)
-    line(x0, y, x1, y, col);
+  SWAPIF(x0, x1);
+  SWAPIF(y0, y1);
+
+  for(int16_t y = y0; y <= y1; y++){
+    for(int16_t x = x0; x<= x1; x++){
+      pixel(x, y, col);
+    }
+  }
 }
 
-             
+void XYDraw::fadeToBlackRectangle(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint8_t fade)
+{
+  SWAPIF(x0, x1);
+  SWAPIF(y0, y1);
+
+  for(int16_t y = y0; y <= y1; y++){
+    for(int16_t x = x0; x<= x1; x++){
+      (*this)(x, y).fadeToBlackBy(fade);
+    }
+  }
+}
+
+
+
 void XYDraw::circle(int16_t xc, int16_t yc, int16_t r, const CRGB &col){
-  
+
   int16_t x = -r;
   int16_t y = 0;
   int16_t p = 2 - (2 * r);
@@ -131,17 +140,16 @@ void XYDraw::circle(int16_t xc, int16_t yc, int16_t r, const CRGB &col){
       p += (++x * 2) + 1;
   }
   while (x < 0);
-  
+
 }
 
-void XYDraw::fillCircle(int16_t xc, int16_t yc, int16_t r, const CRGB &col)
-{
+void XYDraw::fillCircle(int16_t xc, int16_t yc, int16_t r, const CRGB &col){
+  
   int16_t x = r;
   int16_t y = 0;
   int16_t p = 1 - x;
 
   while (x >= y){
-
     line(xc + x, yc + y, xc - x, yc + y, col);
     line(xc + y, yc + x, xc - y, yc + x, col);
     line(xc - x, yc - y, xc + x, yc - y, col);
@@ -157,6 +165,9 @@ void XYDraw::fillCircle(int16_t xc, int16_t yc, int16_t r, const CRGB &col)
     }
   }
 }
+
+
+
 
 //Coordinate system is move to (mx, my)
 //Each point of the rectangle is translated to new system
@@ -175,9 +186,9 @@ void XYDraw::mirrorRectangle(int16_t x0, int16_t y0,
 }
 
 void XYDraw::mirrorRectangleHorizontally(int16_t x0, int16_t y0, 
-                                        uint16_t width, uint16_t height, 
-                                        int16_t mx, 
-                                        int16_t shiftx, int16_t shifty){
+                                         uint16_t width, uint16_t height, 
+                                         int16_t mx, 
+                                         int16_t shiftx, int16_t shifty){
   for(int16_t x = x0; x < (int16_t)width; x++){
     for(int16_t y = y0; y < (int16_t)height; y++){
       (*this)(MIRROR(x, mx) + shiftx, y + shifty) = (*this)(x, y);
@@ -248,7 +259,7 @@ public:
     }
 
     //Move y
-    y+= _ys;
+    y += _ys;
     if(abs(y) > abs(_p) ){ //Move x
       x+= _xs;
       if(abs(x) > abs(_dx) ){ //Done
@@ -278,9 +289,9 @@ protected:
 
   int8_t _x;   //current x
   int8_t _y;   //current y
-  int8_t _p;   //current on the Hypotenuse
+  int8_t _p;   //current y on the Hypotenuse
 
-  //Hypotenuse is defined as y = -height/width * x + (y0 + height + x0 * heigh / width )
+  //Hypotenuse is defined as y(x) = -height/width * x + (y0 + height + x0 * heigh / width )
   //Use 32-bit in y scale for higher precision
   int32_t _a;
   int32_t _b;
@@ -291,7 +302,6 @@ protected:
 
   //x or y moving variable true if y
   bool _revert; 
-
 };
 
 //Widht and hight are number of dots including x0, y0
@@ -389,7 +399,6 @@ void XYDraw::mirrorRightTriangleButterfly(int16_t x0, int16_t y0,
 
   } while(en.next(x, y));
 
-
 }
 
 
@@ -407,3 +416,7 @@ void kaleidoscope(CRGB *leds, uint16_t numLeds){
   xy.mirrorRectangleHorizontally(0, 0, xy.width()/2, xy.height()/2, xy.width()/2, xy.width() % 2 - 1);
   xy.mirrorRectangleVertically(0, 0, xy.width(), xy.height() / 2, xy.height() / 2, 0, xy.height() % 2 - 1);
 };
+
+
+
+#endif //USE_MATRIX

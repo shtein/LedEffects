@@ -52,19 +52,21 @@
 #endif
 
 //Effect sound commands
-#define EEMC_GET_SOUND_LOW          0x10   //Lower 
-#define EEMC_GET_SOUND_HIGH         0x11   //Upper
-#define EEMC_GET_SOUND_SENSITIVITY  0x12   //Sensitiviy
-#define EEMC_GET_SOUND_USE_MAX      0x13   //Min lower
-#define EEMC_GET_SOUND_USE_MIN      0x14   //Max upper
-#define EEMC_GET_SOUND_LOG          0x15   //Log scale
+#define EEMC_GET_SOUND                    0x10   //Stat and config
+#define EEMC_GET_SOUND_LOW                0x11   //Lower 
+#define EEMC_GET_SOUND_HIGH               0x12   //Upper
+#define EEMC_GET_SOUND_USE_MAX            0x13   //Min lower
+#define EEMC_GET_SOUND_USE_MIN            0x14   //Max upper
+#define EEMC_GET_SOUND_LOG                0x15   //Log scale
+#define EEMC_GET_SOUND_NOISE              0x16   //Noise threshold
+
 
 #define EEMC_SOUND_LOW          (EEMC_LED | EEMC_GET_SOUND_LOW)          //Change lower 
 #define EEMC_SOUND_HIGH         (EEMC_LED | EEMC_GET_SOUND_HIGH)         //Change upper
-#define EEMC_SOUND_SENSITIVITY  (EEMC_LED | EEMC_GET_SOUND_SENSITIVITY)  //Enable sensitiviy
 #define EEMC_SOUND_USE_MAX      (EEMC_LED | EEMC_GET_SOUND_USE_MAX)      //Use min lower
 #define EEMC_SOUND_USE_MIN      (EEMC_LED | EEMC_GET_SOUND_USE_MIN)      //Use max upper
 #define EEMC_SOUND_LOG          (EEMC_LED | EEMC_GET_SOUND_LOG)          //Show audio in log scale
+#define EEMC_SOUND_NOISE        (EEMC_LED | EEMC_GET_SOUND_NOISE)        //Enable/disable noise threshold
 
 //Errors
 #define EEER_SUCCESS    0x00 //No error
@@ -104,11 +106,32 @@ DECLARE_STR_PROGMEM(rs_Flags)
 DECLARE_STR_PROGMEM(rs_Cfg)
 DECLARE_STR_PROGMEM(rs_Dsc)
 
+#ifdef USE_SOUND
+DECLARE_STR_PROGMEM(rs_SndLower)
+DECLARE_STR_PROGMEM(rs_SndUpper)
+DECLARE_STR_PROGMEM(rs_SndMin)
+DECLARE_STR_PROGMEM(rs_SndMax)
+DECLARE_STR_PROGMEM(rs_SndAverage)
+DECLARE_STR_PROGMEM(rs_SndStdDev)
+DECLARE_STR_PROGMEM(rs_SoundVIM)
+#endif  
+
 #else 
 
 typedef void *NtfSet;
 
 #endif //NTF_ENABLED
+
+
+#ifdef USE_SOUND
+
+enum SoundVUMType{
+  sv_None = 0,
+  sv_Symmetric,
+  sv_Bar
+};
+
+#endif
 
 
 #endif //__EFFECTENGINECTX_H

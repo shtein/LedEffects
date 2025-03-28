@@ -92,14 +92,14 @@ protected:
                     );
 
         //Show center
-        leds[ripple.getCenter()] = CHSV(ripple.getColorIndex(), 255, 255);
+        leds[ripple.getCenter()] = CHSV(ripple.getColorIndex(), 0xFF, 0xFF);
       }
       else{
           //Move first
           ripple.move();
 
           //Prepare color        
-          CHSV hsv(ripple.getColorIndex(), 255, 255);
+          CHSV hsv(ripple.getColorIndex(), 0xFF, 0xFF);
           hsv.hue        += ripple.getOffset() * 2;
           hsv.saturation -= ripple.getOffset() * 5;
           hsv.value       = cos8(map(ripple.getOffset(), 1, RIPPLE_MAX, 0, 128));
