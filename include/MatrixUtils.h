@@ -3,16 +3,25 @@
 
 //////////////////////////////
 // Swap
-#define SWAPIF(a, b) \
-  if(a > b){ \
-    auto c = a; \
-    a = b; \
-    b = c; \
-  }
+template <typename T>
+constexpr void swapIf(T &a, T &b) {
+    if (a > b) {
+        T c = a;
+        a = b;
+        b = c;
+    }
+}
 
+#define SWAPIF(a, b) swapIf(a, b)
+  
 //////////////////////////////
 // Mirror
-#define MIRROR(p, m) (2 * (m) - (p))
+
+constexpr int mirror(int p, int m) {
+  return 2 * m - p;
+}
+
+#define MIRROR(p, m) mirror(p, m)
 
 ///////////////////////////////////////
 // Point
@@ -21,6 +30,7 @@ struct Pnt {
   T x;
   T y;
 
+  
   inline Pnt() __attribute__((always_inline)){
     x = 0;
     y = 0;
@@ -142,6 +152,75 @@ struct Segment{
 typedef Segment<int8_t>  Segment8_t;
 typedef Segment<int16_t> Segment16_t;
 typedef Segment<int32_t> Segment32_t;
+
+
+//////////////////////////////////////
+//Right Triangle
+template <typename T>
+struct RightTriangle{
+  T x;      //X of the right angle
+  T y;      //Y of the right angle
+  T dx;     //Width - negative for x meanus right angle is on the right
+  T dy;     //Height - negative for y means right angle is on the bottom
+
+  inline RightTriangle()  __attribute__((always_inline)) = default;
+
+  inline RightTriangle (T cx, T cy, T w, T h)  __attribute__((always_inline)):
+    x(cx), y(cy), dx(w > 0 ? w - 1 : w  + 1), dy(h > 0 ? h - 1 : h + 1){
+  };
+
+  inline RightTriangle& operator= (const RightTriangle &)  __attribute__((always_inline)) = default;
+
+  inline T width() const __attribute__((always_inline)) {
+    return dx > 0 ? dx + 1 : dx - 1;
+  }
+
+  inline T height() const __attribute__((always_inline)) {
+    return dy > 0 ? dy + 1: dy - 1;
+  }
+
+  inline bool TopSided() const __attribute__((always_inline)) {
+    return dy > 0;
+  }
+  inline bool BottomSided() const __attribute__((always_inline)) {
+    return dy < 0;
+  }
+  inline bool LeftSided() const __attribute__((always_inline)) {
+    return dx > 0;
+  }
+
+  inline bool RightSided() const __attribute__((always_inline)) {
+    return dx < 0;
+  }
+  
+  inline T cornerX() const __attribute__((always_inline)) {  
+    return  x + dx;
+  }
+
+  inline T cornerY() const __attribute__((always_inline)) {  
+    return  y + dy;
+  }
+
+  inline T hypotenuseX(T y) const __attribute__((always_inline)) {
+    return - y * dx / dy + dx + x;
+  }
+
+  inline T hypotenuseY(T x) const __attribute__((always_inline)) {
+    return -x * dy / dx + dy + y;
+  }  
+
+  void randomPointX(T &rx, T &ry, T offsC = 0, T offsH = 0) const{
+    //Random dot
+    rx =  x < cornerX() ? random8(x + offsC, cornerX() + 1 - offsH) : random8(cornerX() + offsC, x + 1 - offsH);
+
+    T h = hypotenuseY(rx);
+    ry = y > cornerY() ? random8(h, y + 1) : random8(y, h + 1);
+  }
+};
+
+typedef RightTriangle<int8_t>  RightTriangle8_t;
+typedef RightTriangle<int16_t> RightTriangle16_t;
+typedef RightTriangle<int32_t> RightTriangle32_t;
 
 
 #endif //__MATRIXUTILS_H

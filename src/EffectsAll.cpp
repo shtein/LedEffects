@@ -278,7 +278,7 @@ bool getEffect(uint8_t effectId, EFFECT_DESCRIPTION &ed){
 
 #ifndef NO_EFFECT_SOUND_VUM
     case el_SoundVUM:      
-      GET_EFFECT(ed, EffectSoundVUM, rs_Effect_SoundVUM, ECF_SOUND | ECF_SOUND_VIM);      
+      GET_EFFECT(ed, EffectSoundVUM, rs_Effect_SoundVUM, ECF_SOUND | ECF_SOUND_VUM);      
     break;
 #endif 
 

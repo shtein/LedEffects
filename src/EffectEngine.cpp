@@ -97,8 +97,8 @@ void putNtfObject(NtfBase &resp, const EFFECT_DATA &data){
     resp.put_F(rs_Sound, true);
   }
 
-  if(data.flags & ECF_SOUND_VIM){
-    resp.put_F(rs_SoundVIM, EFFECT_PARAM_SOUNDVIM(data));
+  if(data.flags & ECF_SOUND_VUM){
+    resp.put_F(rs_SoundVIM, EFFECT_PARAM_SOUNDVUM(data));
   }
 
 #endif
@@ -576,7 +576,7 @@ DEFINE_STR_PROGMEM(rs_CmdParam_Val,           "sat|v")
 DEFINE_STR_PROGMEM(rs_CmdParam_Trans,         "transpal|t")
 DEFINE_STR_PROGMEM(rs_CmdParam_Leds,          "leds|l")
 
-#ifdef USE_SOUND
+#if defined (USE_SOUND) && !defined(NO_SOUND_COMMANDS)
 DEFINE_STR_PROGMEM(rs_CmdParam_Snd,           "snd")
 DEFINE_STR_PROGMEM(rs_CmdParam_UseLog,        "ulog")
 DEFINE_STR_PROGMEM(rs_CmdParam_UseMax,        "umax")

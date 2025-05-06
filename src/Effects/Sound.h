@@ -6,7 +6,7 @@
 
 
 ////////////////////////////////////////////
-// EffectSoundVIM - sound visualization with VU meter kind of display
+// EffectSoundVUM - sound visualization with VU meter kind of display
 
 
 //Default palette
@@ -41,24 +41,26 @@ protected:
 #ifdef USE_MATRIX  
     XY xy;
 
-    int bandLeds = xy.height();
-    int bandRows = xy.width() / SC_MAX_BANDS;
+    size_t bandLeds = xy.height();
+    size_t bandRows = xy.width() / SC_MAX_BANDS;
+    size_t firstRow = ( xy.width() % SC_MAX_BANDS ) / 2;
+    
 
     //Draw each band according to matrix configuration
-    for(int i = 0; i < SC_MAX_BANDS; i++){
+    for(size_t i = 0; i < SC_MAX_BANDS; i++){
 
       uint8_t colorIndexFirst = mapEx(i, 0, SC_MAX_BANDS, 0, 255 );
       uint8_t colorIndexLast  = mapEx(i + 1, 0, SC_MAX_BANDS, 0, 255 );    
 
       //Bars
-      for(int j = 0; j < bandRows; j++){  
+      for(size_t j = 0; j < bandRows; j++){  
         
-        int first = xy.xy(i * bandRows + j, 0);
-        int last  = xy.xy(i * bandRows + j, xy.height() - 1);
+        size_t first = xy.xy(i  * bandRows + j + firstRow, 0);
+        size_t last  = xy.xy(i  * bandRows + j + firstRow, xy.height() - 1);
         
-        int index = first > last ? last : first;
+        size_t index = first > last ? last : first;
 
-        if (EFFECT_PARAM_SOUNDVIM(_cfg) == sv_Symmetric){
+        if (EFFECT_PARAM_SOUNDVUM(_cfg) == sv_Symmetric){
           drawBandSymmetric(leds + index, bandLeds, bands[i], colorIndexFirst,  colorIndexLast, i < 2 ? 1 : i < 4 ? 2 : 3 );
         }else{
           drawBand(leds + index, bandLeds, first > last ? 0 : bandLeds - 1, bands[i], colorIndexFirst,  colorIndexLast );
@@ -66,7 +68,7 @@ protected:
         
       }           
     }  
-
+    /*
     //Draw boundary
     //See if there is last column
     //Min and max
@@ -89,6 +91,7 @@ protected:
                   (_ctxSound.flags & SC_MAP_USE_MAX) ? CRGB::Black : CRGB(CHSV(HUE_BLUE + 25, 255, 127)),
                   false
                 );
+    */
        
 #else
     //Number of sections
@@ -188,56 +191,254 @@ void drawBandSymmetric(CRGB *leds,
 /////////////////////////////////////////////////////
 // EffectSoundRGB
 
+typedef bool(*FuncRGBMode_t)(uint16_t &, uint16_t, XYDraw &, const RightTriangle8_t &);
+
+
+//Bass in triangle up and down
+#define BUD_START_AT_HYPOTENUSE 0x01
+#define BUD_STOP_AT_CATHETUS    0x02
+#define BUD_CHESS               0x04
+
+bool mode_BassUpDown(uint16_t &value,              //Context value
+                     uint16_t timeDelta,           //Time delta
+                     uint8_t flags,                //Flags        
+                     XYDraw &draw,                 //Drawing object
+                     const RightTriangle8_t &tr    //Triangle
+             ){  
+
+  struct S{
+  uint8_t dir:1;    //0 - down, 1 - up
+  uint8_t y:6;      //Y coordinate
+  };
+  S *s = (S *)&value;  
+
+  int8_t x =  tr.hypotenuseX(s->y);
+
+  //Top line
+  draw.line(flags & BUD_START_AT_HYPOTENUSE ? x : tr.cornerX(), tr.y, tr.x, tr.y, CRGB::Red);
+
+    
+  //Check for the next beat
+  if( /*timeDelta >= random8(0, 201) && */ timeDelta <= 700 ){  
+
+    //Draw next line
+    if(!s->dir || !(flags & BUD_STOP_AT_CATHETUS)){            
+      draw.line(x, s->y, tr.x, s->y, CRGB::Red); 
+    }
+
+    //Move up or down
+    s->y += tr.TopSided() ? 1 - s->dir * 2 : -1 + s->dir * 2;         
+
+    //Change direction if it is at the end of the line          
+    s->dir  = s->y == tr.cornerY() || s->y == 0 ? !s->dir : s->dir; 
+
+    
+    //Return true if it came to the top              
+    return s->y == 0 && !s->dir;
+    
+  }
+
+  return true;  
+}
+
+
+
+//Bass drawing mode 1
+bool mode1_RGBBass(uint16_t &value,              //Context value
+                   uint16_t timeDelta,           //Time delta
+                   XYDraw &draw,                 //Drawing object
+                   const RightTriangle8_t &tr    //Triangle
+                  ){  
+                     
+  return  mode_BassUpDown(value, timeDelta, 0, draw, tr);  
+}
+
+//Bass drawing mode 2
+bool mode2_RGBBass(uint16_t &value,                             //Context value
+                   uint16_t timeDelta,                          //Time delta
+                   XYDraw &draw,                                //Drawing object
+                   const RightTriangle8_t &tr                   //Triangle
+                  ){
+
+  return mode_BassUpDown(value, timeDelta, BUD_START_AT_HYPOTENUSE | BUD_STOP_AT_CATHETUS, draw, tr);
+ }
+
+ 
+
+ //Bass drawing mode 1
+bool mode1_RGBMid(uint16_t &value,              //Context value
+                  uint16_t timeDelta,           //Time delta
+                  XYDraw &draw,                 //Drawing object
+                  const RightTriangle8_t &tr    //Triangle
+ ){  
+
+  struct S{
+    uint8_t dir:1; //0 - down, 1 - up
+    uint8_t y:7;   //Y coordinate
+  };
+  
+  S *s = (S *)&value;
+
+  //Draw vertical drop  
+  draw.pixel(tr.x, tr.cornerY() + (tr.BottomSided() ? s->y : -s->y), CRGB::Green);
+  s->y = (s->y + 1) % abs(tr.height());
+    
+  //Random dot
+  int8_t x, y;
+  tr.randomPointX(x, y, 1, 0);
+  draw.pixel(x, y, CRGB::Green);
+
+  
+  return false;  
+ }
+
+
+//Bass drawing mode 1
+bool mode1_RGBTreble(uint16_t &value,              //Context value
+                     uint16_t timeDelta,           //Time delta
+                     XYDraw &draw,                 //Drawing object
+                     const RightTriangle8_t &tr    //Triangle
+                    ){  
+
+  //Random dot
+  
+  int8_t x, y;
+  tr.randomPointX(x, y);
+  draw.pixel(x, y, CRGB::Blue);
+  
+  return false;  
+}
+
+
+
 class EffectSoundRGB: public Effect{
   public:
+
   virtual void reset(){    
     setSpeedDelay(10);
-    _lastBeatTime = 0;
-    _lastMidTime  = 0;
-    _bassOffset   = 0;
+
+    _bassFunc = 0;
+    _ctxSound.bassValue = 0;
+    BASS_BEAT_RESET();
+
+    _ctxSound.midValue = 0; 
+    MID_BEAT_RESET();
+
+    
+    _ctxSound.trebleValue = 0;  
+    TREBLE_BEAT_RESET();
   }
 
 protected:
+
+  //Bass drawing
+  void proceedBass(XYDraw &draw, uint8_t value, uint8_t threshold){  
+
+    //Rectangle for drawing
+    RightTriangle8_t tr(draw.width() / 2 - 1, 0, -draw.width() / 2, draw.height() / 2);
+
+    //Fade first
+    draw.fadeToBlackRightTriangle(tr.x, tr.y, tr.width(), tr.height(), getSpeedDelay() * 7 / 2);
+
+    if(BASS_BEAT_CHECK() >= 150 && value >= threshold){
+
+      FuncRGBMode_t bf[] = {mode1_RGBBass, mode2_RGBBass, mode2_RGBBass};      
+      
+      if(bf[_bassFunc](_ctxSound.bassValue, BASS_BEAT_CHECK(), draw, tr)){
+        //Change mode
+        _ctxSound.bassValue = 0;
+        
+        
+        //Change function
+        _bassFunc = random8(sizeof(bf) / sizeof(bf[0]));      
+      }
+      
+      //Set next check time
+      BASS_BEAT_RESET();
+    }
+
+    //Mirror top left to top right
+    draw.mirrorRightTriangleHorizontally(tr.x, tr.y, tr.width(), tr.height(), draw.width() / 2 - 1, 1);
+    //Mirror top left to bottom left
+    draw.mirrorRightTriangleVertically(tr.x, tr.y, tr.width(), tr.height(), draw.height() / 2 - 1, 0, 1);
+    //Mirror top right to bottom right
+    draw.mirrorRightTriangleVertically(tr.x + 1, tr.y, draw.width() / 2, draw.height() / 2, draw.height() / 2 - 1, 0, 1);
+  }
+
+  void proceedMid(XYDraw &draw, uint8_t value, uint8_t threshold){  
+    
+    //Draw in left-top horizontal right angle triangle 
+    RightTriangle8_t tr(0, draw.height() / 2 - 1, draw.width() / 2 - 1, -(draw.height() / 2 - 1));    
+
+    draw.fadeToBlackRightTriangle(tr.x, tr.y, tr.width(), tr.height(), getSpeedDelay() * 2);
+
+    //Check for time and peak
+    if(MID_BEAT_CHECK() >= 100 && value >= threshold){
+
+      mode1_RGBMid(_ctxSound.midValue, MID_BEAT_CHECK(), draw, tr);
+
+      //Set next check time
+      MID_BEAT_RESET();
+    }
+
+    draw.mirrorRightTriangleHorizontally(tr.x, tr.y, tr.width(), tr.height(), draw.width() / 2 - 1, 1);
+    
+  }
+
+  void processTreble(XYDraw &draw, uint8_t value, uint8_t threshold){  
+    //Draw in left-botton horizontal right angle triangle 
+    RightTriangle8_t tr(0, draw.height() / 2, draw.width() / 2 - 1, draw.height() / 2 - 1);    
+
+    //Fade first
+    draw.fadeToBlackRightTriangle(tr.x, tr.y, tr.width(), tr.height(), getSpeedDelay() );
+    
+    //Check time and peak
+    if(TREBLE_BEAT_CHECK() >= 50 && value >= threshold) 
+    {
+      mode1_RGBTreble(_ctxSound.trebleValue, TREBLE_BEAT_CHECK(), draw, tr);
+    
+      //Set next check time
+      TREBLE_BEAT_RESET();
+    }
+
+    draw.mirrorRightTriangleHorizontally(tr.x, tr.y, tr.width(), tr.height(), draw.width() / 2 -1, 1);
+  }
   
   void proceed(CRGB *leds, uint16_t numLeds){
     //Get sound data
     uint8_t bands[SC_MAX_BANDS];
     getSoundBands(bands, SC_MAX_BANDS);
 
-    fadeToBlackBy(leds, numLeds, getSpeedDelay());
-
-    XYDraw draw(leds, numLeds);    
     
-    //Bass
-    uint8_t val = (uint16_t)(bands[0] + bands[1]) / 2;
-  
-    if(val > _statsSound.get(ssgAverageBass).getAverage () - _statsSound.get(ssgAverageBass).getStdDev() / 2 && DELTA_MILLS(_lastBeatTime) > 100){
-      //leds[random16(0, numLeds)] = CRGB::Red;
-      
-      
-      draw.rectangle(_bassOffset, _bassOffset, draw.width() - 1 - _bassOffset, draw.height() - 1 - _bassOffset, CRGB::Red);
-      
-      _bassOffset = DELTA_MILLS(_lastBeatTime) > 400 ? 0 : (_bassOffset + 1) % (min(draw.width(), draw.height() ) + 1 );
-      SET_MILLIS(_lastBeatTime);      
-    }
+    //Draw
+    XYDraw draw(leds, numLeds); 
 
-    //Mid
-    val = (uint16_t)(bands[2] + bands[3] + bands[4]) / 3;
+    //Draw bass
+    proceedBass(draw, 
+                ((uint16_t)bands[0] + bands[1]) / 2, 
+                _statsSound.get(ssgAverageBass).getAverage () - _statsSound.get(ssgAverageBass).getStdDev() / 2
+              );
 
-    if(val > _statsSound.get(ssAverageMid).getAverage() - _statsSound.get(ssAverageMid).getStdDev() / 2 && DELTA_MILLS(_lastMidTime) > 100){
-      for (int i = 0; i < draw.width(); i++) {
-        uint8_t hue = random8();
-        //leds[draw.xy(i, draw.height() / 2)] = CHSV(hue, 255, 255);
-      }      
+              
+    //Draw mid
+    proceedMid(draw, 
+              ((uint16_t)bands[2] + bands[3]) / 2,
+              _statsSound.get(ssgAverageMid).getAverage() - _statsSound.get(ssgAverageMid).getStdDev() * 2 / 3
+            );
 
-      SET_MILLIS(_lastMidTime);      
-    }
+
+    //Draw treble
+    processTreble(draw, 
+                  ((uint16_t)bands[4] + bands[5] + bands[6]) / 3,
+                  _statsSound.get(ssgAverageTreble).getAverage() - _statsSound.get(ssgAverageTreble).getStdDev() * 3 / 4
+                );              
+
   }
   
   protected:
-    uint16_t _lastBeatTime;
-    uint16_t _lastMidTime;
-    uint8_t  _bassOffset;
+    //Bass drawing
+    uint8_t _bassFunc;
+    
 };
 
 

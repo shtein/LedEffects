@@ -84,6 +84,15 @@ class Effect{
       uint8_t  flags;       //Flags how to scale sound capture
       uint8_t  lower;       //Lower boundary from 0 to upper
       uint8_t  upper;       //Upper boundary from lower to 255
+
+      uint8_t   bassTicks;   //Bass beat time
+      uint16_t  bassValue;   //Bass drawing context
+
+      uint8_t  midTicks;    //Mid beat offset
+      uint16_t midValue;    //Mid drawing context 
+
+      uint8_t  trebleTicks; //Treble beat offset
+      uint16_t trebleValue; //Treble drawing context
     };
 
     static EFFECT_SOUND_CONTEXT _ctxSound;       //Sound context    
@@ -102,6 +111,18 @@ class Effect{
 
 #define SCALE_SOUND(bands, numBands) \
   scaleSound(bands, numBands, _ctxSound.flags, _ctxSound.lower, _ctxSound.upper, SOUND_MIN(), SOUND_MAX(), SOUND_AVERAGE(), SOUND_STDDEV())
+
+
+//Beat detection  
+#define BASS_BEAT_CHECK() (_ctxSound.bassTicks * getSpeedDelay())
+#define BASS_BEAT_RESET() _ctxSound.bassTicks = 0;
+
+#define MID_BEAT_CHECK() (_ctxSound.midTicks * getSpeedDelay())
+#define MID_BEAT_RESET() _ctxSound.midTicks = 0;
+
+#define TREBLE_BEAT_CHECK() (_ctxSound.trebleTicks * getSpeedDelay()) 
+#define TREBLE_BEAT_RESET() _ctxSound.trebleTicks = 0;
+
 
 #endif
 

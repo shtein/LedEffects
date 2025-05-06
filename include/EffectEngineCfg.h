@@ -66,7 +66,7 @@ bool setModeConfig(uint8_t mode, const EFFECT_MODE_CONFIG &cfg);
 #define ECF_TRANSFORM     0x04
 #define ECF_KALEYDOSCOPE  0x08
 #define ECF_SOUND         0x10
-#define ECF_SOUND_VIM     0x20
+#define ECF_SOUND_VUM     0x20
 
 
 ////////////////////////////////////
@@ -74,7 +74,7 @@ bool setModeConfig(uint8_t mode, const EFFECT_MODE_CONFIG &cfg);
 
 #define EFFECT_PARAM_TRANSFORM(s) s.bytes[0]
 #define EFFECT_PARAM_HSV(s) (*(CHSV *)s.bytes)
-#define EFFECT_PARAM_SOUNDVIM(s) s.bytes[1]
+#define EFFECT_PARAM_SOUNDVUM(s) s.bytes[1]
 
 
 struct EFFECT_DATA{
@@ -100,8 +100,8 @@ struct EFFECT_DATA{
   }
 
   inline EFFECT_DATA(uint8_t f, SoundVUMType t) __attribute__((always_inline)){
-    flags = f | ECF_SOUND_VIM;
-    EFFECT_PARAM_SOUNDVIM((*this)) = t;    
+    flags = f | ECF_SOUND_VUM;
+    EFFECT_PARAM_SOUNDVUM((*this)) = t;    
   }
 
 };

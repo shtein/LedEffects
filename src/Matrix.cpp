@@ -304,14 +304,14 @@ protected:
   bool _revert; 
 };
 
-//Widht and hight are number of dots including x0, y0
+//Width and hight are number of dots including x0, y0
 //Hypotenuse is defined as y = -height/width * x + (y0 + height + x0 * heigh / width )
 //Use 32-bit in y scale for higher precision
 
-void XYDraw::rightTriangle(int16_t x0, int16_t y0,
-                           int16_t dx, int16_t dy,
-                           const CRGB & col
-                          ){
+void XYDraw::fillRightTriangle(int16_t x0, int16_t y0,
+                               int16_t dx, int16_t dy,
+                               const CRGB & col
+                             ){
 
   RightTrianglePoints en(dx, dy);
 
@@ -319,10 +319,26 @@ void XYDraw::rightTriangle(int16_t x0, int16_t y0,
   en.first(x, y); 
   do {
 
-    (*this)(x + x0, y + y0) = CRGB(map(x, 0, dx, 0, 255), map(x, 0, dy, 0,255), 127); //col + CRGB(x * 10, 0, 0);
+    (*this)(x + x0, y + y0) = col; //CRGB(map(x, 0, dx, 0, 255), map(x, 0, dy, 0, 255), 127); //col + CRGB(x * 10, 0, 0);
   } while(en.next(x, y));
 
-}                                
+}                 
+
+void XYDraw::fadeToBlackRightTriangle(int16_t x0, int16_t y0,
+                                    int16_t dx, int16_t dy,
+                                    uint8_t fade
+                                   ){
+
+  RightTrianglePoints en(dx, dy);
+
+  int8_t x, y;
+  en.first(x, y); 
+  do {
+
+    (*this)(x + x0, y + y0).fadeToBlackBy(fade);
+  } while(en.next(x, y));
+
+}
   
 
 void XYDraw::mirrorRightTriangle(int16_t x0, int16_t y0,

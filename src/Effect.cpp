@@ -84,7 +84,7 @@ Effect::EFFECT_CONTEXT Effect::_ctx;
 //Sound specific
 SoundCapture *Effect::_sc = NULL;
 SoundStats    Effect::_statsSound;
-Effect::EFFECT_SOUND_CONTEXT Effect::_ctxSound = { SC_MAP_ABOVE_NOISE, SOUND_LOWER_MIN, SOUND_UPPER_MAX };
+Effect::EFFECT_SOUND_CONTEXT Effect::_ctxSound = { SC_MAP_USE_MIN | SC_MAP_USE_MAX | SC_MAP_ABOVE_NOISE, SOUND_LOWER_MIN, SOUND_UPPER_MAX };
 #endif
 
 
@@ -115,11 +115,12 @@ bool Effect::onCmd(const struct CtrlQueueItem &itm, NtfSet &ntf){
     break;
 
     default:
-    #ifdef USE_SOUND
+    #if defined (USE_SOUND) && !defined(NO_SOUND_COMMANDS)      
+        //Sound command
       if(_cfg.flags & ECF_SOUND){
         return onCmdSound(itm, ntf);
-      }
-    #endif
+      }    
+    #endif //USE_SOUND
     return false;
   } 
 
@@ -158,6 +159,10 @@ void Effect::getSoundBands(uint8_t *bands, size_t numBands){
 
   //Calculate stat
   _statsSound.process(bands, numBands);
+
+  _ctxSound.bassTicks++;
+  _ctxSound.midTicks++;
+  _ctxSound.trebleTicks++;  
 }
 
 
