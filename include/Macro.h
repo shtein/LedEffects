@@ -28,12 +28,29 @@
 #define SW2POS_CTRL VAR_NAME(ecsw2p)
   
 //Notifications
+
 #define _NTF_INIT() static NtfSet ntf;      
 #ifdef NTF_ENABLED
   #define _NTF_ADD(a) ntf.addNtf(a); 
 #else  
   #define _NTF_ADD(a)
-#endif
+#endif //NTF_ENABLED
+
+#ifdef SERIAL_ENABLED
+  #define _SERIAL_INPUT() \
+    static SerialInput inSer; \
+    static CtrlItemSerial<parseCommandInput> ctrlSer(&inSer); \
+    cp.addControl(&ctrlSer); \
+    _NTF_ADD(&ctrlSer);
+#else
+  #ifdef NTF_ENABLED
+    #define _SERIAL_INPUT() \
+      static NtfSerial ntfSer; \
+      _NTF_ADD(&ntfSer);
+  #else
+    #define _SERIAL_INPUT()
+  #endif //NTF_ENABLED
+#endif //SERIAL_ENABLED
 
 #ifdef WRITE_CONFIG_ONLY
   #define _CFG_SETUP     setup
@@ -112,7 +129,8 @@ void _ENGINE_LOOP() \
 
 ///////////////////////////////////////
 //Control map
-#define BEGIN_CONTROL_MAP()  
+#define BEGIN_CONTROL_MAP() \
+  _SERIAL_INPUT()
 
 #define END_CONTROL_MAP()
 
@@ -134,7 +152,6 @@ void _ENGINE_LOOP() \
     }, &pb); \
     cp.addControl(&pbCtrl); \
   }
-
 
 #define PUSH_BUTTON_TO_CMD(ctrl, cmd, ...) \
     case ctrl: \
@@ -203,17 +220,8 @@ void _ENGINE_LOOP() \
 #endif //USE_IR_REMOTE
 
 
-//Serial input
-#define SERIAL_INPUT() \
-  static SerialInput inSer; \
-  static CtrlItemSerial<parseCommandInput> ctrlSer(&inSer); \
-  cp.addControl(&ctrlSer); \
-  _NTF_ADD(&ctrlSer);
-
-
 //Wifi and Web
 #if defined(ESP8266) || defined(ESP32)
-
 #define WEB_INPUT(port) \
   static WebApiInput inWeb; \
   static CtrlItemWebApi<parseCommandInput> ctrlWeb(&inWeb); \

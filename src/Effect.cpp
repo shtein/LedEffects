@@ -12,8 +12,6 @@
 
 #ifdef NTF_ENABLED
 
-
-
 //Getting/setting effect speed
 struct EEResp_EffectSound{  
   uint8_t flags;
@@ -83,7 +81,6 @@ Effect::EFFECT_CONTEXT Effect::_ctx;
 #ifdef USE_SOUND
 //Sound specific
 SoundCapture *Effect::_sc = NULL;
-SoundStats    Effect::_statsSound;
 Effect::EFFECT_SOUND_CONTEXT Effect::_ctxSound = { SC_MAP_USE_MIN | SC_MAP_USE_MAX | SC_MAP_ABOVE_NOISE, SOUND_LOWER_MIN, SOUND_UPPER_MAX };
 #endif
 
@@ -153,12 +150,14 @@ void Effect::initSoundCapture(SoundCapture *sc){
     _sc->init();
 }
 
-void Effect::getSoundBands(uint8_t *bands, size_t numBands){
+void Effect::getSoundBands(sc_band_t &bands, bool scale){
   //Get band data
-  _sc->getData(bands, numBands);
+  _sc->getProcessedData(bands);
 
-  //Calculate stat
-  _statsSound.process(bands, numBands);
+  if(scale){
+    //Scale sound bands
+    _sc->scaleSound(bands, _ctxSound.flags, _ctxSound.lower, _ctxSound.upper);
+  }
 
   _ctxSound.bassTicks++;
   _ctxSound.midTicks++;

@@ -41,7 +41,7 @@ void moveGravity(Obj<T> &obj, int16_t t){
 class EffectMatrixDrops: public EffectPaletteTransform{
 
 protected:
-  inline void reset(){
+   void reset(){
     EffectPaletteTransform::reset();
 
     for(int i = 0; i < MAXTRIX_DROPS_MAX_OBJECTS; i++){
@@ -52,7 +52,7 @@ protected:
     setSpeedDelay(80);
   }
 
-  inline void proceed(CRGB *leds, uint16_t numLeds) __attribute__((always_inline))
+  void proceed(CRGB *leds, uint16_t numLeds) 
   {
     EffectPaletteTransform::proceed(leds, numLeds);
 
@@ -65,7 +65,6 @@ protected:
     for(int i = 0; i < MAXTRIX_DROPS_MAX_OBJECTS; i++){
       Drop  &drop  = _drops[i];
       Pnt8_t &pos  = drop.obj.pos;
-
 
       //Is over
       if(pos.y > random8(xy.height(), xy.height() + xy.height() / 4)){
@@ -117,7 +116,7 @@ public:
   }
 
   
-  inline void proceed(CRGB *leds, uint16_t numLeds) __attribute__((always_inline)){
+  void proceed(CRGB *leds, uint16_t numLeds) {
     EffectPaletteTransform::proceed(leds, numLeds);
 
     //Fade all

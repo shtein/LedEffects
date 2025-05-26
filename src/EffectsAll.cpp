@@ -52,17 +52,17 @@
   }
 
 #ifdef SOUND_ONLY
+  #define NO_EFFECT_STATIC_COLOR
   #define NO_EFFECT_PALLETE_TRANSFORM
   #define NO_EFFECT_RAINBOW
   #define NO_EFFECT_RAINBOW_MOVE
+  #define NO_EFFECT_FADE_INOUT 
+  #define NO_EFFECT_COLOR_WIPE 
   #define NO_THEATER_CHASE_RAINBOW
   #define NO_EFFECT_RUNNING_LIGHTS
   #define NO_EFFECT_EMERGENCY_LIGHTS  
   #define NO_EFFECT_FIRE
-  #define NO_EFFECT_STATIC_COLOR
-  #define NO_EFFECT_COLOR_WIPE
-  #define NO_EFFECT_RIPPLE
-  #define NO_EFFECT_FADE_INOUT
+  #define NO_EFFECT_RIPPLE  
   #define NO_EFFECT_METEOR_RAIN
   #define NO_EFFECT_JUGGLE
   #define NO_EFFECT_TWINKLE_FOX
@@ -75,6 +75,7 @@
   #define NO_EFFECT_MATRIX_BOUNCING_DOTS
   #define NO_EFFECT_MATRIX_CIRCLES
 #endif
+
 
 DEFINE_STR_PROGMEM(rs_Effect_StaticColor,          "Static color")
 DEFINE_STR_PROGMEM(rs_Effect_Blur,                 "Blur")
@@ -262,7 +263,7 @@ bool getEffect(uint8_t effectId, EFFECT_DESCRIPTION &ed){
     break;
 #endif //NO_EFFECT_MATRIX_CIRCLES
 
-#ifdef USE_SOUND
+  #ifdef USE_SOUND
 
 #ifndef NO_EFFECT_SOUND_MATRIX_RGB    
     case el_SoundMatrixRGB:
@@ -270,19 +271,15 @@ bool getEffect(uint8_t effectId, EFFECT_DESCRIPTION &ed){
     break;
 #endif    
 
-#endif //USE_SOUND
-
-#endif //USE_MATRIX
-
-#ifdef USE_SOUND
-
 #ifndef NO_EFFECT_SOUND_VUM
     case el_SoundVUM:      
       GET_EFFECT(ed, EffectSoundVUM, rs_Effect_SoundVUM, ECF_SOUND | ECF_SOUND_VUM);      
     break;
-#endif 
+#endif //NO_EFFECT_SOUND_VUM
 
-#endif //USE_SOUND
+  #endif //USE_SOUND
+
+#endif //USE_MATRIX
 
     default:
     return false;

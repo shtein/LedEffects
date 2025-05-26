@@ -10,9 +10,7 @@
 #endif 
 
 #ifdef USE_SOUND
-  #include "SoundUtils.h"
-
-  class SoundCapture;
+  #include <SoundCapture.h>
 #endif
 
 ///////////////////
@@ -52,7 +50,7 @@ class Effect{
     
 #ifdef USE_SOUND
     //Sound
-    void getSoundBands(uint8_t *bands, size_t numBands);
+    void getSoundBands(sc_band_t &bands, bool scale);
     bool onCmdSound(const struct CtrlQueueItem &itm, NtfSet &ntf);
 #endif    
 
@@ -82,8 +80,8 @@ class Effect{
 #ifdef USE_SOUND
     struct EFFECT_SOUND_CONTEXT{
       uint8_t  flags;       //Flags how to scale sound capture
-      uint8_t  lower;       //Lower boundary from 0 to upper
-      uint8_t  upper;       //Upper boundary from lower to 255
+      uint16_t  lower;       //Lower boundary from 0 to upper
+      uint16_t  upper;       //Upper boundary from lower to 255
 
       uint8_t   bassTicks;   //Bass beat time
       uint16_t  bassValue;   //Bass drawing context
@@ -96,22 +94,12 @@ class Effect{
     };
 
     static EFFECT_SOUND_CONTEXT _ctxSound;       //Sound context    
-    static SoundStats           _statsSound;     //Max, min, average
     static SoundCapture        *_sc;             //Sound capture  
 
 #endif    
 };
 
 #ifdef USE_SOUND
-
-#define SOUND_MIN() (_statsSound.get(SoundStatGet::ssgMin).getAverage() - _statsSound.get(SoundStatGet::ssgMin).getStdDev())
-#define SOUND_MAX() (_statsSound.get(SoundStatGet::ssgMax).getAverage() + _statsSound.get(SoundStatGet::ssgMax).getStdDev())
-#define SOUND_AVERAGE() _statsSound.get(SoundStatGet::ssgAverage).getAverage()
-#define SOUND_STDDEV()  _statsSound.get(SoundStatGet::ssgAverage).getStdDev()
-
-#define SCALE_SOUND(bands, numBands) \
-  scaleSound(bands, numBands, _ctxSound.flags, _ctxSound.lower, _ctxSound.upper, SOUND_MIN(), SOUND_MAX(), SOUND_AVERAGE(), SOUND_STDDEV())
-
 
 //Beat detection  
 #define BASS_BEAT_CHECK() (_ctxSound.bassTicks * getSpeedDelay())

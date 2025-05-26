@@ -89,7 +89,7 @@ struct EFFECT_DATA{
     flags = f;    
   }
 
-  inline EFFECT_DATA(uint8_t f, const CHSV &hsv) __attribute__((always_inline)){
+  EFFECT_DATA(uint8_t f, const CHSV &hsv) __attribute__((always_inline)){
     flags = f | ECF_HSV;    
     EFFECT_PARAM_HSV((*this)) = hsv;
   }
@@ -99,10 +99,12 @@ struct EFFECT_DATA{
     EFFECT_PARAM_TRANSFORM((*this)) = t;
   }
 
+#ifdef USE_SOUND
   inline EFFECT_DATA(uint8_t f, SoundVUMType t) __attribute__((always_inline)){
     flags = f | ECF_SOUND_VUM;
     EFFECT_PARAM_SOUNDVUM((*this)) = t;    
   }
+#endif //USE_SOUND
 
 };
 

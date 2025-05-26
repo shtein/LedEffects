@@ -15,27 +15,17 @@ enum XYType {
 };
 
 
-/////////////////////
-//Base matrix template class
-template<const uint16_t W, const uint16_t H>
-class XYMatrixBase{  
-  public:  
-
-    int16_t width() const { return W; };
-    int16_t height() const { return H; };
-
-    virtual  int16_t xy(int x, int y) const = 0;
-    virtual  int x(int16_t index) const = 0;
-    virtual  int y(int16_t index) const = 0;
-};
-
-
-
-
 ///////////////////////
 // Matrix template for matrix type, still abstract
 template <const uint16_t W, const uint16_t H,  const XYType T>
-class XYMatrix: public XYMatrixBase<W, H>{  
+class XYMatrix{  
+  int16_t width() const { return W; };
+  int16_t height() const { return H; };
+
+
+  int16_t xy(int x, int y) const = 0;
+  int x(int16_t index) const  = 0;
+  int y(int16_t index) const  = 0;
 };
 
 ///////////////////////////
@@ -53,8 +43,11 @@ class XYMatrix: public XYMatrixBase<W, H>{
 //    19 < 18 < 17 < 16 < 15
 
 template <const uint16_t W, const uint16_t H>
-class XYMatrix<W, H, xyMatrixSerpent>: public XYMatrixBase<W, H>{  
+class XYMatrix<W, H, xyMatrixSerpent>{  
   public:
+    int16_t width() const { return W; };
+    int16_t height() const { return H; };
+
     int16_t xy(int x, int y) const { return (x & 0x01) ? x * H + H - 1 - y :  x * H + y; } 
     int x(int16_t index) const { return index / H; }
     int y(int16_t index) const { return (index / H & 0x01) ? H - 1 - index % H : index % H; };
@@ -77,8 +70,11 @@ class XYMatrix<W, H, xyMatrixSerpent>: public XYMatrixBase<W, H>{
 //    15 > 16 > 17 > 18 > 19
 
 template <const uint16_t W, const uint16_t H>
-class XYMatrix<W, H, xyMatrixStraight>: public XYMatrixBase<W, H>{  
+class XYMatrix<W, H, xyMatrixStraight>{  
   public:
+    int16_t width() const { return W; };
+    int16_t height() const { return H; };
+
     int16_t xy(int x, int y) const { return  x * H + y; } 
     int x(int16_t index) const { return index / H; }
     int y(int16_t index) const { return index % H; };
@@ -181,9 +177,6 @@ protected:
   int16_t _numLeds;   //max leds
   uint8_t _flags;     //drawing options
 };
-
-
-
 
 //Kaleidoscope
 void kaleidoscope(CRGB *leds, uint16_t numLeds);

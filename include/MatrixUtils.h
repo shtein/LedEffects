@@ -13,6 +13,15 @@ constexpr void swapIf(T &a, T &b) {
 }
 
 #define SWAPIF(a, b) swapIf(a, b)
+
+template <typename T>
+uint8_t random8_ab(T a, T b){
+  swapIf(a, b);
+
+  return random8(a, b + 1);
+}
+
+#define RANDOM8_AB(a, b) random8_ab((int8_t)(a), (int8_t)(b))
   
 //////////////////////////////
 // Mirror
@@ -179,17 +188,17 @@ struct RightTriangle{
     return dy > 0 ? dy + 1: dy - 1;
   }
 
-  inline bool TopSided() const __attribute__((always_inline)) {
+  inline bool topSided() const __attribute__((always_inline)) {
     return dy > 0;
   }
-  inline bool BottomSided() const __attribute__((always_inline)) {
+  inline bool bottomSided() const __attribute__((always_inline)) {
     return dy < 0;
   }
-  inline bool LeftSided() const __attribute__((always_inline)) {
+  inline bool leftSided() const __attribute__((always_inline)) {
     return dx > 0;
   }
 
-  inline bool RightSided() const __attribute__((always_inline)) {
+  inline bool rightSided() const __attribute__((always_inline)) {
     return dx < 0;
   }
   
@@ -201,20 +210,17 @@ struct RightTriangle{
     return  y + dy;
   }
 
-  inline T hypotenuseX(T y) const __attribute__((always_inline)) {
-    return - y * dx / dy + dx + x;
+  inline T hypotenuseX(T ry) const __attribute__((always_inline)) {
+    return -ry * dx / dy + dx + x;
   }
 
-  inline T hypotenuseY(T x) const __attribute__((always_inline)) {
-    return -x * dy / dx + dy + y;
+  inline T hypotenuseY(T rx) const __attribute__((always_inline)) {
+    return -rx * dy / dx + dy + y;
   }  
 
-  void randomPointX(T &rx, T &ry, T offsC = 0, T offsH = 0) const{
-    //Random dot
-    rx =  x < cornerX() ? random8(x + offsC, cornerX() + 1 - offsH) : random8(cornerX() + offsC, x + 1 - offsH);
-
-    T h = hypotenuseY(rx);
-    ry = y > cornerY() ? random8(h, y + 1) : random8(y, h + 1);
+  inline void randomPointY(T &rx, T &ry, T offsC = 0, T offsH = 0) const __attribute__((always_inline)){
+    rx = RANDOM8_AB(x + (leftSided() ? offsC : - offsC), cornerX() + (leftSided() ? - offsH : offsH));  
+    ry = RANDOM8_AB(hypotenuseY(rx), y);
   }
 };
 

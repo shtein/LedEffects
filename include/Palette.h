@@ -43,6 +43,9 @@ DECLARE_GRADIENT_PALETTE(firstlove_gp);
 DECLARE_GRADIENT_PALETTE(roseedan_gp); 
 DECLARE_GRADIENT_PALETTE(passionata_gp); 
 
+//Sound 
+DECLARE_GRADIENT_PALETTE(sound_bands_gp);
+
 
 //////////////////////////////////////////////////////
 // Color schemes - set of transforming theme palettes 

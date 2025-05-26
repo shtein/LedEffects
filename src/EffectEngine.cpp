@@ -93,6 +93,7 @@ void putNtfObject(NtfBase &resp, const EFFECT_DATA &data){
   }
 
 #ifdef USE_SOUND
+
   if(data.flags & ECF_SOUND){
     resp.put_F(rs_Sound, true);
   }
@@ -100,7 +101,7 @@ void putNtfObject(NtfBase &resp, const EFFECT_DATA &data){
   if(data.flags & ECF_SOUND_VUM){
     resp.put_F(rs_SoundVIM, EFFECT_PARAM_SOUNDVUM(data));
   }
-
+  
 #endif
 
 } 
@@ -366,6 +367,8 @@ void EffectEngine::onEffectChange(const struct CtrlQueueData &data){
   
   //Change effect
   setEffect(effectNum);
+
+  DBG_OUTLN("Effect changed %d", effectNum);
 }
 
 void EffectEngine::onNumLedsChange(const struct CtrlQueueData &data){
@@ -617,9 +620,7 @@ BEGIN_PARSE_ROUTINE(parseCommandInput)
       VALUE_IS_TOKEN(rs_CmdParam_Next, EEMC_MODE, 0, CTF_VAL_NEXT)  //next mode
       VALUE_IS_TOKEN(rs_CmdParam_Prev, EEMC_MODE, 0, CTF_VAL_PREV)  //prev mode
       VALUE_IS_NUMBER(EEMC_MODE, CTF_VAL_ABS)                       //specific mode
-    END_GROUP_TOKEN()  
-
-    
+    END_GROUP_TOKEN()      
   END_GROUP_TOKEN() //mode
 
   BEGIN_GROUP_TOKEN(rs_CmdParam_Effect) //current effect
@@ -650,7 +651,7 @@ BEGIN_PARSE_ROUTINE(parseCommandInput)
     END_GROUP_TOKEN()
 
     SOUND_COMMANDS()
-
+    
   END_GROUP_TOKEN() //effect
 
   BEGIN_GROUP_TOKEN(rs_CmdParam_Leds) //num leds

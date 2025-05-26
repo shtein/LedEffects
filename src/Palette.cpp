@@ -374,6 +374,14 @@ void getPal_Plasma(CRGBPalette16 &pal){
 }
 
 
+//Sound palette rgb like
+DEFINE_GRADIENT_PALETTE( sound_bands_gp ) {
+  0,   0xBF,   0,    0,   // red
+  128,    0,   0xBF,   0,   // green   
+  255,    0,   0,   0xBF,   // blue
+}; 
+
+
 
 BEGIN_TRANSFORM_SCHEMA_RGB16_PALETTE(getPal_Confetti)
   TRANSOFRM_PALETTE(OceanColors_p)

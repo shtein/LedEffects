@@ -122,8 +122,6 @@ BEGIN_EFFECT_ENGINE()
       PUSH_BUTTON_TO_CMD(PB_CONTROL_CLICK_SHORT, EEMC_EFFECT)      
     END_PUSH_BUTTON() 
 
-    //Serial
-    SERIAL_INPUT()
     
     //WiFi
     //WIFI_INPUT() 
