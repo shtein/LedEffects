@@ -367,8 +367,6 @@ void EffectEngine::onEffectChange(const struct CtrlQueueData &data){
   
   //Change effect
   setEffect(effectNum);
-
-  DBG_OUTLN("Effect changed %d", effectNum);
 }
 
 void EffectEngine::onNumLedsChange(const struct CtrlQueueData &data){

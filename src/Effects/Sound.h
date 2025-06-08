@@ -15,7 +15,6 @@
 class EffectSoundVUM: public Effect{
 public:
   virtual void reset(){
-    
     setSpeedDelay(10);
     _ctx.palCurrent = sound_bands_gp;
   }
@@ -176,7 +175,7 @@ bool mode_BassUpDown(uint16_t &value,              //Context value
 
     
   //Check for the next beat
-  if( /*timeDelta >= random8(0, 201) && */ timeDelta <= 700 ){  
+  if( /*timeDelta >= random8(0, 201) && */ timeDelta <= 500 ){  
 
     //Draw next line
     if(!s->dir || !(flags & BUD_STOP_AT_CATHETUS)){            
@@ -192,7 +191,6 @@ bool mode_BassUpDown(uint16_t &value,              //Context value
     
     //Return true if it came to the top              
     return s->y == 0 && !s->dir;
-    
   }
 
   return true;  
@@ -305,11 +303,11 @@ protected:
     RightTriangle8_t tr(draw.width() / 2 - 1, 0, -draw.width() / 2, draw.height() / 2);
 
     //Fade first
-    draw.fadeToBlackRightTriangle(tr.x, tr.y, tr.width(), tr.height(), getSpeedDelay() * 5);
+    draw.fadeToBlackRightTriangle(tr.x, tr.y, tr.width(), tr.height(), getSpeedDelay() * 6);
     
     if(BASS_BEAT_CHECK() >= 150 && _sc->isBassPeak(value)){      
 
-      DBG_OUTLN("%d %d %d", value, _sc->getStats(ssgAverageBass).getAverage(), _sc->getStats(ssgAverageBass).getStdDev());
+      //DBG_OUTLN("%d %d %d %d", value, _sc->getStats(ssgAverageBass).getAverage(), _sc->getStats(ssgAverageBass).getStdDev(), _sc->getMin());
 
       FuncRGBMode_t bf[] = {mode1_RGBBass, mode2_RGBBass, mode2_RGBBass};      
       
@@ -338,10 +336,12 @@ protected:
     //Draw in left-top horizontal right angle triangle 
     RightTriangle8_t tr(0, draw.height() / 2 - 1, draw.width() / 2 - 1, -(draw.height() / 2 - 1));    
 
-    draw.fadeToBlackRightTriangle(tr.x, tr.y, tr.width(), tr.height(), getSpeedDelay() * 2);
+    draw.fadeToBlackRightTriangle(tr.x, tr.y, tr.width(), tr.height(), getSpeedDelay() * 4);
 
     //Check for time and peak
-    if(MID_BEAT_CHECK() >= 100 && _sc->isMidPeak(value)){      
+    if(MID_BEAT_CHECK() >= 100 && _sc->isMidPeak(value)){ 
+
+      //DBG_OUTLN("%d %d %d %d", value, _sc->getStats(ssgAverageMid).getAverage(), _sc->getStats(ssgAverageMid).getStdDev(), _sc->getMin());     
 
       if(mode1_RGBMid(_ctxSound.midValue, MID_BEAT_CHECK(), draw, tr))
       {
@@ -367,7 +367,8 @@ protected:
     //Check time and peak
     if(TREBLE_BEAT_CHECK() >= 50 && _sc->isTreblePeak(value)){      
                 
-    
+      //DBG_OUTLN("%d %d %d ", value, _sc->getStats(ssgAverageTreble).getAverage(), _sc->getStats(ssgAverageTreble).getStdDev());     
+
       if(mode1_RGBTreble(_ctxSound.trebleValue, TREBLE_BEAT_CHECK(), draw, tr))
       {
         //Reset
@@ -387,13 +388,14 @@ protected:
     uint16_t bands[SC_MAX_BANDS];
     getSoundBands(bands, false);
     
+    
     //Draw
     XYDraw draw(leds, numLeds); 
 
     
     //Draw bass
     proceedBass(draw, 
-                ((uint16_t)bands[0] + bands[1]) / 2 //max(bands[0], bands[1])
+                ((uint16_t)bands[0] + bands[1]) / 2 //max(bands[0], bands[1]) 
               );
 
 
@@ -405,7 +407,7 @@ protected:
 
     //Draw treble
     processTreble(draw, 
-                  ((uint16_t)bands[4] + bands[5] + bands[6]) / 3  // max(bands[4], max(bands[5], bands[6])),              
+                ((uint16_t)bands[4] + bands[5] + bands[6]) / 3 //max(bands[4], max(bands[5], bands[6]))  
                 );              
 
   }
