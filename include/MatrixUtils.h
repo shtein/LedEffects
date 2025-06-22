@@ -211,17 +211,18 @@ struct RightTriangle{
   }
 
   inline T hypotenuseX(T ry) const __attribute__((always_inline)) {
-    return -ry * dx / dy + dx + x;
+    return -(ry - cornerY()) * dx / dy + x;
   }
 
   inline T hypotenuseY(T rx) const __attribute__((always_inline)) {
-    return -rx * dy / dx + dy + y;
+    return -(rx - cornerX()) * dy / dx + y;
   }  
 
   inline void randomPointY(T &rx, T &ry, T offsC = 0, T offsH = 0) const __attribute__((always_inline)){
     rx = RANDOM8_AB(x + (leftSided() ? offsC : - offsC), cornerX() + (leftSided() ? - offsH : offsH));  
     ry = RANDOM8_AB(hypotenuseY(rx), y);
   }
+
 };
 
 typedef RightTriangle<int8_t>  RightTriangle8_t;

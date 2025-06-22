@@ -525,7 +525,7 @@ void EffectEngine::loop(const struct CtrlQueueItem &itm, NtfSet &ntf){
     
     //Safe config
     saveConfig();
-    DBG_OUTLN("Config saved");
+    //DBG_OUTLN("Config saved");
 
     //Reset
     _millisToSaveCfg = 0;    
