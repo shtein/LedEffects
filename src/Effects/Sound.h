@@ -249,9 +249,18 @@ bool mode2_RGBBass(uint16_t &value,                             //Context value
  }
 
 
- 
+//Bass drawing mode 3
+bool mode3_RGBBass(uint16_t &value,              //Context value
+                  uint16_t timeDelta,           //Time delta
+                  XYDraw &draw,                 //Drawing object
+                  const RightTriangle8_t &tr    //Triangle
+                 ){        
+  
+  return mode_BassLines(value, timeDelta, draw, random8(2) == 0 ? BUD_LINE_HORIZONTAL : BUD_LINE_VERTICAL, tr);
+}
 
- //Bass drawing mode 1
+
+//Mid drawing mode 1
 bool mode1_RGBMid(uint16_t &value,              //Context value
                   uint16_t timeDelta,           //Time delta
                   XYDraw &draw,                 //Drawing object
@@ -285,18 +294,7 @@ bool mode1_RGBMid(uint16_t &value,              //Context value
  }
 
 
-
-bool mode3_RGBBass(uint16_t &value,              //Context value
-                  uint16_t timeDelta,           //Time delta
-                  XYDraw &draw,                 //Drawing object
-                  const RightTriangle8_t &tr    //Triangle
-                 ){        
-  
-  return mode_BassLines(value, timeDelta, draw, random8(2) == 0 ? BUD_LINE_HORIZONTAL : BUD_LINE_VERTICAL, tr);
-}
-
-
-//Bass drawing mode 1
+//Treble drawing mode 1
 bool mode1_RGBTreble(uint16_t &value,              //Context value
                      uint16_t timeDelta,           //Time delta
                      XYDraw &draw,                 //Drawing object
@@ -319,7 +317,7 @@ bool mode1_RGBTreble(uint16_t &value,              //Context value
 }
 
 
-//Bass drawing mode 1
+//Treble drawing mode 2
 bool mode2_RGBTreble(uint16_t &value,              //Context value
                      uint16_t timeDelta,           //Time delta
                      XYDraw &draw,                 //Drawing object
@@ -378,6 +376,34 @@ bool mode2_RGBTreble(uint16_t &value,              //Context value
 
 }
 
+//Treble drawing mode 3
+bool mode3_RGBTreble(uint16_t &value,              //Context value
+                     uint16_t timeDelta,           //Time delta
+                     XYDraw &draw,                 //Drawing object
+                     const RightTriangle8_t &tr    //Triangle
+                    ){  
+
+  value ++; //Increment value
+                      
+  int8_t xInc = tr.topSided() ? 1 : -1; //Increment for x coordinate
+  int8_t yInc = tr.leftSided() ? 1 : -1;
+
+  CHSV hsv = CHSV(HUE_BLUE, 255, 255); //Color to use
+
+  for(int8_t i = tr.x; i != tr.cornerX() + xInc; i += xInc){
+    for(int8_t j = tr.y; j != tr.hypotenuseY(i) + yInc; j += yInc){
+      //Draw pixel
+      hsv.value = inoise8(i, j, value * 8); //Get noise value
+      hsv.saturation = 255 - (value % 64) * 4; //Saturation changes with value
+      draw.pixel(i, j, hsv); //Use noise to get color
+      
+    }   
+  }
+
+  return value > random8(200, 255); //Return true if it is time to reset
+}
+
+
 
 class EffectSoundRGB: public Effect{
   public:
@@ -410,7 +436,7 @@ protected:
 
     if(BASS_BEAT_CHECK() >= 150 && _sc->isBassPeak()){          
 
-      DBG_OUTLN("%d %d %d %d %d", _sc->getStats(ssgAverage).getAverage(), _sc->getStats(ssgAverage).getStdDev(), _sc->getBass(), _sc->getStats(ssgAverageBass).getAverage(), _sc->getStats(ssgAverageBass).getStdDev());  
+      //DBG_OUTLN("%d %d %d %d %d", _sc->getStats(ssgAverage).getAverage(), _sc->getStats(ssgAverage).getStdDev(), _sc->getBass(), _sc->getStats(ssgAverageBass).getAverage(), _sc->getStats(ssgAverageBass).getStdDev());  
 
       FuncRGBMode_t bf[] = {mode1_RGBBass, mode2_RGBBass, mode3_RGBBass};      
       
@@ -470,7 +496,7 @@ protected:
       
       //DBG_OUTLN("%d %d %d %d %d", _sc->getStats(ssgAverage).getAverage(), _sc->getStats(ssgAverage).getStdDev(), _sc->getTreble(), _sc->getStats(ssgAverageTreble).getAverage(), _sc->getStats(ssgAverageTreble).getStdDev());  
                 
-      FuncRGBMode_t tf[] = {mode1_RGBTreble, mode2_RGBTreble};   
+      FuncRGBMode_t tf[] = {mode1_RGBTreble, mode2_RGBTreble, /*mode3_RGBTreble*/ };   
 
       if(tf[_trebleFunc](_ctxSound.trebleValue, TREBLE_BEAT_CHECK(), draw, tr))
       {
