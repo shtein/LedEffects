@@ -48,18 +48,44 @@ protected:
       _drops[i].obj.pos = Pnt8_t(127, 127);
       _drops[i].obj.vel = Pnt8_t(0, 1);
     }
-
+#ifdef USE_SOUND
+    setSpeedDelay(10);
+#else
     setSpeedDelay(80);
+#endif //USE_SOUND
   }
 
   void proceed(CRGB *leds, uint16_t numLeds) 
-  {
+  {    
     EffectPaletteTransform::proceed(leds, numLeds);
+    
+#ifdef USE_SOUND
+    //Get sound data
+    sc_band_t bands;
+    getSoundBands(bands, false);
 
-      //Fade all
+    bool silence = !(_cfg.flags & ECF_SOUND) || _sc->isSilence(5000);
+
+    _ctx.byte ++;
+    if(_ctx.byte * getSpeedDelay() < 80){
+      //Skip this time
+      return;
+    }
+    _ctx.byte = 0;
+
     fadeToBlackBy(leds, numLeds, MATRIX_OBJECTS_FADE);  
 
-    XYDraw xy(leds, numLeds, XY_DRAW_ADD_COLORS);
+    bool treble = _sc->isTreblePeak() && TREBLE_BEAT_CHECK() >= 50;
+    bool mid    = _sc->isMidPeak() && MID_BEAT_CHECK() >= 100;
+    bool bass   = _sc->isBassPeak() && BASS_BEAT_CHECK() >= 150; 
+
+    if(bass || mid || treble || silence){
+
+#else
+    fadeToBlackBy(leds, numLeds, MATRIX_OBJECTS_FADE);        
+#endif    
+
+    XYDraw xy(leds, numLeds, XY_DRAW_ADD_COLORS); 
 
     //Proceed with objects
     for(int i = 0; i < MAXTRIX_DROPS_MAX_OBJECTS; i++){
@@ -82,7 +108,15 @@ protected:
       //Move    
       moveLinear(drop.obj, 1);
     }
+
+#ifdef USE_SOUND
+      if(treble) TREBLE_BEAT_RESET();
+      if(mid) MID_BEAT_RESET();
+      if(bass) BASS_BEAT_RESET();
+    } //End of sound check
+#endif //USE_SOUND
   }
+
   
 
 protected:

@@ -111,6 +111,8 @@ class Effect{
 #define TREBLE_BEAT_CHECK() (_ctxSound.trebleTicks * getSpeedDelay()) 
 #define TREBLE_BEAT_RESET() _ctxSound.trebleTicks = 0;
 
+#define SOUND_FADE_10(fade) (fade * getSpeedDelay() / 10)
+
 
 #endif
 

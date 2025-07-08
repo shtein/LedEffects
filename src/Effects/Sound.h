@@ -12,6 +12,7 @@
 #define SS_FADE_FACTOR_DELTA(fade) (getSpeedDelay() * fade)
 
 
+
 class EffectSoundVUM: public Effect{
 public:
   virtual void reset(){
@@ -28,6 +29,7 @@ protected:
     uint16_t bands[SC_MAX_BANDS];
     getSoundBands(bands, true);
 
+    
     XY xy;
 
     size_t bandLeds = xy.height();
@@ -56,7 +58,9 @@ protected:
         }
         
       }           
-    }           
+    }     
+      
+    
   }
 
 #else
@@ -432,7 +436,7 @@ protected:
     RightTriangle8_t tr(draw.width() / 2 - 1, 0, -draw.width() / 2, draw.height() / 2);
 
     //Fade first
-    draw.fadeToBlackRightTriangle(tr.x, tr.y, tr.width(), tr.height(), getSpeedDelay() * 6);
+    draw.fadeToBlackRightTriangle(tr.x, tr.y, tr.width(), tr.height(), SOUND_FADE_10(60));
 
     if(BASS_BEAT_CHECK() >= 150 && _sc->isBassPeak()){          
 
@@ -463,7 +467,7 @@ protected:
     //Draw in left-top horizontal right angle triangle 
     RightTriangle8_t tr(0, draw.height() / 2 - 1, draw.width() / 2 - 1, -(draw.height() / 2 - 1));    
 
-    draw.fadeToBlackRightTriangle(tr.x, tr.y, tr.width(), tr.height(), getSpeedDelay() * 4);
+    draw.fadeToBlackRightTriangle(tr.x, tr.y, tr.width(), tr.height(), SOUND_FADE_10(40));
 
     //Check for time and peak
     if(MID_BEAT_CHECK() >= 100 && _sc->isMidPeak()){ 
@@ -489,7 +493,7 @@ protected:
     RightTriangle8_t tr(0, draw.height() / 2, draw.width() / 2 - 1, draw.height() / 2 - 1);    
 
     //Fade first
-    draw.fadeToBlackRightTriangle(tr.x, tr.y, tr.width(), tr.height(), getSpeedDelay() * 2);
+    draw.fadeToBlackRightTriangle(tr.x, tr.y, tr.width(), tr.height(), SOUND_FADE_10(20));
     
     //Check time and peak
     if(TREBLE_BEAT_CHECK() >= 50 && _sc->isTreblePeak()){ 

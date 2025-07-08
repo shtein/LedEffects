@@ -11,6 +11,8 @@ BEGIN_EFFECTS(0)
     ADD_EFFECT_SOUND(el_SoundVUM, sv_Symmetric)
     ADD_EFFECT_SOUND(el_SoundVUM, sv_Bar)
     ADD_EFFECT_SOUND(el_SoundMatrixRGB)
+    ADD_EFFECT_SOUND(el_Confetti, tl_Confetti)
+    ADD_EFFECT_SOUND(el_Maxtrix_Drops, tl_TwinkleFox)
   END_MODE()
 END_EFFECTS()
 

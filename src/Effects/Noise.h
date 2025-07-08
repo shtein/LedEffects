@@ -101,10 +101,33 @@ class EffectConfetti: public EffectPaletteTransform{
     void proceed(CRGB *leds, uint16_t numLeds){  
       EffectPaletteTransform::proceed(leds, numLeds);
       //Fade all
-      fadeToBlackBy(leds, numLeds, 8);                     
+              
+      
+#ifdef USE_SOUND                
+      //Get sound data
+      sc_band_t bands;
+      getSoundBands(bands, false);  
+
+      bool silence = !(_cfg.flags & ECF_SOUND) || _sc->isSilence(5000);
+
+      fadeToBlackBy(leds, numLeds, silence ? 8 : SOUND_FADE_10(25));    
+
+      bool treble = _sc->isTreblePeak() && TREBLE_BEAT_CHECK() >= 50;
+      bool mid    = _sc->isMidPeak() && MID_BEAT_CHECK() >= 100;
+      bool bass   = _sc->isBassPeak() && BASS_BEAT_CHECK() >= 150; 
+
+      if( treble || mid || bass || silence) { 
+        int cnt = numLeds / LEDS_MAX + 1;
+
+        if(treble) cnt ++;
+#else
+      fadeToBlackBy(leds, numLeds, 8);    
+
+      int cnt = numLeds / LEDS_MAX + 1;
+#endif //USE_SOUND      
 
       //Once per each LEDS_MAX leds
-      int cnt = numLeds / LEDS_MAX + 1;
+      
       for(int i = 0; i < cnt; i++){
         uint16_t ledIndex = random16(cnt * LEDS_MAX);
 
@@ -112,7 +135,16 @@ class EffectConfetti: public EffectPaletteTransform{
           leds[ledIndex] = getCurrentPalColor(random8());
       } 
 
+#ifdef USE_SOUND
+        //Set next check time
+        if(treble) TREBLE_BEAT_RESET();
+        if(mid) MID_BEAT_RESET();
+        if(bass) BASS_BEAT_RESET();
+      } 
+#endif //USE_SOUND
+
     }
+
 
     void reset(){
       EffectPaletteTransform::reset();
