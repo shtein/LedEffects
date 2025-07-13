@@ -13,6 +13,8 @@ BEGIN_EFFECTS(0)
     ADD_EFFECT_SOUND(el_SoundMatrixRGB)
     ADD_EFFECT_SOUND(el_Confetti, tl_Confetti)
     ADD_EFFECT_SOUND(el_Maxtrix_Drops, tl_TwinkleFox)
+    ADD_EFFECT_KALEYDOSCOPE(el_TwinkleFox, tl_TwinkleFox)
+    ADD_EFFECT(el_Matrix_Bouncing_Dots)
   END_MODE()
 END_EFFECTS()
 

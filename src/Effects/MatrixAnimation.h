@@ -64,7 +64,7 @@ protected:
     sc_band_t bands;
     getSoundBands(bands, false);
 
-    bool silence = !(_cfg.flags & ECF_SOUND) || _sc->isSilence(5000);
+    bool silence = !(_cfg.flags & ECF_SOUND) || _sc->isSound(false, 5000);
 
     _ctx.byte ++;
     if(_ctx.byte * getSpeedDelay() < 80){

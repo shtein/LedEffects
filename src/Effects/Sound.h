@@ -287,7 +287,7 @@ bool mode1_RGBMid(uint16_t &value,              //Context value
   tr.randomPointY(x, y, 1);
   draw.pixel(x, y, CRGB::Green);
 
-  if(timeDelta <= 150){
+  if(timeDelta <= 125){
     tr.randomPointY(x, y);
     draw.pixel(x, y, CRGB::ForestGreen);
   }
@@ -310,12 +310,13 @@ bool mode1_RGBTreble(uint16_t &value,              //Context value
   int8_t x, y;
   tr.randomPointY(x, y);
   draw.pixel(x, y, CRGB::Blue);
-
+                    
+  
   if(timeDelta <= 100){
     tr.randomPointY(x, y);
     draw.pixel(x, y, CRGB::DeepSkyBlue);
   }
-
+  
   
   return (x == tr.x && y == tr.y)  /*|| x == tr.x && y == tr.cornerY()) ||  (x == tr.cornerX() && y == tr.y) */ ? true : false;  //Return true if it is at the corner
 }

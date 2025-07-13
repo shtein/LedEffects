@@ -108,7 +108,7 @@ class EffectConfetti: public EffectPaletteTransform{
       sc_band_t bands;
       getSoundBands(bands, false);  
 
-      bool silence = !(_cfg.flags & ECF_SOUND) || _sc->isSilence(5000);
+      bool silence = !(_cfg.flags & ECF_SOUND) || _sc->isSound(false, 5000);
 
       fadeToBlackBy(leds, numLeds, silence ? 8 : SOUND_FADE_10(25));    
 
@@ -119,7 +119,7 @@ class EffectConfetti: public EffectPaletteTransform{
       if( treble || mid || bass || silence) { 
         int cnt = numLeds / LEDS_MAX + 1;
 
-        if(treble) cnt ++;
+        //if(treble) cnt ++;
 #else
       fadeToBlackBy(leds, numLeds, 8);    
 

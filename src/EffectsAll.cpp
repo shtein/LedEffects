@@ -231,7 +231,7 @@ bool getEffect(uint8_t effectId, EFFECT_DESCRIPTION &ed){
     break;
 #endif //NO_EFFECT_RUNNING_LIGHTS
 
-#ifdef NO_EFFECT_TWINKLE_FOX
+#if !defined(NO_EFFECT_TWINKLE_FOX) || defined(EFFECT_TWINKLE_FOX)
     case el_TwinkleFox:
       GET_EFFECT(ed, EffectTwinkleFox, rs_Effect_TwinkleFox, ECF_TRANSFORM);      
     break;
@@ -251,7 +251,7 @@ bool getEffect(uint8_t effectId, EFFECT_DESCRIPTION &ed){
     break;
 #endif //NO_EFFECT_MATRIX_DROPS
 
-#ifndef NO_EFFECT_MATRIX_BOUNCING_DOTS
+#if !defined(NO_EFFECT_MATRIX_BOUNCING_DOTS) || defined(EFFECT_MATRIX_BOUNCING_DOTS)
     case el_Matrix_Bouncing_Dots:
       GET_EFFECT(ed, EffectMatrixBounsingDots, rs_Effect_Matrix_Bouncing_Dots);
     break;
