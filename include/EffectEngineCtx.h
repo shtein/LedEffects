@@ -37,20 +37,6 @@
 #define EEMC_SPEED       (EEMC_LED | EEMC_GET_SPEED)      //Speed changed
 #define EEMC_TRANSFORM   (EEMC_LED | EEMC_GET_TRANSFORM)  //Palette transform
 
-#if defined(ESP8266) || defined(ESP32)
-  //Wifi control
-  #define EEMC_WIFI                 0x40    //Wifi commands
-  #define EEMC_WIFI_STATUS          0x40    //WIFI status
-  #define EEMC_WIFI_STATUS_CHANGE   0x41    //WIFI status
-  #define EEMC_WIFI_SCAN            0x42    //WIFI scan networks
-  #define EEMC_WIFI_AP_ON           0x43    //Enable AP
-  #define EEMC_WIFI_AP_OFF          0x44    //Disable AP
-  #define EEMC_WIFI_CONNECT         0x45    //Connect WIFI
-  #define EEMC_WIFI_DISCONNECT      0x46    //Diconnect WIFI
-  #define EEMC_WIFI_CFG_GET         0x47    //Get WIFI configuration
-  #define EEMC_WIFI_CFG_CLEAR       0x48    //Clear config 
-#endif
-
 //Effect sound commands
 #define EEMC_GET_SOUND                    0x10   //Stat and config
 #define EEMC_GET_SOUND_LOW                0x11   //Lower 
@@ -81,13 +67,6 @@
 
 #include <Notification.h>
 
-//////////////////////////////////////
-// Set of notifiers
-#ifndef MAX_NTF
-  #define MAX_NTF 2
-#endif //MAX_NTF
-
-typedef NtfBaseSet<MAX_NTF> NtfSet;
 
 ///////////////////////////////////////
 // Serialization for command responses
@@ -118,7 +97,7 @@ DECLARE_STR_PROGMEM(rs_SoundVIM)
 
 #else 
 
-typedef void *NtfSet;
+#define NtfSet void*
 
 #endif //NTF_ENABLED
 

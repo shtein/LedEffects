@@ -81,7 +81,6 @@ bool checkConfigVersion(){
 //////////////////////////////////////////////
 // Engine 
 
-
 bool getEngineConfigInt(EEPROMCfg &ee, EFFECT_ENGINE_CONFIG &cfg){
   ee.moveTo(EFFECT_ENGINE_OFFSET);
   ee >> cfg;
@@ -216,8 +215,6 @@ bool addModeConfig(const char *modeName){
     }
   }
 
-  
-  
   //Save mode data
   strncpy_P(cfgMode.name, modeName, sizeof(cfgMode.name));
   cfgMode.effectNum  = 0;

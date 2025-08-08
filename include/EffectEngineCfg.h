@@ -23,7 +23,7 @@ struct EFFECT_ENGINE_VERSION{
 };
 
 bool getConfigVersion(EFFECT_ENGINE_VERSION &ver);
-bool checkConfigVersiong();
+bool checkConfigVersion();
 
 
 //Effect Engine configuration 

@@ -200,12 +200,14 @@ bool Effect::onCmdSound(const struct CtrlQueueItem &itm, NtfSet &ntf){
   }
 
 #ifdef NTF_ENABLED    
+/*
   ntf.put(CmdResponse<EEResp_EffectSound> { itm.cmd, {_ctxSound.flags, _ctxSound.lower, _ctxSound.upper,
                                                       _statsSound.get(SoundStatGet::ssgMin), 
                                                       _statsSound.get(SoundStatGet::ssgMax),
                                                       _statsSound.get(SoundStatGet::ssgAverage)                                                          
                                                     } 
                                                }); 
+*/                                               
 #endif
 
   return true;
