@@ -14,10 +14,10 @@ BEGIN_EFFECTS(EFF_RANDOM_START_EFFECT)
     ADD_EFFECT(el_Plasma, tl_Plasma)        
     ADD_EFFECT(el_Confetti, tl_Confetti)
     ADD_EFFECT(el_Blur)
-    ADD_EFFECT(el_RainbowMove)
     ADD_EFFECT(el_Noise, tl_Default)            
     ADD_EFFECT(el_MoodBlobs) 
     ADD_EFFECT(el_TwinkleFox, tl_TwinkleFox)
+    ADD_EFFECT(el_PacificOcean)
   END_MODE()
 
   BEGIN_MODE("Hlwn")      
@@ -32,23 +32,23 @@ BEGIN_EFFECTS(EFF_RANDOM_START_EFFECT)
     ADD_EFFECT(el_Noise,tl_Christmas )
   END_MODE()
 
-  BEGIN_MODE("Ukraine")      
-    ADD_EFFECT(el_Confetti, tl_UkrainianFlag )
-    ADD_EFFECT(el_Noise, tl_UkrainianFlag )
-    ADD_EFFECT(el_TwinkleFox, tl_UkrainianFlag )
-  END_MODE()  
+  BEGIN_MODE("July4")      
+    ADD_EFFECT(el_Confetti, tl_July_4th )
+    ADD_EFFECT(el_Noise, tl_July_4th )
+    ADD_EFFECT(el_TwinkleFox, tl_July_4th)
+  END_MODE()
 
 END_EFFECTS()
   
 
-BEGIN_EFFECT_ENGINE()      
+BEGIN_EFFECT_ENGINE()     
   //Leds
   BEGIN_LEDS()
     ADD_STRIP(NEOPIXEL, LED_PIN)
     ADD_STRIP(NEOPIXEL, LED_PIN2)
   END_LEDS()
 
-//Control    
+  //Control    
   BEGIN_CONTROL_MAP()
     BEGIN_PUSH_BUTTON(MODE_PIN)    
       PUSH_BUTTON_TO_CMD(PB_CONTROL_PUSH_LONG, EEMC_MODE)

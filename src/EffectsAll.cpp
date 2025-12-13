@@ -66,7 +66,7 @@
   #define NO_EFFECT_METEOR_RAIN
   #define NO_EFFECT_JUGGLE
   #define NO_EFFECT_TWINKLE_FOX
-  #define NO_EFFECT_NOISE
+  //#define NO_EFFECT_NOISE
   #define NO_EFFECT_MOOD_BLOBS
   #define NO_EFFECT_PLAZMA
   //#define NO_EFFECT_CONFETTI
@@ -74,6 +74,7 @@
   //#define NO_EFFECT_MATRIX_DROPS
   #define NO_EFFECT_MATRIX_BOUNCING_DOTS
   #define NO_EFFECT_MATRIX_CIRCLES
+  #define NO_EFFECT_MATRIX_FIRE
 #endif
 
 
@@ -100,6 +101,7 @@ DEFINE_STR_PROGMEM(rs_Effect_Fire,                 "Fire")
 DEFINE_STR_PROGMEM(rs_Effect_Matrix_Drops,         "Matrix drops")
 DEFINE_STR_PROGMEM(rs_Effect_Matrix_Bouncing_Dots, "Matrix bouncing dots")
 DEFINE_STR_PROGMEM(rs_Effect_Matrix_Circles,       "Matrix circles")
+DEFINE_STR_PROGMEM(rs_Effect_Matrix_Fire,          "Matrix fire")
 #ifdef USE_SOUND
 DEFINE_STR_PROGMEM(rs_Effect_SoundVUM,             "Sound VUM")
 DEFINE_STR_PROGMEM(rs_Effect_SoundMatrixRGB,       "Sound matrix RGB")
@@ -177,7 +179,7 @@ bool getEffect(uint8_t effectId, EFFECT_DESCRIPTION &ed){
     break;        
 #endif //NO_EFFECT_PALLETE_TRANSFORM  
 
-#ifndef NO_EFFECT_NOISE
+#if !defined(NO_EFFECT_NOISE) || defined(NO_EFFECT_NOISE)
     case el_Noise:
       GET_EFFECT(ed, EffectNoise, rs_Effect_Noise, ECF_TRANSFORM);      
     break;        
@@ -263,7 +265,13 @@ bool getEffect(uint8_t effectId, EFFECT_DESCRIPTION &ed){
     break;
 #endif //NO_EFFECT_MATRIX_CIRCLES
 
-  #ifdef USE_SOUND
+#if !defined(NO_EFFECT_MATRIX_FIRE) || defined(EFFECT_MATRIX_FIRE)  
+    case el_Matrix_Fire:
+      GET_EFFECT(ed, EffectMatrixFire, rs_Effect_Matrix_Fire);
+    break;
+#endif //NO_EFFECT_MATRIX_FIRE
+
+#ifdef USE_SOUND
 
 #ifndef NO_EFFECT_SOUND_MATRIX_RGB    
     case el_SoundMatrixRGB:

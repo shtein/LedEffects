@@ -53,7 +53,7 @@ protected:
     
     if(_ctx.rgb != bg){
       bg  = blend(_ctx.rgb, bg, 35);
-      Effect::_ctx.rgb = bg;
+      _ctx.rgb = bg;
     }  
 
     //Init pseudo random elements

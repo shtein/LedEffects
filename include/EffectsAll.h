@@ -29,6 +29,7 @@ enum EffectList{
   el_Maxtrix_Drops,
   el_Matrix_Bouncing_Dots,
   el_Matrix_Circles,
+  el_Matrix_Fire,
   el_SoundVUM,
   el_SoundMatrixRGB,
   el_Total

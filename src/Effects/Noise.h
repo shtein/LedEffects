@@ -25,8 +25,13 @@ class EffectPaletteTransformFast: public EffectPaletteTransform {
 //EffectNoise
 #define NOISE_DIST Effect::_ctx.value
 
-#define XSCALE          30
-#define YSCALE          30
+#ifdef USE_MATRIX
+  #define XSCALE          20
+  #define YSCALE          20
+#else
+  #define XSCALE          30
+  #define YSCALE          30
+#endif //USE_MATRIX  
 
 //getPal_Default
 class EffectNoise: public EffectPaletteTransform{
@@ -35,14 +40,26 @@ class EffectNoise: public EffectPaletteTransform{
       //Call parrent
       EffectPaletteTransform::proceed(leds, numLeds);
 
+#ifdef USE_MATRIX
+      XYDraw xy(leds, numLeds);
+
+      for (int16_t x = 0; x < xy.width(); x++) {            
+        for (int16_t y = 0; y < xy.height(); y++) {                
+          xy(x, y) = ColorFromPalette( RainbowColors_p,  inoise8(NOISE_DIST + x * XSCALE, NOISE_DIST + y * YSCALE), 255 );
+        }
+      }
+#else
       //Do default actions
       for(uint16_t i = 0; i < numLeds; i++){       
         leds[i]  = getCurrentPalColor((uint8_t)( inoise8(i * XSCALE, NOISE_DIST + i * YSCALE) % 255 ));
       }
 
-  
+      
+#endif //USE_MATRIX
+
       //Prepare for the next move
       NOISE_DIST += beatsin8(10, 1, 4);                                               
+
     }
 
     void reset(){

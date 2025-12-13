@@ -3,6 +3,9 @@
 
 //Halloween
 DECLARE_GRADIENT_PALETTE( halloween_gp);
+DECLARE_GRADIENT_PALETTE( purple_mist_gp );
+DECLARE_GRADIENT_PALETTE( spooky_green_gp ); 
+DECLARE_GRADIENT_PALETTE( pumpkin_glow_gp );
 
 //Autumn 
 DECLARE_GRADIENT_PALETTE( es_autumn_01_gp );
@@ -45,6 +48,8 @@ DECLARE_GRADIENT_PALETTE(passionata_gp);
 
 //Sound 
 DECLARE_GRADIENT_PALETTE(sound_bands_gp);
+
+
 
 
 //////////////////////////////////////////////////////
@@ -102,6 +107,7 @@ DECLARE_TRANSFORM_SCHEMA_TYPE(getPal_SnowAndIce)
 DECLARE_TRANSFORM_SCHEMA_TYPE(getPal_ValentinesDay)
 DECLARE_TRANSFORM_SCHEMA_TYPE(getPal_UkraineFlag)
 DECLARE_TRANSFORM_SCHEMA_TYPE(getPal_PortugalFlag)
+DECLARE_TRANSFORM_SCHEMA_TYPE(getPal_Rainbow)
 
 ///////////////////////////////////////////////////
 // Retrieving transform function
@@ -120,6 +126,7 @@ enum TransformPalList{
   tl_UkrainianFlag,
   tl_PortugalFlag,
   tl_IsraelFlag,
+  tl_Rainbow,
   tl_Total
 };
 

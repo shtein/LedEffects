@@ -96,14 +96,13 @@ BEGIN_EFFECTS(EFF_RANDOM_START_EFFECT)
     ADD_EFFECT("Twinkle fox-ukr", EffectTwinkleFox, &UkraineFlag )
   END_MODE()
 */
-
 END_EFFECTS()
 
   //Effect Engine
 BEGIN_EFFECT_ENGINE() 
   //Leds
   BEGIN_LEDS()       
-    ADD_STRIP(NEOPIXEL, LED_PIN)
+    ADD_STRIP(NEOPIXEL, 1)
   END_LEDS()
 
 //Control    
@@ -117,11 +116,13 @@ BEGIN_EFFECT_ENGINE()
     END_REMOTE()
 */
 
+
+  
     BEGIN_PUSH_BUTTON(MODE_PIN)    
       PUSH_BUTTON_TO_CMD(PB_CONTROL_PUSH_LONG, EEMC_MODE)
       PUSH_BUTTON_TO_CMD(PB_CONTROL_CLICK_SHORT, EEMC_EFFECT)      
     END_PUSH_BUTTON() 
-
+  
     
     //WiFi
     //WIFI_INPUT() 

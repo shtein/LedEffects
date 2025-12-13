@@ -45,8 +45,7 @@ struct Pnt {
     y = 0;
   };
   
-  inline Pnt(T x0, T y0) __attribute__((always_inline)): x(x0), y(y0)
-  {
+  inline Pnt(T x0, T y0) __attribute__((always_inline)): x(x0), y(y0){
   };
 
   inline Pnt& operator= (const Pnt& pnt) __attribute__((always_inline)) = default;

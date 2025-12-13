@@ -13,9 +13,37 @@ DEFINE_GRADIENT_PALETTE( halloween_gp ) {
     0, 173, 53,  1,
   127,   0,  0,  0,
   191, 173, 53,  1,
-  255, 173, 53,  1};
+  255, 173, 53,  1 
+};
 
-  
+
+// A few Halloween-inspired palettes
+DEFINE_GRADIENT_PALETTE( purple_mist_gp ) {
+  0,   5,  0,  10,    // almost black violet
+  64, 50,  0, 100,    // deep purple
+ 128,120,  0, 180,    // brighter violet
+ 192,180, 60, 255,    // ghostly purple-white
+ 255,  5,  0,  10     // loop back dark
+};
+
+DEFINE_GRADIENT_PALETTE( spooky_green_gp ) {
+  0,   0,  2,  0,     // black green
+  64,  0, 20,  0,     // dark green
+ 128,  0, 100,  0,    // glowing toxic green
+ 192,  50,255, 50,    // bright slime
+ 255,   0,  2,  0
+};
+
+DEFINE_GRADIENT_PALETTE( pumpkin_glow_gp ) {
+  0,  10,  0,  0,     // black red
+  64, 120,  0,  0,    // deep ember red
+ 128, 255,  60,  0,   // glowing orange
+ 192, 255, 120, 10,   // pumpkin glow
+ 255,  10,  0,  0
+};
+
+
+
 // Gradient palette "es_autumn_20_gp", originally from
 // http://soliton.vm.bytemark.co.uk/pub/cpt-city/es/autumn/tn/es_autumn_20.png.index.html
 // converted for FastLED with gammas (2.6, 2.2, 2.5)
@@ -351,6 +379,14 @@ const TProgmemRGBPalette16 PortugalFlag_p FL_PROGMEM ={
 };
 
 
+//Sound palette rgb like
+DEFINE_GRADIENT_PALETTE( sound_bands_gp ) {
+  0,   0xBF,   0,    0,   // red
+  128,    0,   0xBF,   0,   // green   
+  255,    0,   0,   0xBF,   // blue
+}; 
+
+
 
 //////////////////////////////////////////////////
 // Transform functions
@@ -374,12 +410,6 @@ void getPal_Plasma(CRGBPalette16 &pal){
 }
 
 
-//Sound palette rgb like
-DEFINE_GRADIENT_PALETTE( sound_bands_gp ) {
-  0,   0xBF,   0,    0,   // red
-  128,    0,   0xBF,   0,   // green   
-  255,    0,   0,   0xBF,   // blue
-}; 
 
 
 
@@ -404,9 +434,17 @@ BEGIN_TRANSFORM_SCHEMA_GRADIENT_PALETTE(getPal_Autunm)
 END_TRANSFORM_SCHEMA()
 
 ///////////////////
-//Halloween - better autumn than autumn
+//Halloween 
 BEGIN_TRANSFORM_SCHEMA_GRADIENT_PALETTE(getPal_Halloween)
-  TRANSOFRM_PALETTE(halloween_gp)
+  TRANSOFRM_PALETTE(purple_mist_gp)  
+  TRANSOFRM_PALETTE(spooky_green_gp)
+  TRANSOFRM_PALETTE(pumpkin_glow_gp)
+END_TRANSFORM_SCHEMA()
+
+///////////////////
+//Halloween 
+BEGIN_TRANSFORM_SCHEMA_GRADIENT_PALETTE(getPal_HalloweenScene)
+  TRANSOFRM_PALETTE(purple_mist_gp)  
 END_TRANSFORM_SCHEMA()
 
 
@@ -468,6 +506,11 @@ BEGIN_TRANSFORM_SCHEMA_RGB16_PALETTE(getPal_SnowAndIce)
   TRANSOFRM_PALETTE(Ice_p)
 END_TRANSFORM_SCHEMA()
 
+////////////////
+// Rainbow
+BEGIN_TRANSFORM_SCHEMA_RGB16_PALETTE(getPal_Rainbow)
+  TRANSOFRM_PALETTE(RainbowColors_p)  
+END_TRANSFORM_SCHEMA()
 
 #ifdef NTF_ENABLED
   #define _GET_PAL_TRANSFORM_NAME(td, tname) \
@@ -531,6 +574,9 @@ bool getPalTransform(uint8_t transformId, TRANSFORM_DESCRIPTION &td){
     break;
     case tl_IsraelFlag:
       GET_PAL_TRANSFORM(td, getPal_IsraelFlag, PSTR("Israel Flag"));
+    break;
+    case tl_Rainbow:
+      GET_PAL_TRANSFORM(td, getPal_Rainbow, PSTR("Rainbow"));
     break;
     default:
     return false;

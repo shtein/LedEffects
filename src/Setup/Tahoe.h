@@ -17,10 +17,16 @@ BEGIN_EFFECTS(EFF_RANDOM_START_EFFECT)
     ADD_EFFECT(el_PacificOcean)
   END_MODE()
 
-  BEGIN_MODE("Hlwn")      
+  BEGIN_MODE("Fall")      
     ADD_EFFECT(el_Confetti, tl_Autumn )
+    ADD_EFFECT(el_Noise, tl_Autumn)
+    ADD_EFFECT(el_TwinkleFox, tl_Autumn)
+  END_MODE()
+
+  BEGIN_MODE("Hlwn")      
+    ADD_EFFECT(el_Confetti, tl_Halloween )
     ADD_EFFECT(el_Noise, tl_Halloween)
-    ADD_EFFECT(el_TwinkleFox, tl_Halloween)
+    ADD_EFFECT(el_TwinkleFox, tl_Halloween) 
   END_MODE()
 
   BEGIN_MODE("Chrms")      
@@ -59,7 +65,6 @@ END_EFFECTS()
 
 //Effect Engine
 BEGIN_EFFECT_ENGINE()
-
   //Leds
   BEGIN_LEDS()
     ADD_STRIP(WS2811, LED_PIN2)
@@ -68,15 +73,12 @@ BEGIN_EFFECT_ENGINE()
   END_LEDS()
 
 //Control    
-  BEGIN_CONTROL_MAP()
-  
+  BEGIN_CONTROL_MAP()  
     BEGIN_PUSH_BUTTON(MODE_PIN)    
       PUSH_BUTTON_TO_CMD(PB_CONTROL_PUSH_LONG, EEMC_MODE)
       PUSH_BUTTON_TO_CMD(PB_CONTROL_CLICK_SHORT, EEMC_EFFECT)      
     END_PUSH_BUTTON()
 
-    //SERIAL_INPUT()
-    
   END_CONTROL_MAP()
       
 END_EFFECT_ENGINE() 

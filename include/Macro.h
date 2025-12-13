@@ -36,6 +36,16 @@
   #define _NTF_ADD(a)
 #endif //NTF_ENABLED
 
+#ifdef SERIAL_BINARY_ENABLED
+  #define _SERIAL_BINARY_INPUT() \
+    static SerialInputBinary inSerBin; \
+    static CtrlItemSerialBinary ctrlSr(&inSerBin); \
+    cp.addControl(&ctrlSr);
+  #else
+    #define _SERIAL_BINARY_INPUT()
+#endif //SERIAL_BINARY_ENABLED
+
+
 #ifdef SERIAL_ENABLED
   #define _SERIAL_INPUT() \
     static SerialInput inSer; \
@@ -92,6 +102,13 @@ void _CFG_LOOP(){}
 #define ADD_EFFECT_KALEYDOSCOPE(effect, ...) _ADD_EFFECT(effect, ECF_KALEYDOSCOPE, ##__VA_ARGS__)
 #define ADD_EFFECT_SOUND(effect, ...) _ADD_EFFECT(effect, ECF_SOUND, ##__VA_ARGS__)
 
+
+#ifdef DELAY_ON_START 
+  #define _DELAY_ON_START() delay(DELAY_ON_START)
+#else
+  #define _DELAY_ON_START()
+#endif
+
 //Effect Engine
 #define BEGIN_EFFECT_ENGINE() \
 static EffectEngine ee; \
@@ -99,6 +116,7 @@ static CtrlPanel cp; \
 _NTF_INIT(); \
 \
 void _ENGINE_SETUP(){ \
+  _DELAY_ON_START(); \
   DBG_INIT(); \
   DBG_OUTLN("Engine started - " SETUP_NAME );  
 
@@ -130,7 +148,8 @@ void _ENGINE_LOOP() \
 ///////////////////////////////////////
 //Control map
 #define BEGIN_CONTROL_MAP() \
-  _SERIAL_INPUT()
+  _SERIAL_INPUT() \
+  _SERIAL_BINARY_INPUT()
 
 #define END_CONTROL_MAP()
 

@@ -64,8 +64,9 @@ class Effect{
       CRGBPalette16  palCurrent;  //palette 1
       CRGBPalette16  palTarget;   //palette 2      
       
-      union{                      //Reusable data items        
-        CRGB     rgb;        
+      //Reusable data items                      
+      CRGB  rgb;  
+      union {                      
         uint8_t  byte;
         int8_t   ch;
         uint16_t word;

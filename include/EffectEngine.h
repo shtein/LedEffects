@@ -3,7 +3,6 @@
 
 #include "EffectEngineCtx.h"
 #include "EffectEngineCfg.h"
-#include "WiFiConnect.h"
 
 //Engine flags
 #define EFF_RANDOM_START_MODE     0x01
@@ -50,10 +49,6 @@ class EffectEngine{
    
     uint16_t            _millis;          //Processing
     uint16_t            _millisToSaveCfg; //When to safe config
-
-#if defined(ESP8266) || defined(ESP32)
-    WiFiConnection   _wifi;               //WiFi connectivity
-#endif
 };
 
 

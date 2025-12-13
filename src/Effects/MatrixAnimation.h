@@ -25,7 +25,6 @@ void moveGravity(Obj<T> &obj, int16_t t){
   obj.pos.y = t * t * G_CONST / 2 + obj.vel.y * t + obj.pos.y;
 
   obj.vel.y +=  G_CONST * t;
-  
 }
 
 
@@ -79,7 +78,7 @@ protected:
     bool mid    = _sc->isMidPeak() && MID_BEAT_CHECK() >= 100;
     bool bass   = _sc->isBassPeak() && BASS_BEAT_CHECK() >= 150; 
 
-    if(bass || mid || treble || silence){
+    if(bass || mid || /*treble ||*/ silence){
 
 #else
     fadeToBlackBy(leds, numLeds, MATRIX_OBJECTS_FADE);        
@@ -240,6 +239,49 @@ public:
 protected:
   Obj32_t _obj;
 };
+
+
+///////////////////////////////////////////////
+//EffectMatrixFire
+
+#define MATRIX_FIRE_X_SCALE      64
+#define MATRIX_FIRE_Y_SCALE      64
+#define MATRIX_FIRE_SPEED        40
+#define MATRIX_FIRE_OVERLAY      150
+#define MATRIX_FIRE_B_ADJ        10    //Brightness adjustment
+
+
+
+class EffectMatrixFire: public Effect{
+public:
+  void reset(){
+    setSpeedDelay(20);  
+
+    _ctx.word = 0;
+  };
+
+  void proceed(CRGB *leds, uint16_t numLeds){
+
+    _ctx.word += MATRIX_FIRE_SPEED;
+
+    XYDraw xy(leds, numLeds);
+
+    for(int16_t x = 0; x < xy.width(); x++){
+      for(int16_t y = 0; y < xy.height(); y++){
+
+          int16_t raw = inoise8(x * MATRIX_FIRE_X_SCALE, (y * MATRIX_FIRE_Y_SCALE) - _ctx.word) - (y * (255 / xy.height()));
+          uint8_t colorIndex = (raw < 0) ? 0 : (raw > 255 ? 255 : raw);
+          uint8_t brightness = (raw <= 0) ? 0 : (uint8_t)(255 - (raw / MATRIX_FIRE_B_ADJ));
+
+         nblend(xy(x, (xy.height() - y - 1)), ColorFromPalette(HeatColors_p, colorIndex, brightness), MATRIX_FIRE_OVERLAY);        
+
+      }
+    }
+
+  };
+
+};
+  
 
 
 #endif //__MATRIX_ANIMATION_H

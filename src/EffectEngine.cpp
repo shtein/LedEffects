@@ -355,6 +355,8 @@ void EffectEngine::onModeChange(const struct CtrlQueueData &data){
     //Change mode
     setMode(mode);  
   }
+
+  //DBG_OUTLN("Mode changed %d", mode );
 }
 
 
@@ -367,6 +369,8 @@ void EffectEngine::onEffectChange(const struct CtrlQueueData &data){
   
   //Change effect
   setEffect(effectNum);
+
+  //DBG_OUTLN("Effect changed %d", effectNum );
 }
 
 void EffectEngine::onNumLedsChange(const struct CtrlQueueData &data){
@@ -459,6 +463,8 @@ bool EffectEngine::onCmd(const struct CtrlQueueItem &itm, NtfSet &ntf){
 #endif    
     return true;
   }
+
+  DBG_OUTLN("EffectEngine::onCmd 0x%04X", itm.cmd );
   
   //Initial
   bool processed = false;
@@ -466,11 +472,6 @@ bool EffectEngine::onCmd(const struct CtrlQueueItem &itm, NtfSet &ntf){
   if(itm.cmd & EEMC_EE){ //Engine command
     processed = onCmdEE(itm, ntf);
   }  
-#if defined(ESP8266) || defined(ESP32)
-  else if(itm.cmd & EEMC_WIFI){ //Wifi command
-    processed =  _wifi.onCmd(itm);
-  }
-#endif
   else{ //Effect command
       if(_curEffect){
          processed = _curEffect->onCmd(itm, ntf);
@@ -489,6 +490,7 @@ bool EffectEngine::onCmd(const struct CtrlQueueItem &itm, NtfSet &ntf){
 
 void EffectEngine::loop(const struct CtrlQueueItem &itm, NtfSet &ntf){
  
+
   if(itm.cmd != EEMC_NONE){
     onCmd(itm, ntf);      
   }
@@ -657,34 +659,5 @@ BEGIN_PARSE_ROUTINE(parseCommandInput)
     VALUE_IS_PAIR(rs_CmdParam_Set, EEMC_NUMLEDS, CTF_VAL_ABS) //sets     
   END_GROUP_TOKEN() //leds
   
-//WIFI
-#if defined(ESP8266) || defined(ESP32)
-  BEGIN_GROUP_TOKEN("wifi") 
-    VALUE_IS_TOKEN("status|", EEMC_WIFI_STATUS)                   //WiFi status
-
-    BEGIN_GROUP_TOKEN("ap")                                       //AP control
-      VALUE_IS_TOKEN("on", EEMC_WIFI_AP_ON)                       //AP off               
-      VALUE_IS_TOKEN("off", EEMC_WIFI_AP_OFF)                     //AP off         
-    END_GROUP_TOKEN()
-
-    VALUE_IS_TOKEN("scan|s", EEMC_WIFI_SCAN)                      //Scan networks  
-
-    BEGIN_OBJECT("connect|c", WIFI_CONNECT, EEMC_WIFI_CONNECT)   //Connect
-      DATA_MEMBER("ssid|s", ssid)                                 //SSID
-      DATA_MEMBER("pwd|p", pwd, "")                               //Password
-      DATA_MEMBER_AS_IP("gateway|gw", gateway, 0)                 //Gateway
-      DATA_MEMBER_AS_IP("subnetmask|sm", subnetMask, 0)           //Subnet mask
-      DATA_MEMBER_AS_IP("dns1", dns1, 0)                          //DNS 1
-      DATA_MEMBER_AS_IP("dns2", dns2, 0)                          //DNS 2
-    END_OBJECT()
-    VALUE_IS_TOKEN("disconnect|d", EEMC_WIFI_DISCONNECT)          //Disconnect
-
-    BEGIN_GROUP_TOKEN("config|cfg")
-      VALUE_IS_TOKEN("get|", EEMC_WIFI_CFG_GET)                   //Get config saved after last succesfull connect
-      VALUE_IS_TOKEN("clear", EEMC_WIFI_CFG_CLEAR)                //Clear config for debugging purposes
-    END_GROUP_TOKEN()
-  
-  END_GROUP_TOKEN()
-#endif
 
 END_PARSE_ROUTINE()
