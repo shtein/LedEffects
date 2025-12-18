@@ -508,8 +508,10 @@ END_TRANSFORM_SCHEMA()
 
 ////////////////
 // Rainbow
-BEGIN_TRANSFORM_SCHEMA_RGB16_PALETTE(getPal_Rainbow)
+BEGIN_TRANSFORM_SCHEMA_RGB16_PALETTE(getPal_Noise)
   TRANSOFRM_PALETTE(RainbowColors_p)  
+  TRANSOFRM_PALETTE(OceanColors_p) 
+  TRANSOFRM_PALETTE(HeatColors_p)
 END_TRANSFORM_SCHEMA()
 
 #ifdef NTF_ENABLED
@@ -575,8 +577,8 @@ bool getPalTransform(uint8_t transformId, TRANSFORM_DESCRIPTION &td){
     case tl_IsraelFlag:
       GET_PAL_TRANSFORM(td, getPal_IsraelFlag, PSTR("Israel Flag"));
     break;
-    case tl_Rainbow:
-      GET_PAL_TRANSFORM(td, getPal_Rainbow, PSTR("Rainbow"));
+    case tl_Noise:
+      GET_PAL_TRANSFORM(td, getPal_Noise, PSTR("Noise"));
     break;
     default:
     return false;

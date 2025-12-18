@@ -15,7 +15,7 @@ BEGIN_EFFECTS(0)
     ADD_EFFECT_SOUND(el_Maxtrix_Drops, tl_TwinkleFox)
     ADD_EFFECT_KALEYDOSCOPE(el_TwinkleFox, tl_TwinkleFox)
     ADD_EFFECT(el_Matrix_Fire)
-    ADD_EFFECT(el_Noise, tl_Rainbow)
+    ADD_EFFECT(el_Noise, tl_Noise)
   END_MODE()
 END_EFFECTS()
 

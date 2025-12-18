@@ -17,7 +17,7 @@
 
 
 //Effect Engine Version
-struct EFFECT_ENGINE_VERSION{
+struct __attribute__((packed)) EFFECT_ENGINE_VERSION{
   uint8_t verHigh;
   uint8_t verLow;
 };
@@ -27,7 +27,7 @@ bool checkConfigVersion();
 
 
 //Effect Engine configuration 
-struct EFFECT_ENGINE_CONFIG{
+struct __attribute__((packed)) EFFECT_ENGINE_CONFIG{
   uint8_t               flags;        //Flags
   uint8_t               numModes;     //Number of modes
   uint8_t               modeNum;      //Current mode
@@ -42,7 +42,7 @@ bool setEngineConfig(const EFFECT_ENGINE_CONFIG &cfg);
 //Effect Mode configuration
 #define MODE_NAME_LEN   16
 
-struct EFFECT_MODE_CONFIG{
+struct __attribute__((packed)) EFFECT_MODE_CONFIG{
   char    name[MODE_NAME_LEN]; //Mode name
   uint8_t numEffects;          //Number of effects
   uint8_t effectNum;           //Current effect   
@@ -77,7 +77,7 @@ bool setModeConfig(uint8_t mode, const EFFECT_MODE_CONFIG &cfg);
 #define EFFECT_PARAM_SOUNDVUM(s) s.bytes[1]
 
 
-struct EFFECT_DATA{
+struct __attribute__((packed)) EFFECT_DATA{
   uint8_t  flags;      //Flags  
   uint8_t  bytes[6];   //Data    
 
@@ -112,7 +112,7 @@ struct EFFECT_DATA{
 
 //////////////////////////////
 // Effect config
-struct EFFECT_CONFIG{  
+struct __attribute__((packed)) EFFECT_CONFIG{  
   uint8_t     effectId;     //Effect id
   uint8_t     speedDelay;   //Speed
   EFFECT_DATA data;         //Data    

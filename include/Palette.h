@@ -107,7 +107,7 @@ DECLARE_TRANSFORM_SCHEMA_TYPE(getPal_SnowAndIce)
 DECLARE_TRANSFORM_SCHEMA_TYPE(getPal_ValentinesDay)
 DECLARE_TRANSFORM_SCHEMA_TYPE(getPal_UkraineFlag)
 DECLARE_TRANSFORM_SCHEMA_TYPE(getPal_PortugalFlag)
-DECLARE_TRANSFORM_SCHEMA_TYPE(getPal_Rainbow)
+DECLARE_TRANSFORM_SCHEMA_TYPE(getPal_Noise)
 
 ///////////////////////////////////////////////////
 // Retrieving transform function
@@ -126,7 +126,7 @@ enum TransformPalList{
   tl_UkrainianFlag,
   tl_PortugalFlag,
   tl_IsraelFlag,
-  tl_Rainbow,
+  tl_Noise,
   tl_Total
 };
 

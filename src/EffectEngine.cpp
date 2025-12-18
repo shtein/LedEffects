@@ -463,8 +463,6 @@ bool EffectEngine::onCmd(const struct CtrlQueueItem &itm, NtfSet &ntf){
 #endif    
     return true;
   }
-
-  DBG_OUTLN("EffectEngine::onCmd 0x%04X", itm.cmd );
   
   //Initial
   bool processed = false;

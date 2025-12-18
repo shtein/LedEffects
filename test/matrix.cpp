@@ -107,7 +107,7 @@ void testObjMoveAwayDown(){
 }
 
 
-/*
+
 int main(int , char **){
   UNITY_BEGIN();
 
@@ -120,4 +120,3 @@ int main(int , char **){
   return 0;
 }
 
-*/

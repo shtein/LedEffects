@@ -58,7 +58,7 @@
   #define NO_EFFECT_RAINBOW_MOVE
   #define NO_EFFECT_FADE_INOUT 
   #define NO_EFFECT_COLOR_WIPE 
-  #define NO_THEATER_CHASE_RAINBOW
+  #define NO_EFFECT_THEATER_CHASE_RAINBOW
   #define NO_EFFECT_RUNNING_LIGHTS
   #define NO_EFFECT_EMERGENCY_LIGHTS  
   #define NO_EFFECT_FIRE
@@ -102,10 +102,9 @@ DEFINE_STR_PROGMEM(rs_Effect_Matrix_Drops,         "Matrix drops")
 DEFINE_STR_PROGMEM(rs_Effect_Matrix_Bouncing_Dots, "Matrix bouncing dots")
 DEFINE_STR_PROGMEM(rs_Effect_Matrix_Circles,       "Matrix circles")
 DEFINE_STR_PROGMEM(rs_Effect_Matrix_Fire,          "Matrix fire")
-#ifdef USE_SOUND
 DEFINE_STR_PROGMEM(rs_Effect_SoundVUM,             "Sound VUM")
 DEFINE_STR_PROGMEM(rs_Effect_SoundMatrixRGB,       "Sound matrix RGB")
-#endif
+
 
 uint8_t getEffectFlags(uint8_t effectId){
   EFFECT_DESCRIPTION ed;
@@ -209,11 +208,11 @@ bool getEffect(uint8_t effectId, EFFECT_DESCRIPTION &ed){
     break;    
 #endif //NO_EFFECT_RAINBOW
 
-#ifndef NO_THEATER_CHASE_RAINBOW
+#ifndef NO_EFFECT_THEATER_CHASE_RAINBOW
     case el_TheaterChaseRainbow:
       GET_EFFECT(ed, EffectTheaterChaseRainbow, rs_Effect_TheaterChaseRainbow);      
     break;
-#endif //NO_THEATER_CHASE_RAINBOW
+#endif //NO_EFFECT_THEATER_CHASE_RAINBOW
 
 #ifndef NO_EFFECT_RAINBOW_MOVE    
     case el_RainbowMove:
