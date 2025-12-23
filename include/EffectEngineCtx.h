@@ -64,10 +64,7 @@
 #define SAVE_CONFIG_TIMEOUT 30000
 
 #ifdef NTF_ENABLED
-
 #include <Notification.h>
-
-
 ///////////////////////////////////////
 // Serialization for command responses
 DECLARE_STR_PROGMEM(rs_Mode)
@@ -100,7 +97,6 @@ DECLARE_STR_PROGMEM(rs_SoundVIM)
 #define NtfSet void*
 
 #endif //NTF_ENABLED
-
 
 #ifdef USE_SOUND
 

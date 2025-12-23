@@ -356,7 +356,7 @@ void EffectEngine::onModeChange(const struct CtrlQueueData &data){
     setMode(mode);  
   }
 
-  //DBG_OUTLN("Mode changed %d", mode );
+  DBG_OUTLN("Mode changed %d", mode );
 }
 
 
@@ -370,7 +370,7 @@ void EffectEngine::onEffectChange(const struct CtrlQueueData &data){
   //Change effect
   setEffect(effectNum);
 
-  //DBG_OUTLN("Effect changed %d", effectNum );
+  DBG_OUTLN("Effect changed %d", effectNum );
 }
 
 void EffectEngine::onNumLedsChange(const struct CtrlQueueData &data){
