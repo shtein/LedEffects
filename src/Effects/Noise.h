@@ -43,6 +43,9 @@ class EffectNoise: public EffectPaletteTransform{
       //Call parrent
       EffectPaletteTransform::proceed(leds, numLeds);
 
+      //Prepare for the next move
+      NOISE_DIST += beatsin8(10, 1, 4);  
+
 #ifdef USE_MATRIX
       XYDraw xy(leds, numLeds);
 
@@ -51,7 +54,7 @@ class EffectNoise: public EffectPaletteTransform{
 
           xy(x, y) = getCurrentPalColor(inoise8(x * XSCALE + (256 - beatsin16(3, 0, 512)), 
                                                 y * YSCALE + NOISE_DIST
-                                               )
+                                               ), 128
                                        );
                                               
         }
@@ -66,8 +69,6 @@ class EffectNoise: public EffectPaletteTransform{
       
 #endif //USE_MATRIX      
 
-      //Prepare for the next move
-      NOISE_DIST += beatsin8(10, 1, 4);  
 
     }
 
@@ -78,7 +79,7 @@ class EffectNoise: public EffectPaletteTransform{
       Effect::setSpeedDelay(10);
 
       //Init distortion
-      //NOISE_DIST = random16(millis());
+      NOISE_DIST = random16(millis());
     }
 };
 

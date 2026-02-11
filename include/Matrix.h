@@ -19,8 +19,8 @@ enum XYType {
 // Matrix template for matrix type, still abstract
 template <const uint16_t W, const uint16_t H,  const XYType T>
 class XYMatrix{  
-  int16_t width() const { return W; };
-  int16_t height() const { return H; };
+  int16_t width() const __attribute__((always_inline)) { return W; };
+  int16_t height() const __attribute__((always_inline)) { return H; };
 
 
   int16_t xy(int x, int y) const = 0;
@@ -45,12 +45,12 @@ class XYMatrix{
 template <const uint16_t W, const uint16_t H>
 class XYMatrix<W, H, xyMatrixSerpent>{  
   public:
-    int16_t width() const { return W; };
-    int16_t height() const { return H; };
+    int16_t width() const __attribute__((always_inline)) { return W; };
+    int16_t height() const __attribute__((always_inline)) { return H; };
 
-    int16_t xy(int x, int y) const { return (x & 0x01) ? x * H + H - 1 - y :  x * H + y; } 
-    int x(int16_t index) const { return index / H; }
-    int y(int16_t index) const { return (index / H & 0x01) ? H - 1 - index % H : index % H; };
+    int16_t xy(int x, int y) const __attribute__((always_inline)) { return (x & 0x01) ? x * H + H - 1 - y :  x * H + y; } 
+    int x(int16_t index) const __attribute__((always_inline)) { return index / H; }
+    int y(int16_t index) const __attribute__((always_inline)) { return (index / H & 0x01) ? H - 1 - index % H : index % H; };
 };
 
 //////////////////////////////
@@ -72,12 +72,12 @@ class XYMatrix<W, H, xyMatrixSerpent>{
 template <const uint16_t W, const uint16_t H>
 class XYMatrix<W, H, xyMatrixStraight>{  
   public:
-    int16_t width() const { return W; };
-    int16_t height() const { return H; };
+    int16_t width() const __attribute__((always_inline)) { return W; };
+    int16_t height() const __attribute__((always_inline)) { return H; };
 
-    int16_t xy(int x, int y) const { return  x * H + y; } 
-    int x(int16_t index) const { return index / H; }
-    int y(int16_t index) const { return index % H; };
+    int16_t xy(int x, int y) const __attribute__((always_inline)) { return  x * H + y; } 
+    int x(int16_t index) const __attribute__((always_inline)) { return index / H; }
+    int y(int16_t index) const __attribute__((always_inline)) { return index % H; };
 };
 
 
@@ -95,10 +95,11 @@ public:
   XYDraw(CRGB *leds, int16_t numLeds, uint8_t flags = 0);
   ~XYDraw();
 
-  void setFlags(uint8_t flags);
-  uint8_t getFlags() const;
+  inline void setFlags(uint8_t flags) __attribute__((always_inline)) {_flags = flags;}
+  inline uint8_t getFlags() const __attribute__((always_inline))  {  return _flags; }
 
-  CRGB &operator()(int16_t x, int16_t y);
+  CRGB& operator()(int16_t x, int16_t y);
+  const CRGB& operator()(int16_t x, int16_t y) const;
 
   //Drawing functions
   void pixel(int16_t x, int16_t y, const CRGB &col);
@@ -182,4 +183,5 @@ protected:
 void kaleidoscope(CRGB *leds, uint16_t numLeds);
 
 #endif //USE_MATRIX
+
 #endif //__MATRIX_H

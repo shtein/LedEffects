@@ -7,7 +7,7 @@
 // EffectTwinkleFox
 
 //Whtever it function does
-inline uint8_t attackDecayWave8( uint8_t i){  
+inline uint8_t attackDecayWave8(uint8_t i){  
   return (i < 86) ? i * 3 : 255 - ((i - 86) + ((i - 86) / 2));
 }
 

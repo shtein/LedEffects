@@ -1,7 +1,7 @@
 #ifndef __SOUND_H
 #define __SOUND_H
 
-#include <utils.h>
+#include <alutils.h>
 #include <SoundCapture.h>
 
 
@@ -291,8 +291,6 @@ bool mode1_RGBMid(uint16_t &value,              //Context value
     tr.randomPointY(x, y);
     draw.pixel(x, y, CRGB::ForestGreen);
   }
-
-
   
   return timeDelta > 300 ? true : false;  
  }

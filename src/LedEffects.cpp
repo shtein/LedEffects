@@ -102,7 +102,7 @@ END_EFFECTS()
 BEGIN_EFFECT_ENGINE() 
   //Leds
   BEGIN_LEDS()       
-    ADD_STRIP(NEOPIXEL, 1)
+    ADD_STRIP(NEOPIXEL, LED_PIN)
   END_LEDS()
 
 //Control    

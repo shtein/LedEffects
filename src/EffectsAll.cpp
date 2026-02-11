@@ -61,7 +61,7 @@
   #define NO_EFFECT_THEATER_CHASE_RAINBOW
   #define NO_EFFECT_RUNNING_LIGHTS
   #define NO_EFFECT_EMERGENCY_LIGHTS  
-  #define NO_EFFECT_FIRE
+  //#define NO_EFFECT_FIRE
   #define NO_EFFECT_RIPPLE  
   #define NO_EFFECT_METEOR_RAIN
   #define NO_EFFECT_JUGGLE
@@ -74,7 +74,6 @@
   //#define NO_EFFECT_MATRIX_DROPS
   #define NO_EFFECT_MATRIX_BOUNCING_DOTS
   #define NO_EFFECT_MATRIX_CIRCLES
-  #define NO_EFFECT_MATRIX_FIRE
 #endif
 
 
@@ -101,7 +100,6 @@ DEFINE_STR_PROGMEM(rs_Effect_Fire,                 "Fire")
 DEFINE_STR_PROGMEM(rs_Effect_Matrix_Drops,         "Matrix drops")
 DEFINE_STR_PROGMEM(rs_Effect_Matrix_Bouncing_Dots, "Matrix bouncing dots")
 DEFINE_STR_PROGMEM(rs_Effect_Matrix_Circles,       "Matrix circles")
-DEFINE_STR_PROGMEM(rs_Effect_Matrix_Fire,          "Matrix fire")
 DEFINE_STR_PROGMEM(rs_Effect_SoundVUM,             "Sound VUM")
 DEFINE_STR_PROGMEM(rs_Effect_SoundMatrixRGB,       "Sound matrix RGB")
 
@@ -238,7 +236,7 @@ bool getEffect(uint8_t effectId, EFFECT_DESCRIPTION &ed){
     break;
 #endif //NO_EFFECT_TWINKLE_FOX    
 
-#ifndef NO_EFFECT_FIRE    
+#if !defined(NO_EFFECT_FIRE) || defined(EFFECT_FIRE)      
     case el_Fire:
       GET_EFFECT(ed, EffectFire, rs_Effect_Fire);      
     break;
@@ -263,12 +261,6 @@ bool getEffect(uint8_t effectId, EFFECT_DESCRIPTION &ed){
       GET_EFFECT(ed, EffectMatrixCircles, rs_Effect_Matrix_Circles, ECF_TRANSFORM);
     break;
 #endif //NO_EFFECT_MATRIX_CIRCLES
-
-#if !defined(NO_EFFECT_MATRIX_FIRE) || defined(EFFECT_MATRIX_FIRE)  
-    case el_Matrix_Fire:
-      GET_EFFECT(ed, EffectMatrixFire, rs_Effect_Matrix_Fire);
-    break;
-#endif //NO_EFFECT_MATRIX_FIRE
 
 #ifdef USE_SOUND
 

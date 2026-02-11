@@ -15,14 +15,6 @@ XYDraw::XYDraw(CRGB *leds, int16_t numLeds, uint8_t flags){
 XYDraw::~XYDraw(){ 
 }
 
-void XYDraw::setFlags(uint8_t flags){
-  _flags = flags;
-}
-
-uint8_t XYDraw::getFlags() const{
-  return _flags;
-}
-
 
 CRGB & XYDraw::operator()(int16_t x, int16_t y){
   int16_t index = xy(x, y);
@@ -35,6 +27,19 @@ CRGB & XYDraw::operator()(int16_t x, int16_t y){
   else
     return _oob;
 }
+
+const CRGB & XYDraw::operator()(int16_t x, int16_t y) const{
+  int16_t index = xy(x, y);
+
+  if( x >= 0 && x < width() && 
+      y >= 0 && y < height() && 
+      index >= 0 && index < _numLeds 
+     )
+    return _leds[index];
+  else
+    return _oob;
+}
+
 
 void XYDraw::pixel(int16_t x, int16_t y, const CRGB &col){
   
@@ -237,7 +242,7 @@ public:
 
     //Init values    
     int32_t h = (int32_t)_dy << 16 ;
-    _a  = _dx != 0? -h / (int32_t)_dx : 0; 
+    _a  = _dx != 0 ? -h / (int32_t)_dx : 0; 
     _b  =  h;
   
   };

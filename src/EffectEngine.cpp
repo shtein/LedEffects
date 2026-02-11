@@ -259,6 +259,11 @@ void EffectEngine::init() {
  
   //Don't uncomment it if you don;t know what it is 
   //FastLED.setMaxPowerInVoltsAndMilliamps(5,1000);
+  #ifdef BRIGHTNESS
+    FastLED.setBrightness(BRIGHTNESS);
+  #endif
+
+
 
   fill_solid(_leds, MAX_LEDS, CRGB::Black);
 
@@ -356,7 +361,7 @@ void EffectEngine::onModeChange(const struct CtrlQueueData &data){
     setMode(mode);  
   }
 
-  DBG_OUTLN("Mode changed %d", mode );
+  //DBG_OUTLN("Mode changed %d", mode );
 }
 
 
@@ -370,7 +375,7 @@ void EffectEngine::onEffectChange(const struct CtrlQueueData &data){
   //Change effect
   setEffect(effectNum);
 
-  DBG_OUTLN("Effect changed %d", effectNum );
+  //DBG_OUTLN("Effect changfed %d", effectNum );
 }
 
 void EffectEngine::onNumLedsChange(const struct CtrlQueueData &data){
@@ -487,7 +492,7 @@ bool EffectEngine::onCmd(const struct CtrlQueueItem &itm, NtfSet &ntf){
 }
 
 void EffectEngine::loop(const struct CtrlQueueItem &itm, NtfSet &ntf){
- 
+
 
   if(itm.cmd != EEMC_NONE){
     onCmd(itm, ntf);      

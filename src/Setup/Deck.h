@@ -22,9 +22,10 @@ BEGIN_EFFECTS(EFF_RANDOM_START_EFFECT)
 
   BEGIN_MODE("Hlwn")      
     ADD_EFFECT(el_Confetti, tl_Halloween )
-    ADD_EFFECT(el_Plasma, tl_Autumn )
     ADD_EFFECT(el_Noise, tl_Halloween)
+    ADD_EFFECT(el_TwinkleFox, tl_Halloween) 
   END_MODE()
+
   
   BEGIN_MODE("Chrms")      
     ADD_EFFECT(el_Confetti, tl_Christmas )
