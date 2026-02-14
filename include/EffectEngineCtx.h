@@ -54,14 +54,25 @@
 #define EEMC_SOUND_LOG          (EEMC_LED | EEMC_GET_SOUND_LOG)          //Show audio in log scale
 #define EEMC_SOUND_NOISE        (EEMC_LED | EEMC_GET_SOUND_NOISE)        //Enable/disable noise threshold
 
-//Errors
-#define EEER_SUCCESS    0x00 //No error
-#define EEER_INVALID    0x01 //Invalid input
-#define EEER_UNHANDLED  0x02 //Unhandled command
-#define EEER_DELAYED    0x03 //Delayed response
+
+#ifdef USE_SOUND
+
+enum SoundVUMType{
+  sv_None = 0,
+  sv_Symmetric,
+  sv_Bar
+};
+
+#endif
+
+
 
 //Timeout to save config
 #define SAVE_CONFIG_TIMEOUT 30000
+
+#ifdef NTF_BINARY_ENABLED
+#include <CtrlSerial.h>
+#endif 
 
 #ifdef NTF_ENABLED
 #include <Notification.h>
@@ -92,21 +103,10 @@ DECLARE_STR_PROGMEM(rs_SndStdDev)
 DECLARE_STR_PROGMEM(rs_SoundVIM)
 #endif  
 
-#else 
-
-#define NtfSet void*
+extern NtfSet ntf;
 
 #endif //NTF_ENABLED
 
-#ifdef USE_SOUND
-
-enum SoundVUMType{
-  sv_None = 0,
-  sv_Symmetric,
-  sv_Bar
-};
-
-#endif
 
 
 #endif //__EFFECTENGINECTX_H

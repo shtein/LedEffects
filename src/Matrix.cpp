@@ -6,7 +6,7 @@
 ////////////////////////////////
 // XYDraw
 
-XYDraw::XYDraw(CRGB *leds, int16_t numLeds, uint8_t flags){
+XYDraw::XYDraw(CRGB *leds, uint16_t numLeds, uint8_t flags){
   _leds     = leds;
   _numLeds  = numLeds;
   _flags    = flags;
@@ -21,7 +21,7 @@ CRGB & XYDraw::operator()(int16_t x, int16_t y){
 
   if( x >= 0 && x < width() && 
       y >= 0 && y < height() && 
-      index >= 0 && index < _numLeds 
+      index >= 0 && index < (int16_t)_numLeds 
      )
     return _leds[index];
   else
@@ -33,7 +33,7 @@ const CRGB & XYDraw::operator()(int16_t x, int16_t y) const{
 
   if( x >= 0 && x < width() && 
       y >= 0 && y < height() && 
-      index >= 0 && index < _numLeds 
+      index >= 0 && index < (int16_t)_numLeds 
      )
     return _leds[index];
   else

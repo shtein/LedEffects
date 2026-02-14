@@ -28,13 +28,47 @@
 #define SW2POS_CTRL VAR_NAME(ecsw2p)
   
 //Notifications
+#if defined (NTF_ENABLED) || defined (NTF_BINARY_ENABLED)
+  #define _NTF_DATA(cmd, error, T, ...) CmdResponse<T> resp = {cmd, error, {__VA_ARGS__}};
+  #define _NTF_DATA0(cmd, error) CmdResponse<> resp = {cmd, error};
+#else
+  #define _NTF_DATA(cmd, error, T, ...)
+  #define _NTF_DATA0(cmd, error)
+#endif
 
-#define _NTF_INIT() static NtfSet ntf;      
+#ifdef NTF_BINARY_ENABLED
+  #define _NTF_BIN_RESP() ntfSerialBin((const uint8_t *)&resp, sizeof(resp)); 
+#else
+  #define _NTF_BIN_RESP()
+#endif
+
+
 #ifdef NTF_ENABLED
-  #define _NTF_ADD(a) ntf.addNtf(a); 
+  #define _NTF_INIT() NtfSet ntf;   
+  #define _NTF_ADD(a) ntf.addNtf(a);   
+  #define _NTF_RESP() ntf.put(resp); 
 #else  
-  #define _NTF_ADD(a)
+  #define _NTF_INIT()
+  #define _NTF_ADD(a)  
+  #define _NTF_RESP()  
 #endif //NTF_ENABLED
+
+
+#define NTF_RESP(cmd, T, ...) \
+  { \
+    _NTF_DATA(cmd, EEER_SUCCESS, T, ##__VA_ARGS__) \
+    _NTF_RESP() \
+    _NTF_BIN_RESP() \
+  }
+
+#define NTF_ERROR(cmd, err) \
+  { \
+    _NTF_DATA0(cmd, err) \
+    _NTF_RESP() \
+    _NTF_BIN_RESP() \
+  }
+
+
 
 #ifdef SERIAL_BINARY_ENABLED
   #define _SERIAL_BINARY_INPUT() \
@@ -128,7 +162,7 @@ void _ENGINE_LOOP() \
 { \
   CtrlQueueItem itm; \
   cp.loop(itm); \
-  ee.loop(itm, ntf); \
+  ee.loop(itm); \
 }
 
 #define BEGIN_LEDS() \

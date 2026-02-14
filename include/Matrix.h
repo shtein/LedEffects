@@ -92,7 +92,7 @@ typedef XYMatrix<MATRIX_WIDTH, MATRIX_HEIGHT, MATRIX_TYPE> XY;          //Coordi
 
 class XYDraw: public XY{
 public:
-  XYDraw(CRGB *leds, int16_t numLeds, uint8_t flags = 0);
+  XYDraw(CRGB *leds, uint16_t numLeds, uint8_t flags = 0);
   ~XYDraw();
 
   inline void setFlags(uint8_t flags) __attribute__((always_inline)) {_flags = flags;}
@@ -173,10 +173,10 @@ public:
                                 
 
 protected:
-  CRGB   *_leds;      //leds array
-  CRGB    _oob;       //out of boundary
-  int16_t _numLeds;   //max leds
-  uint8_t _flags;     //drawing options
+  CRGB    *_leds;      //leds array
+  CRGB     _oob;       //out of boundary
+  uint16_t _numLeds;   //max leds
+  uint8_t  _flags;     //drawing options
 };
 
 //Kaleidoscope

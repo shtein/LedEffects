@@ -6,6 +6,8 @@
 
 #include "effectenginectx.h"
 #include "effect.h"
+#include "Macro.h"
+#include "Resp.h"
 
 #ifdef USE_SOUND  
 #include <SoundCapture.h>
@@ -51,19 +53,12 @@ void putNtfObject(NtfBase &resp, const EEResp_EffectSound &data){
 
 
 //Getting/setting pallete transform rutine
-struct EEResp_EffectTransform{  
-  uint8_t transform;
-};
-
 void putNtfObject(NtfBase &resp, const EEResp_EffectTransform &data){
   resp.put_F(rs_Transform, data.transform);
 }
 
 
 //Getting/setting effect speed
-struct EEResp_EffectSpeed{  
-  uint16_t speed;
-};
 
 void putNtfObject(NtfBase &resp, const EEResp_EffectSpeed &data){
   resp.put_F(rs_Speed, data.speed);
@@ -98,24 +93,23 @@ void Effect::draw(CRGB *leds, uint16_t numLeds){
 }
 
 
-bool Effect::onCmd(const struct CtrlQueueItem &itm, NtfSet &ntf){ 
+bool Effect::onCmd(const struct CtrlQueueItem &itm){ 
 
   //Process command
   switch(itm.cmd){    
     case EEMC_SPEED:
       setSpeedDelay(itm.data.translate(getSpeedDelay(), SPEED_DELAY_MIN, SPEED_DELAY_MAX));
       //Notification
-#ifdef NTF_ENABLED      
+
     case EEMC_GET_SPEED:
-    { ntf.put(CmdResponse<EEResp_EffectSpeed> {itm.cmd, { getSpeedDelay() }}); }
-#endif     
+      NTF_RESP(itm.cmd, EEResp_EffectSpeed, getSpeedDelay()); 
     break;
 
     default:
     #if defined (USE_SOUND) && !defined(NO_SOUND_COMMANDS)      
         //Sound command
       if(_cfg.flags & ECF_SOUND){
-        return onCmdSound(itm, ntf);
+        return onCmdSound(itm);
       }    
     #endif //USE_SOUND
     return false;
@@ -165,7 +159,7 @@ void Effect::getSoundBands(sc_band_t &bands, bool scale){
 }
 
 
-bool Effect::onCmdSound(const struct CtrlQueueItem &itm, NtfSet &ntf){  
+bool Effect::onCmdSound(const struct CtrlQueueItem &itm){  
   
   switch(itm.cmd){    
     case EEMC_SOUND_LOW:
@@ -199,16 +193,8 @@ bool Effect::onCmdSound(const struct CtrlQueueItem &itm, NtfSet &ntf){
     return false;
   }
 
-#ifdef NTF_ENABLED    
-/*
-  ntf.put(CmdResponse<EEResp_EffectSound> { itm.cmd, {_ctxSound.flags, _ctxSound.lower, _ctxSound.upper,
-                                                      _statsSound.get(SoundStatGet::ssgMin), 
-                                                      _statsSound.get(SoundStatGet::ssgMax),
-                                                      _statsSound.get(SoundStatGet::ssgAverage)                                                          
-                                                    } 
-                                               }); 
-*/                                               
-#endif
+  //NTF_RESP(itm.cmd, EEResp_EffectSound, {_ctxSound.flags, _ctxSound.lower, _ctxSound.upper, _statsSound.get(SoundStatGet::ssgMin),_statsSound.get(SoundStatGet::ssgMax), _statsSound.get(SoundStatGet::ssgAverage))
+
 
   return true;
 }
@@ -221,7 +207,7 @@ bool Effect::onCmdSound(const struct CtrlQueueItem &itm, NtfSet &ntf){
 // EffectColor
 
 
-bool EffectColor::onCmd(const struct CtrlQueueItem &itm, NtfSet &ntf){  
+bool EffectColor::onCmd(const struct CtrlQueueItem &itm){  
 //Process command  
   switch(itm.cmd){
     case EEMC_COLOR_HUE: 
@@ -229,15 +215,13 @@ bool EffectColor::onCmd(const struct CtrlQueueItem &itm, NtfSet &ntf){
     case EEMC_COLOR_VAL:
       //Update corresponding color value
       _cfg.bytes[itm.cmd - EEMC_COLOR_HUE] = (uint8_t)itm.data.translate( (int)_cfg.bytes[itm.cmd - EEMC_COLOR_HUE], 0, 255);
-#ifdef NTF_ENABLED
     //Notfification
     case EEMC_GET_COLOR_HSV:
-      { ntf.put(CmdResponse<CHSV>{ itm.cmd, {  CHSV(_cfg.bytes[0], _cfg.bytes[1], _cfg.bytes[2]) } }); }   
-#endif    
+      NTF_RESP(itm.cmd, CHSV, CHSV(_cfg.bytes[0], _cfg.bytes[1], _cfg.bytes[2]) );
     break;
 
     default:
-    return Effect::onCmd(itm, ntf);    
+    return Effect::onCmd(itm);    
   }    
 
   return true;
@@ -299,7 +283,7 @@ CRGB EffectPaletteTransform::getCurrentPalColor(uint8_t index, uint8_t brightnes
   return ColorFromPalette(_ctx.palCurrent, index, brightness, blendType);
 }
 
-bool EffectPaletteTransform::onCmd(const struct CtrlQueueItem &itm, NtfSet &ntf){
+bool EffectPaletteTransform::onCmd(const struct CtrlQueueItem &itm){
   
   switch(itm.cmd){
   //All get commands
@@ -309,16 +293,14 @@ bool EffectPaletteTransform::onCmd(const struct CtrlQueueItem &itm, NtfSet &ntf)
         EFFECT_PARAM_TRANSFORM(_cfg) = td.transformId;
       }
     }
-#ifdef NTF_ENABLED    
+
     case EEMC_GET_TRANSFORM: 
-      { ntf.put(CmdResponse<EEResp_EffectTransform>{ itm.cmd, { EFFECT_PARAM_TRANSFORM(_cfg) } } ); }   
-#endif
+      NTF_RESP(itm.cmd, EEResp_EffectTransform, EFFECT_PARAM_TRANSFORM(_cfg));      
     break;    
 
     default:
-    return Effect::onCmd(itm, ntf);    
+    return Effect::onCmd(itm);    
   }    
 
   return true;
-
 }

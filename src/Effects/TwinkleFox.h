@@ -34,7 +34,7 @@ protected:
     _ctx.rgb = _ctx.palCurrent[0]; //background
   }
 
-  void proceed(CRGB *leds, uint16_t numLeds){
+  void proceed(CRGB *leds, uint16_t numLeds) {
     //Call parent 
     EffectPaletteTransform::proceed(leds, numLeds);
 

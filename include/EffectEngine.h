@@ -18,15 +18,15 @@ class EffectEngine{
     ~EffectEngine();
 
     void init();    
-    void loop(const struct CtrlQueueItem &itm, NtfSet &ntf);   
+    void loop(const struct CtrlQueueItem &itm);   
 
     CRGB *getLeds() const;
     
   protected:
     
     //Command handling
-    bool onCmd(const struct CtrlQueueItem &itm, NtfSet &ntf);
-    bool onCmdEE(const struct CtrlQueueItem &itm, NtfSet &ntf);
+    bool onCmd(const struct CtrlQueueItem &itm);
+    bool onCmdEE(const struct CtrlQueueItem &itm);
 
     void onModeChange(const struct CtrlQueueData &data);
     void onNumLedsChange(const struct CtrlQueueData &data);

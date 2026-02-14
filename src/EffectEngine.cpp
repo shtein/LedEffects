@@ -8,6 +8,9 @@
 #include "Effect.h"
 #include "EffectsAll.h"
 #include "EffectEngine.h"
+#include "Resp.h"
+#include "Macro.h"
+
 
 #ifdef NTF_ENABLED  
 
@@ -111,11 +114,6 @@ void putNtfObject(NtfBase &resp, const EFFECT_CONFIG &data){
   resp.put_F(rs_Data, data.data);    
 }
 
-struct EEResp_Effect{
-  uint8_t            effectNum;
-  EFFECT_CONFIG      cfg;
-};
-
 void putNtfObject(NtfBase &resp, const EEResp_Effect &data){
   resp.put_F(rs_Index, data.effectNum);
 
@@ -125,11 +123,6 @@ void putNtfObject(NtfBase &resp, const EEResp_Effect &data){
 
   resp.put_F(rs_Cfg, data.cfg); 
 }
-
-struct EEResp_Mode{
-  uint8_t             modeNum;
-  EFFECT_MODE_CONFIG  cfgMode;
-};
 
 void putNtfObject(NtfBase &resp, const EEResp_Mode &data){
   resp.put_F(rs_Index, data.modeNum);
@@ -150,10 +143,6 @@ void putNtfObject(NtfBase &resp, const EEResp_Mode &data){
   resp.endArray();
 }
 
-struct EEResp_ModeList{
-  uint8_t     numModes;
-};
-
 void putNtfObject(NtfBase &resp, const EEResp_ModeList &data){
   resp.put_F(rs_ModeCount, data.numModes);
   
@@ -170,8 +159,6 @@ void putNtfObject(NtfBase &resp, const EEResp_ModeList &data){
   resp.endArray();
 }
 
-
-struct EEResp_EffectList{};
 
 void putNtfObject(NtfBase &resp, const EEResp_EffectList &data){
   resp.beginArray_F(rs_Effects);
@@ -361,7 +348,7 @@ void EffectEngine::onModeChange(const struct CtrlQueueData &data){
     setMode(mode);  
   }
 
-  //DBG_OUTLN("Mode changed %d", mode );
+  DBG_OUTLN("Mode changed %d", mode );
 }
 
 
@@ -375,7 +362,7 @@ void EffectEngine::onEffectChange(const struct CtrlQueueData &data){
   //Change effect
   setEffect(effectNum);
 
-  //DBG_OUTLN("Effect changfed %d", effectNum );
+  DBG_OUTLN("Effect changfed %d", effectNum );
 }
 
 void EffectEngine::onNumLedsChange(const struct CtrlQueueData &data){
@@ -395,62 +382,57 @@ void EffectEngine::onNumLedsChange(const struct CtrlQueueData &data){
 }
 
 
-bool EffectEngine::onCmdEE(const struct CtrlQueueItem &itm, NtfSet &ntf){
+bool EffectEngine::onCmdEE(const struct CtrlQueueItem &itm){
   
   //Process command
   switch(itm.cmd){
     case EEMC_MODE:            
       onModeChange(itm.data);
-#ifdef NTF_ENABLED
     //All get commands to process with NTF
     case EEMC_GET_MODE:      
-      ntf.put(CmdResponse<EEResp_Mode> {itm.cmd, {_cfgEngine.modeNum, _cfgMode}} );       
-#endif
+      NTF_RESP(itm.cmd, EEResp_Mode, _cfgEngine.modeNum, _cfgMode);
+      
     break;
 
     case EEMC_EFFECT:    
       onEffectChange(itm.data);    
-#ifdef NTF_ENABLED
     case EEMC_GET_EFFECT: {
-      CmdResponse<EEResp_Effect> resp{itm.cmd, {_cfgMode.effectNum }};
-      getEffectConfig(_cfgEngine.modeNum, _cfgMode.effectNum, resp.data.cfg);
-      if(_curEffect){
-        resp.data.cfg.speedDelay = _curEffect->getSpeedDelay();
-        _curEffect->getConfig(resp.data.cfg.data);        
+      //Optimize !!!
+      EFFECT_CONFIG cfg;
+      getEffectConfig(_cfgEngine.modeNum, _cfgMode.effectNum, cfg);
+
+      if(_curEffect){        
+        _curEffect->getConfig(cfg.data);        
+        cfg.speedDelay = _curEffect->getSpeedDelay();
       }
-      ntf.put(resp);
-    }    
-#endif       
+
+      NTF_RESP(itm.cmd, EEResp_Effect, _cfgMode.effectNum, cfg);    
+    }     
     break;
 
     case EEMC_NUMLEDS:
       onNumLedsChange(itm.data); 
-#ifdef NTF_ENABLED
     case EEMC_GET_NUMLEDS:       
-      { ntf.put(CmdResponse<EEResp_NumLeds>{ itm.cmd, { MAX_LEDS, (uint16_t)_cfgEngine.numLeds }}); }
-    break;
-
-#endif         
+      NTF_RESP(itm.cmd, EEResp_NumLeds, MAX_LEDS, (uint16_t)_cfgEngine.numLeds);    
     break;
 
 //Other get commands
-#ifdef NTF_ENABLED
-    case EEMC_GET_MODE_LIST:               
-      { ntf.put(CmdResponse<EEResp_ModeList>{itm.cmd, {_cfgEngine.numModes }}); }
+    case EEMC_GET_MODE_LIST:         
+      NTF_RESP(itm.cmd, EEResp_ModeList, _cfgEngine.numModes);    
     break;       
 
-    case EEMC_GET_EFFECT_LIST:
-      { ntf.put(CmdResponse<EEResp_EffectList>{itm.cmd}); }
+    case EEMC_GET_EFFECT_LIST:    
+      NTF_RESP(itm.cmd, EEResp_EffectList);
     break; 
 
-    case EEMC_GET_TRANSFORM_LIST:
-      { ntf.put(CmdResponse<EEResp_TransformList>{itm.cmd}); }
+    case EEMC_GET_TRANSFORM_LIST:      
+      NTF_RESP(itm.cmd, EEResp_TransformList);
     break; 
 
     case EEMC_GET_VERSION:
-      { ntf.put(CmdResponse<EEResp_Version>{itm.cmd}); }
+      NTF_RESP(itm.cmd, EEResp_Version);
     break;
-#endif
+
     
     default: 
     return false;
@@ -459,13 +441,11 @@ bool EffectEngine::onCmdEE(const struct CtrlQueueItem &itm, NtfSet &ntf){
   return true;
 }
 
-bool EffectEngine::onCmd(const struct CtrlQueueItem &itm, NtfSet &ntf){
+bool EffectEngine::onCmd(const struct CtrlQueueItem &itm){
   
   //Process error
   if(itm.cmd == EEMC_ERROR) {
-#ifdef NTF_ENABLED    
-    ntf.put(CmdResponse<>{ itm.cmd, EEER_INVALID } );
-#endif    
+    NTF_ERROR(itm.cmd, EEER_INVALID);
     return true;
   }
   
@@ -473,29 +453,29 @@ bool EffectEngine::onCmd(const struct CtrlQueueItem &itm, NtfSet &ntf){
   bool processed = false;
   
   if(itm.cmd & EEMC_EE){ //Engine command
-    processed = onCmdEE(itm, ntf);
+    processed = onCmdEE(itm);
   }  
   else{ //Effect command
       if(_curEffect){
-         processed = _curEffect->onCmd(itm, ntf);
+         processed = _curEffect->onCmd(itm);
       }
   }
     
   //Report of not processed
-#ifdef NTF_ENABLED    
+
   if(!processed){
-    ntf.put(CmdResponse<>{ itm.cmd, EEER_UNHANDLED } );
+    NTF_ERROR(itm.cmd, EEER_UNHANDLED);
   }
-#endif
+
 
   return processed;
 }
 
-void EffectEngine::loop(const struct CtrlQueueItem &itm, NtfSet &ntf){
+void EffectEngine::loop(const struct CtrlQueueItem &itm){
 
 
   if(itm.cmd != EEMC_NONE){
-    onCmd(itm, ntf);      
+    onCmd(itm);      
   }
   
   //See if there were changes
@@ -612,10 +592,10 @@ END_PARSE_ROUTINE()
 
 
 BEGIN_PARSE_ROUTINE(parseCommandInput)  
-  VALUE_IS_TOKEN(rs_CmdParam_Version, EEMC_GET_VERSION)
-  VALUE_IS_TOKEN(rs_CmdParam_EffectList, EEMC_GET_EFFECT_LIST)
-  VALUE_IS_TOKEN(rs_CmdParam_TransformList, EEMC_GET_TRANSFORM_LIST)
-  VALUE_IS_TOKEN(rs_CmdParam_ModeList, EEMC_GET_MODE_LIST)
+  VALUE_IS_TOKEN(rs_CmdParam_Version, EEMC_GET_VERSION)               //Version
+  VALUE_IS_TOKEN(rs_CmdParam_EffectList, EEMC_GET_EFFECT_LIST)        //All effects
+  VALUE_IS_TOKEN(rs_CmdParam_TransformList, EEMC_GET_TRANSFORM_LIST)  //All transform palettes
+  VALUE_IS_TOKEN(rs_CmdParam_ModeList, EEMC_GET_MODE_LIST)            //All modes
   
   BEGIN_GROUP_TOKEN(rs_CmdParam_Mode) //mode 
     VALUE_IS_TOKEN(rs_CmdParam_Get, EEMC_GET_MODE)
@@ -634,7 +614,7 @@ BEGIN_PARSE_ROUTINE(parseCommandInput)
       VALUE_IS_NUMBER(EEMC_EFFECT, CTF_VAL_ABS)                       //specific effect
     END_GROUP_TOKEN()
     
-    BEGIN_GROUP_TOKEN(rs_CmdParam_Speed)
+    BEGIN_GROUP_TOKEN(rs_CmdParam_Speed) //current speed
       VALUE_IS_TOKEN(rs_CmdParam_Get, EEMC_GET_SPEED)
       VALUE_IS_PAIR(rs_CmdParam_Set, EEMC_SPEED, CTF_VAL_ABS)      
     END_GROUP_TOKEN()    

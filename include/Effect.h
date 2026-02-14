@@ -30,7 +30,7 @@ class Effect{
     virtual void reset() = 0;
     
     //Command processing
-    virtual bool onCmd(const struct CtrlQueueItem &itm, NtfSet &ntf);
+    virtual bool onCmd(const struct CtrlQueueItem &itm);
    
     //Speed delay
     void setSpeedDelay(uint8_t speedDelay);
@@ -51,7 +51,7 @@ class Effect{
 #ifdef USE_SOUND
     //Sound
     void getSoundBands(sc_band_t &bands, bool scale);
-    bool onCmdSound(const struct CtrlQueueItem &itm, NtfSet &ntf);
+    bool onCmdSound(const struct CtrlQueueItem &itm);
 #endif    
 
   protected:  
@@ -123,7 +123,7 @@ class Effect{
 class EffectColor: public Effect{
   public:
   //Command processing
-    virtual bool onCmd(const struct CtrlQueueItem &itm, NtfSet &ntf);
+    virtual bool onCmd(const struct CtrlQueueItem &itm);
 };
   
 /////////////////////////////////////////
@@ -134,7 +134,7 @@ class EffectColor: public Effect{
 
 class EffectPaletteTransform: public Effect{ 
 public:
-  virtual bool onCmd(const struct CtrlQueueItem &itm, NtfSet &ntf);
+  virtual bool onCmd(const struct CtrlQueueItem &itm);
 
   protected:  
     virtual void proceed(CRGB *leds, uint16_t numLeds);
