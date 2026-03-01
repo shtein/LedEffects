@@ -17,13 +17,13 @@ inline void EffectFire::reset(){
 #ifdef USE_SOUND
   
   _ctxSound.bassValue = 0;
-  BASS_BEAT_RESET();
+  beatResetBass();
 
   _ctxSound.midValue = 0; 
-  MID_BEAT_RESET();
+  beatResetMid();
 
   _ctxSound.trebleValue = 0;  
-  TREBLE_BEAT_RESET();
+  beatResetTreble();
 
 #endif //USE_SOUND
 
@@ -54,30 +54,28 @@ inline void EffectFire::proceed(CRGB *leds, uint16_t numLeds){
 
 
 #ifdef USE_SOUND
-    //Get sound data
-    uint16_t bands[SC_MAX_BANDS];
-    getSoundBands(bands, false);
+    //Process sound
+    getSound();
     
+    bool bassBeat   = beatCheckBass(BASS_PEAK_CHECK_TIME);
+    bool midBeat    = beatCheckMid(MID_PEAK_CHECK_TIME);
+    bool trebleBeat = beatCheckTreble(TREBLE_PEAK_CHECK_TIME);
 
-    bool bassBeat   = BASS_BEAT_CHECK() >= 150 && _sc->isBassPeak();
-    bool midBeat    = MID_BEAT_CHECK() >= 100 && _sc->isMidPeak();
-    bool trebleBeat = TREBLE_BEAT_CHECK() >= 50 && _sc->isTreblePeak();
-
-    if(bassBeat || midBeat || trebleBeat){ 
+    if(/*bassBeat ||*/ midBeat || trebleBeat){ 
       //Increase speed on mid beat
-      _ctxSound.midValue =  qadd8(_ctxSound.midValue, 160);    
+      _ctxSound.midValue =  qadd8(_ctxSound.midValue, 180);    
     }
 
     if(bassBeat){ 
-      BASS_BEAT_RESET();
+     beatResetBass();
     }
 
     if(midBeat){ 
-      MID_BEAT_RESET();
+      beatResetMid();
     } 
 
     if(trebleBeat){
-      TREBLE_BEAT_RESET();
+      beatResetTreble();
     }     
 
    _ctxSound.midValue = qsub8(_ctxSound.midValue, 8);
@@ -96,7 +94,6 @@ inline void EffectFire::proceed(CRGB *leds, uint16_t numLeds){
       uint8_t brightness = (raw <= 0) ? 0 : (uint8_t)(255 - (raw / MATRIX_FIRE_B_ADJ));
 
       nblend(xy(x, (xy.height() - y - 1)), ColorFromPalette(_ctx.palCurrent, colorIndex, brightness), MATRIX_FIRE_OVERLAY);        
-
     }
   }
 

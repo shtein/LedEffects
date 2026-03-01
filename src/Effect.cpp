@@ -45,12 +45,11 @@ void putNtfObject(NtfBase &resp, const EEResp_EffectSound &data){
 
 #ifdef NTF_ENABLED
 
- void putNtfObject(NtfBase &resp, const CHSV &data){
-  resp.put_F(rs_Hue, data.h);
-  resp.put_F(rs_Sat, data.s);
-  resp.put_F(rs_Val, data.v);
+ void putNtfObject(NtfBase &resp, const EEResp_EffectColor &data){
+  resp.put_F(rs_Hue, data.hsv[0]);
+  resp.put_F(rs_Sat, data.hsv[1]);
+  resp.put_F(rs_Val, data.hsv[2]);
 }
-
 
 //Getting/setting pallete transform rutine
 void putNtfObject(NtfBase &resp, const EEResp_EffectTransform &data){
@@ -153,11 +152,23 @@ void Effect::getSoundBands(sc_band_t &bands, bool scale){
     _sc->scaleSound(bands, _ctxSound.flags, _ctxSound.lower, _ctxSound.upper);
   }
 
+  //Ticks
   _ctxSound.bassTicks++;
   _ctxSound.midTicks++;
   _ctxSound.trebleTicks++;  
 }
 
+void Effect::getSound(){
+  sc_band_t bands;
+
+  //Get band data
+  _sc->getProcessedData(bands);
+
+  //Ticks
+  _ctxSound.bassTicks++;
+  _ctxSound.midTicks++;
+  _ctxSound.trebleTicks++;  
+}
 
 bool Effect::onCmdSound(const struct CtrlQueueItem &itm){  
   
@@ -199,14 +210,35 @@ bool Effect::onCmdSound(const struct CtrlQueueItem &itm){
   return true;
 }
 
+uint16_t Effect::beatCheckBass(uint16_t delta) const {
+  uint16_t n =  (uint16_t)_ctxSound.bassTicks * (uint16_t)getSpeedDelay();
+  if( n >= delta && _sc->isBassPeak())
+    return n;
+    
+  return 0;
+}
+
+uint16_t Effect::beatCheckMid(uint16_t delta) const {
+  uint16_t n =  (uint16_t) _ctxSound.midTicks * (uint16_t)getSpeedDelay();
+  if( n >= delta && _sc->isMidPeak())
+    return n;
+    
+  return 0;
+}
+
+uint16_t Effect::beatCheckTreble(uint16_t delta) const {
+  uint16_t n =  (uint16_t) _ctxSound.trebleTicks * (uint16_t)getSpeedDelay();
+  if( n >= delta && _sc->isTreblePeak())
+    return n;
+    
+  return 0;
+}
 
 #endif //USE_SOUND
 
 
 //////////////////////////////////////
 // EffectColor
-
-
 bool EffectColor::onCmd(const struct CtrlQueueItem &itm){  
 //Process command  
   switch(itm.cmd){
@@ -217,7 +249,7 @@ bool EffectColor::onCmd(const struct CtrlQueueItem &itm){
       _cfg.bytes[itm.cmd - EEMC_COLOR_HUE] = (uint8_t)itm.data.translate( (int)_cfg.bytes[itm.cmd - EEMC_COLOR_HUE], 0, 255);
     //Notfification
     case EEMC_GET_COLOR_HSV:
-      NTF_RESP(itm.cmd, CHSV, CHSV(_cfg.bytes[0], _cfg.bytes[1], _cfg.bytes[2]) );
+      NTF_RESP(itm.cmd, EEResp_EffectColor, _cfg.bytes[0], _cfg.bytes[1], _cfg.bytes[2]);
     break;
 
     default:

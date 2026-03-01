@@ -93,10 +93,10 @@ typedef XYMatrix<MATRIX_WIDTH, MATRIX_HEIGHT, MATRIX_TYPE> XY;          //Coordi
 class XYDraw: public XY{
 public:
   XYDraw(CRGB *leds, uint16_t numLeds, uint8_t flags = 0);
-  ~XYDraw();
 
-  inline void setFlags(uint8_t flags) __attribute__((always_inline)) {_flags = flags;}
-  inline uint8_t getFlags() const __attribute__((always_inline))  {  return _flags; }
+
+  void setFlags(uint8_t flags) {_flags = flags;}
+  uint8_t getFlags() const {  return _flags; }
 
   CRGB& operator()(int16_t x, int16_t y);
   const CRGB& operator()(int16_t x, int16_t y) const;

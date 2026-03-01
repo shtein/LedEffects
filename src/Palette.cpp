@@ -202,19 +202,6 @@ DEFINE_GRADIENT_PALETTE( july4_2_gp ) {
   237, 234,255,233,
   255, 234,255,233};
 
-
-//RGB Palettes
-// Ukraine flag colord
-#define UA_FLAG_BLUE   0x0057B8
-#define UA_FLAG_YELLOW 0xFFD700
-
-const TProgmemRGBPalette16 UkraineFlag_p FL_PROGMEM ={
-  UA_FLAG_BLUE, UA_FLAG_BLUE, UA_FLAG_BLUE, UA_FLAG_BLUE,
-  UA_FLAG_BLUE, UA_FLAG_BLUE, UA_FLAG_BLUE, UA_FLAG_BLUE,
-  UA_FLAG_YELLOW, UA_FLAG_YELLOW, UA_FLAG_YELLOW, UA_FLAG_YELLOW,
-  UA_FLAG_YELLOW, UA_FLAG_YELLOW, UA_FLAG_YELLOW, UA_FLAG_YELLOW
-};
-
 // Israel flag colord
 #define ISRL_FLAG_WHITE 0xFFFFFF
 #define ISRL_FLAG_BLUE  0x0038B8
@@ -464,11 +451,6 @@ BEGIN_TRANSFORM_SCHEMA_GRADIENT_PALETTE(getPal_ValentinesDay)
 END_TRANSFORM_SCHEMA()
 
 
-///////////////////
-//Ukraine Flag
-BEGIN_TRANSFORM_SCHEMA_RGB16_PALETTE(getPal_UkraineFlag)
-  TRANSOFRM_PALETTE(UkraineFlag_p)
-END_TRANSFORM_SCHEMA()
 
 ///////////////////
 //Portugal Flag
@@ -538,48 +520,85 @@ bool getPalTransform(uint8_t transformId, TRANSFORM_DESCRIPTION &td){
 #endif  
 
   switch(transformId){
+
+#ifndef NO_PALLETE_DEFAULT    
     case tl_Default:
       GET_PAL_TRANSFORM(td, getPal_Default, PSTR("Default"));
     break;
+#endif
+
+#ifndef NO_PALLETE_PLASMA    
     case tl_Plasma:
-      GET_PAL_TRANSFORM(td, getPal_PortugalFlag, PSTR("Plasma"));
+      GET_PAL_TRANSFORM(td, getPal_Plasma, PSTR("Plasma"));
     break;
+#endif
+
+#ifndef NO_PALLETE_CONFETTI
     case tl_Confetti:
       GET_PAL_TRANSFORM(td, getPal_Confetti, PSTR("Confetti"));
     break;
+#endif
+
+#ifndef NO_PALLETE_CHRISTMAS    
     case tl_Christmas:
       GET_PAL_TRANSFORM(td, getPal_Christmas, PSTR("Christmas"));
     break;
+#endif    
+
+#ifndef NO_PALLETE_AUTUMN    
     case tl_Autumn:
       GET_PAL_TRANSFORM(td, getPal_Autunm, PSTR("Autumn"));
     break;
+#endif
+
+#ifndef NO_PALLETE_HALLOWEEN        
     case tl_Halloween:
       GET_PAL_TRANSFORM(td, getPal_Halloween, PSTR("Halloween"));
     break;
+#endif    
+
+#ifndef NO_PALLETE_JULY4TH    
     case tl_July_4th:
       GET_PAL_TRANSFORM(td, getPal_July4th, PSTR("July 4th"));
     break;
+#endif 
+
+#ifndef NO_PALLETE_TWINKLE_FOX
     case tl_TwinkleFox:
       GET_PAL_TRANSFORM(td, getPal_TwinkleFox, PSTR("Twinke fox"));
     break;  
+#endif
+
+#ifndef NO_PALLETE_SNOW_AND_ICE    
     case tl_SnowAndIce:
       GET_PAL_TRANSFORM(td, getPal_SnowAndIce, PSTR("Snow and ice"));
     break;
+#endif    
+
+#ifndef NO_PALLETE_VALENTINES
     case tl_Valentines:
       GET_PAL_TRANSFORM(td, getPal_ValentinesDay, PSTR("Valentine's day"));
     break;
-    case tl_UkrainianFlag:
-      GET_PAL_TRANSFORM(td, getPal_UkraineFlag, PSTR("Ukrainian Flag"));
-    break;
+#endif
+
+#ifndef NO_PALLETET_PORTUGAL_FLAG
     case tl_PortugalFlag:
       GET_PAL_TRANSFORM(td, getPal_PortugalFlag, PSTR("Portugal Flag"));
     break;
+#endif
+
+#ifndef NO_PALLETE_ISRAEL_FLAG
     case tl_IsraelFlag:
       GET_PAL_TRANSFORM(td, getPal_IsraelFlag, PSTR("Israel Flag"));
     break;
+#endif    
+
+#ifndef NOPALLETTE_NOISE
     case tl_Noise:
       GET_PAL_TRANSFORM(td, getPal_Noise, PSTR("Noise"));
     break;
+#endif
+
     default:
     return false;
   }

@@ -1,105 +1,12 @@
 #ifndef __MATRIXUTILS_H
 #define __MATRIXUTILS_H
 
-//////////////////////////////
-// Swap
-template <typename T>
-inline constexpr void swapIf(T &a, T &b) {
-    if (a > b) {
-        T c = a;
-        a = b;
-        b = c;
-    }
-}
+#include <alutils.h>
 
-#define SWAPIF(a, b) swapIf(a, b)
-
-template <typename T>
-inline uint8_t random8_ab(T a, T b){
-  swapIf(a, b);
-  return random8(a, b + 1);
-}
-
-#define RANDOM8_AB(a, b) random8_ab((int8_t)(a), (int8_t)(b))
-
-
-template<typename T>
-struct upper_type;
-
-template<> struct upper_type<int8_t>  { using type = int16_t; };
-template<> struct upper_type<int16_t> { using type = int32_t; };
-template<> struct upper_type<int32_t> { using type = int64_t; };
-template<> struct upper_type<uint8_t>  { using type = uint16_t; };
-template<> struct upper_type<uint16_t> { using type = uint32_t; };
-template<> struct upper_type<uint32_t> { using type = uint64_t; };
-
-template<typename T>
-using upper_type_t = typename upper_type<T>::type;
-
-template<typename T>
-struct unsigned_type;
-
-template<> struct unsigned_type<int8_t>  { using type = uint8_t; };
-template<> struct unsigned_type<int16_t> { using type = uint16_t; };
-template<> struct unsigned_type<int32_t> { using type = uint32_t; };
-template<> struct unsigned_type<int64_t> { using type = uint64_t; };
-
-template<typename T>
-using unsigned_type_t = typename unsigned_type<T>::type;
-
-
-template<typename T>
-struct int_limits;
-
-// int8_t
-template <> struct int_limits<int8_t> {
-    static constexpr int8_t  min = INT8_MIN;
-    static constexpr int8_t  max = INT8_MAX;
-};
-
-// int16_t
-template<> struct int_limits<int16_t> {
-    static constexpr int16_t min = INT16_MIN;
-    static constexpr int16_t max = INT16_MAX;
-};
-
-// int32_t
-template<> struct int_limits<int32_t> {
-    static constexpr int32_t min = INT32_MIN;
-    static constexpr int32_t max = INT32_MAX;
-};
-
-// uint8_t
-template <> struct int_limits<uint8_t> {
-    static constexpr uint8_t  min = 0;
-    static constexpr uint8_t  max = UINT8_MAX;
-};
-
-// uint16_t
-template<> struct int_limits<uint16_t> {
-    static constexpr uint16_t min = 0;
-    static constexpr uint16_t max = UINT16_MAX;
-};
-
-// uint32_t
-template<> struct int_limits<uint32_t> {
-    static constexpr uint32_t min = 0;
-    static constexpr uint32_t max = UINT32_MAX;
-};
-
-
-template<typename T>
-T divRound(T a, T b) {
-  return (a >= 0) == (b >= 0)? (a + b / 2) / b : (a - b / 2) / b;
-}
-
-#define DIV_ROUND(a, b) divRound((a), (b))
-
-  
 //////////////////////////////
 // Mirror
 template<typename T>
-inline constexpr int mirror(T p, T m) {
+inline constexpr T mirror(T p, T m) {
   return 2 * m - p;
 }
 
@@ -112,7 +19,6 @@ template <typename T>
 struct Pnt {
   T x;
   T y;
-
   
   inline Pnt() __attribute__((always_inline)){
     x = 0;
@@ -255,6 +161,51 @@ using Obj8_t = Obj<int8_t>;
 using Obj16_t = Obj<int16_t>;
 using Obj32_t = Obj<int32_t>;
 
+
+//////////////////////////////
+// Bouncing in 1D
+template<typename T>
+void bounce1d(T &v1, uint8_t m1, T &v2, uint8_t m2){
+  //Total mass
+  T M = (T)m1 + (T)m2;
+
+  //New speeds
+  T u1 = divRound<T>((m1 - m2) * v1 + 2 * m2 * v2, M);
+  T u2 = divRound<T>((m2 - m1) * v2 + 2 * m1 * v1, M);
+
+  //Update speeds
+  v1 = u1;
+  v2 = u2;
+}
+
+
+template<typename T>
+void bounce2d(Obj<T> &obj1, uint8_t m1, Obj<T> &obj2, uint8_t m2){
+  using V = upper_type_t<T>; // wider integer for intermediates
+
+  //Normal vector
+  Pnt<T> n = obj2.pos - obj1.pos;
+
+  //Tangent ortogonal vector
+  Pnt<T> t = n.ortogonal();
+
+  //Project speeds to normal and ortogonal vectors
+  Pnt<V> u1(obj1.vel * n, obj1.vel * t);
+  Pnt<V> u2(obj2.vel * n, obj2.vel * t);
+
+  //Bounce speeds in normal direction
+  bounce1d<V>(u1.x, m1, u2.x, m2);
+ 
+  // len * len
+  V len2 = n * n;
+
+  //Update velocities
+  obj1.vel.x = (T)divRound<V>(u1.x * n.x + u1.y * t.x, len2);
+  obj1.vel.y = (T)divRound<V>(u1.x * n.y + u1.y * t.y, len2);
+
+  obj2.vel.x = (T)divRound<V>(u2.x * n.x + u2.y * t.x, len2);
+  obj2.vel.y = (T)divRound<V>(u2.x * n.y + u2.y * t.y, len2);
+}
 
 
 //////////////////////////////////////

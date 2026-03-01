@@ -274,7 +274,7 @@ void _ENGINE_LOOP() \
 
 
 //Wifi and Web
-#if defined(ESP8266) || defined(ESP32)
+#ifdef WIFI_ENABLED
 #define WEB_INPUT(port) \
   static WebApiInput inWeb; \
   static CtrlItemWebApi<parseCommandInput> ctrlWeb(&inWeb); \

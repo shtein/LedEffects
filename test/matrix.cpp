@@ -1,6 +1,9 @@
-#include <unity.h>
-#include "MatrixUtils.h"
+
 #include <stdio.h>
+#include <unity.h>
+#include <alutils.h>
+#include "MatrixUtils.h"
+
 
 
 const char *strMsgVert = "Move away %s check fails -- vertical: %d, position: %d, speed: %d";
@@ -17,7 +20,7 @@ void testObjMoveAwayLeft(){
     for(int vel = 0; vel < 3; vel++){ //moves to the left, stays, to the right      
             
       obj.vel.x  = vel - 1;
-      sprintf(msg, strMsgVert, "left", vert, obj.pos.x, obj.vel.x);
+      snprintf(msg, sizeof(msg), strMsgVert, "left", vert, obj.pos.x, obj.vel.x);
 
       //TRUE is only if on or on the left and is moving to the left
       if(obj.pos.x <= vert && obj.vel.x < 0){
@@ -43,7 +46,7 @@ void testObjMoveAwayRight(){
     for(int vel = 0; vel < 3; vel++){ //moves to the left, stays, to the right      
             
       obj.vel.x  = vel - 1;
-      sprintf(msg, strMsgVert, "right", vert, obj.pos.x, obj.vel.x);
+      snprintf(msg, sizeof(msg), strMsgVert, "right", vert, obj.pos.x, obj.vel.x);
 
       //TRUE is only if on or on the righ and is moving to the right
       if(obj.pos.x >= vert && obj.vel.x > 0){
@@ -68,7 +71,7 @@ void testObjMoveAwayUp(){
     for(int vel = 0; vel < 3; vel++){ //moves to the top, stays, to up
             
       obj.vel.y  = vel - 1;
-      sprintf(msg, strMsgVert, "up", horiz, obj.pos.y, obj.vel.y);
+      snprintf(msg, sizeof(msg), strMsgVert, "up", horiz, obj.pos.y, obj.vel.y);
 
       //TRUE is only if on or on the top and is moving to the up
       if(obj.pos.y <= horiz && obj.vel.y < 0){
@@ -93,7 +96,7 @@ void testObjMoveAwayDown(){
     for(int vel = 0; vel < 3; vel++){ //moves to the top, stays, to the bottom
             
       obj.vel.y  = vel - 1;
-      sprintf(msg, strMsgVert, "down", horiz, obj.pos.y, obj.vel.y);
+      snprintf(msg, sizeof(msg), strMsgVert, "down", horiz, obj.pos.y, obj.vel.y);
 
       //TRUE is only if on or on the bottom and is moving to down
       if(obj.pos.y >= horiz && obj.vel.y > 0){
@@ -106,46 +109,28 @@ void testObjMoveAwayDown(){
   }  
 }
 
-void testu8Sqrt(){
-  TEST_ASSERT_EQUAL_INT8(0, uSqrt<int8_t>(0));
-  TEST_ASSERT_EQUAL_INT8(1, uSqrt<int8_t>(1));
-  TEST_ASSERT_EQUAL_INT8(2, uSqrt<int8_t>(4));
-  TEST_ASSERT_EQUAL_INT8(3, uSqrt<int8_t>(9));
-  TEST_ASSERT_EQUAL_INT8(4, uSqrt<int8_t>(16));
-  TEST_ASSERT_EQUAL_INT8(5, uSqrt<int8_t>(25)); 
-  TEST_ASSERT_EQUAL_INT8(15, uSqrt<int8_t>(225));
-  TEST_ASSERT_EQUAL_INT8(16, uSqrt<int8_t>(255));
+void testu8Sqrt(){  
+  struct {    
+    int8_t  out;
+    int16_t in;    
+  } data[] = {{0, 0}, {1, 1}, {2, 4}, {3, 9}, {4, 16}, {5, 25}, {15, 225}, {16, 256}};
+  
+  for(size_t i = 0; i < sizeof(data)/sizeof(data[0]); i++)
+    TEST_ASSERT_EQUAL_INT8(data[i].out, uSqrt<int8_t>(data[i].in));
 }
 
 void testu16Sqrt(){
-  // Edge cases
-  TEST_ASSERT_EQUAL_INT16(0, uSqrt<int16_t>(0));
-  TEST_ASSERT_EQUAL_INT16(1, uSqrt<int16_t>(1));
-  
-  // Perfect squares
-  TEST_ASSERT_EQUAL_INT16(2, uSqrt<int16_t>(4));
-  TEST_ASSERT_EQUAL_INT16(3, uSqrt<int16_t>(9));
-  TEST_ASSERT_EQUAL_INT16(4, uSqrt<int16_t>(16));
-  TEST_ASSERT_EQUAL_INT16(5, uSqrt<int16_t>(25));
-  TEST_ASSERT_EQUAL_INT16(10, uSqrt<int16_t>(100));
-  TEST_ASSERT_EQUAL_INT16(16, uSqrt<int16_t>(256));
-  TEST_ASSERT_EQUAL_INT16(32, uSqrt<int16_t>(1024));
-  TEST_ASSERT_EQUAL_INT16(100, uSqrt<int16_t>(10000));
-  TEST_ASSERT_EQUAL_INT16(128, uSqrt<int16_t>(16384));
-  TEST_ASSERT_EQUAL_INT16(255, uSqrt<int16_t>(65025));
-  
-  // Non-perfect squares (test rounding behavior)
-  TEST_ASSERT_EQUAL_INT16(2, uSqrt<int16_t>(5));
-  TEST_ASSERT_EQUAL_INT16(3, uSqrt<int16_t>(10));
-  TEST_ASSERT_EQUAL_INT16(7, uSqrt<int16_t>(50));
-  TEST_ASSERT_EQUAL_INT16(11, uSqrt<int16_t>(121));
-  TEST_ASSERT_EQUAL_INT16(22, uSqrt<int16_t>(500));
-  TEST_ASSERT_EQUAL_INT16(70, uSqrt<int16_t>(5000));
-  TEST_ASSERT_EQUAL_INT16(141, uSqrt<int16_t>(20000));
-  TEST_ASSERT_EQUAL_INT16(254, uSqrt<int16_t>(64516));
-  
-  // Maximum value for int16_t (65535 = 255.996^2)
-  TEST_ASSERT_EQUAL_INT16(255, uSqrt<int16_t>(65535));
+  struct {    
+    int16_t out;
+    int32_t in;    
+  } data[] = { {0, 0}, {1, 1}, {2, 4}, {3, 9}, {4, 16}, {5, 25}, {15, 225}, {16, 256},
+               {32, 1024}, {100, 10000}, {128, 16384}, {255, 65025}, 
+               {2, 5}, {3, 10}, {7, 50}, {11, 125}, {22, 500}, {70, 5000}, {141, 20000}, {253, 64156}, {255, 65535}
+             };
+
+  for(size_t i = 0; i < sizeof(data)/sizeof(data[0]); i++)
+    TEST_ASSERT_EQUAL_INT16(data[i].out, uSqrt<int16_t>(data[i].in));
+
 }
 
 

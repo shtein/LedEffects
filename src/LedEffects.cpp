@@ -90,11 +90,6 @@ BEGIN_EFFECTS(EFF_RANDOM_START_EFFECT)
     ADD_EFFECT("Noise-ind", EffectNoise, &July4th )
   END_MODE()
 
-  BEGIN_MODE(Ukraine)     
-    ADD_EFFECT("Confetti-ukr", EffectConfetti, &UkraineFlag )
-    ADD_EFFECT("Noise-ukr", EffectNoise, &UkraineFlag )
-    ADD_EFFECT("Twinkle fox-ukr", EffectTwinkleFox, &UkraineFlag )
-  END_MODE()
 */
 END_EFFECTS()
 

@@ -2,9 +2,6 @@
 #define __MATRIX_ANIMATION_H
 
 
-
-
-
 #define MATRIX_OBJECTS_FADE 128
 
 ////////////////////////////////////////
@@ -14,11 +11,9 @@
 // Move linear routine
 template<typename T>
 void moveLinear(Obj<T> &obj, int16_t t){
-
   //Change position, speed does not change
   obj.pos.x += t * obj.vel.x;
   obj.pos.y += t * obj.vel.y;
-
 }
 
 
@@ -48,9 +43,8 @@ protected:
     EffectPaletteTransform::proceed(leds, numLeds);
     
 #ifdef USE_SOUND
-    //Get sound data
-    sc_band_t bands;
-    getSoundBands(bands, false);
+    //Process sound
+    getSound();
 
     bool silence = !(_cfg.flags & ECF_SOUND) || _sc->isSound(false, 5000);
 
@@ -63,11 +57,11 @@ protected:
 
     fadeToBlackBy(leds, numLeds, MATRIX_OBJECTS_FADE);  
 
-    bool treble = _sc->isTreblePeak() && TREBLE_BEAT_CHECK() >= 50;
-    bool mid    = _sc->isMidPeak() && MID_BEAT_CHECK() >= 100;
-    bool bass   = _sc->isBassPeak() && BASS_BEAT_CHECK() >= 150; 
+    bool treble = beatCheckTreble(TREBLE_PEAK_CHECK_TIME);
+    bool mid    = beatCheckMid(MID_PEAK_CHECK_TIME);
+    bool bass   = beatCheckBass(BASS_PEAK_CHECK_TIME); 
 
-    if(bass || mid || /*treble ||*/ silence){
+    if(bass || mid || treble || silence){
 
 #else
     fadeToBlackBy(leds, numLeds, MATRIX_OBJECTS_FADE);        
@@ -97,9 +91,9 @@ protected:
     }
 
 #ifdef USE_SOUND
-      if(treble) TREBLE_BEAT_RESET();
-      if(mid) MID_BEAT_RESET();
-      if(bass) BASS_BEAT_RESET();
+      if(treble) beatResetTreble();
+      if(mid) beatResetMid();
+      if(bass) beatResetBass();
     } //End of sound check
 #endif //USE_SOUND
   }
@@ -217,60 +211,12 @@ void moveGravity(Obj<T> &obj, int16_t t){
 }
 
 
-//////////////////////////////
-// Bouncing in 1D
-template<typename T>
-void bounce1d(T &v1, uint8_t m1, T &v2, uint8_t m2){
-  //Total mass
-  T M = (T)m1 + (T)m2;
-
-  //New speeds
-  T u1 = divRound<T>((m1 - m2) * v1 + 2 * m2 * v2, M);
-  T u2 = divRound<T>((m2 - m1) * v2 + 2 * m1 * v1, M);
-
-  //Update speeds
-  v1 = u1;
-  v2 = u2;
-}
-
-
-template<typename T>
-void bounce2d(Obj<T> &obj1, uint8_t m1, Obj<T> &obj2, uint8_t m2){
-  using V = upper_type_t<T>; // wider integer for intermediates
-
-  //Normal vector
-  Pnt<T> n = obj2.pos - obj1.pos;
-
-  //Tangent ortogonal vector
-  Pnt<T> t = n.ortogonal();
-
-  //Project speeds to normal and ortogonal vectors
-  Pnt<V> u1(obj1.vel * n, obj1.vel * t);
-  Pnt<V> u2(obj2.vel * n, obj2.vel * t);
-
-  //Bounce speeds in normal direction
-  bounce1d<V>(u1.x, m1, u2.x, m2);
- 
-  // len * len
-  V len2 = n * n;
-
-  //Update velocities
-  obj1.vel.x = (T)divRound<V>(u1.x * n.x + u1.y * t.x, len2);
-  obj1.vel.y = (T)divRound<V>(u1.x * n.y + u1.y * t.y, len2);
-
-  obj2.vel.x = (T)divRound<V>(u2.x * n.x + u2.y * t.x, len2);
-  obj2.vel.y = (T)divRound<V>(u2.x * n.y + u2.y * t.y, len2);
-}
-
-
 #ifndef MATRIX_BOUNCING_DOTS_MAX_OBJECTS
   #define MATRIX_BOUNCING_DOTS_MAX_OBJECTS 5
 #endif
 
 #define I2FP(v) ((int16_t)((v) << 8))
 #define FP2I(v) ((int8_t)((v) >> 8))
-
-
 
 class EffectMatrixBounsingDots: public EffectPaletteTransform{
 public:
@@ -280,10 +226,14 @@ public:
     XY xy;
 
     for(size_t i = 0; i < MATRIX_BOUNCING_DOTS_MAX_OBJECTS; i++){
-      _dots[i].colorIndex = random8();
-      _dots[i].mass       = (i + 1) * 2;
-      _dots[i].obj.pos    = Pnt16_t(random16(I2FP(xy.width() - 1)), random16(0, I2FP(xy.height() / 2 - 1)));
-      _dots[i].obj.vel    = Pnt16_t(random16(64, 192) * (1 - random8(1) * 2), 0);      
+      auto &d = _dots[i];
+
+      d.colorIndex = random8();
+      d.mass       = (i + 1) * 2;
+      d.obj.pos    = Pnt16_t(random16(I2FP(xy.width())), random16(I2FP(xy.height() / 2)));
+      d.obj.vel    = Pnt16_t(random16(64, 192), 0);   
+      if(random8() & 0x01)   
+        d.obj.vel.x = -d.obj.vel.x;      
     }
     
     setSpeedDelay(20);  
@@ -316,8 +266,7 @@ public:
           bounce2d<int16_t>(obj, _dots[i].mass, obj2, _dots[j].mass);          
         }       
       }
-    
-    
+        
       //Check for bounce with boundaries
       if(obj.movesAwayLeft(xmin)){
         obj.vel.x = -obj.vel.x;

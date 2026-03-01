@@ -65,8 +65,6 @@ enum SoundVUMType{
 
 #endif
 
-
-
 //Timeout to save config
 #define SAVE_CONFIG_TIMEOUT 30000
 

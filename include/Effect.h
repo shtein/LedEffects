@@ -13,10 +13,6 @@
   #include <SoundCapture.h>
 #endif
 
-///////////////////
-// Helpers
-#define qsuba(x, b)  ((x > b) ? x - b : 0) 
-
 
 ///////////////////
 // Basic effect
@@ -51,7 +47,17 @@ class Effect{
 #ifdef USE_SOUND
     //Sound
     void getSoundBands(sc_band_t &bands, bool scale);
+    void getSound();
     bool onCmdSound(const struct CtrlQueueItem &itm);
+
+    uint16_t beatCheckBass(uint16_t delta) const;
+    void beatResetBass() { _ctxSound.bassTicks = 0; }
+
+    uint16_t beatCheckMid(uint16_t delta) const;
+    void beatResetMid() { _ctxSound.midTicks = 0; }
+
+    uint16_t beatCheckTreble(uint16_t delta) const;
+    void beatResetTreble() { _ctxSound.trebleTicks = 0; }
 #endif    
 
   protected:  
@@ -80,7 +86,7 @@ class Effect{
 
 #ifdef USE_SOUND
     struct EFFECT_SOUND_CONTEXT{
-      uint8_t  flags;       //Flags how to scale sound capture
+      uint8_t   flags;       //Flags how to scale sound capture
       uint16_t  lower;       //Lower boundary from 0 to upper
       uint16_t  upper;       //Upper boundary from lower to 255
 
@@ -102,18 +108,10 @@ class Effect{
 
 #ifdef USE_SOUND
 
-//Beat detection  
-#define BASS_BEAT_CHECK() (_ctxSound.bassTicks * getSpeedDelay())
-#define BASS_BEAT_RESET() _ctxSound.bassTicks = 0;
-
-#define MID_BEAT_CHECK() (_ctxSound.midTicks * getSpeedDelay())
-#define MID_BEAT_RESET() _ctxSound.midTicks = 0;
-
-#define TREBLE_BEAT_CHECK() (_ctxSound.trebleTicks * getSpeedDelay()) 
-#define TREBLE_BEAT_RESET() _ctxSound.trebleTicks = 0;
-
 #define SOUND_FADE_10(fade) (fade * getSpeedDelay() / 10)
-
+#define BASS_PEAK_CHECK_TIME   180
+#define MID_PEAK_CHECK_TIME    100
+#define TREBLE_PEAK_CHECK_TIME 50
 
 #endif
 

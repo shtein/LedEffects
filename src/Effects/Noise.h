@@ -134,17 +134,16 @@ class EffectConfetti: public EffectPaletteTransform{
               
       
 #ifdef USE_SOUND                
-      //Get sound data
-      sc_band_t bands;
-      getSoundBands(bands, false);  
+      //Process sound
+      getSound();
 
       bool silence = !(_cfg.flags & ECF_SOUND) || _sc->isSound(false, 5000);
 
       fadeToBlackBy(leds, numLeds, silence ? 8 : SOUND_FADE_10(25));    
 
-      bool treble = _sc->isTreblePeak() && TREBLE_BEAT_CHECK() >= 50;
-      bool mid    = _sc->isMidPeak() && MID_BEAT_CHECK() >= 100;
-      bool bass   = _sc->isBassPeak() && BASS_BEAT_CHECK() >= 150; 
+      bool treble = beatCheckTreble(TREBLE_PEAK_CHECK_TIME);
+      bool mid    = beatCheckMid(MID_PEAK_CHECK_TIME);
+      bool bass   = beatCheckBass(BASS_PEAK_CHECK_TIME); 
 
       if( treble || mid || bass || silence) { 
         int cnt = numLeds / LEDS_MAX + 1;
@@ -167,9 +166,9 @@ class EffectConfetti: public EffectPaletteTransform{
 
 #ifdef USE_SOUND
         //Set next check time
-        if(treble) TREBLE_BEAT_RESET();
-        if(mid) MID_BEAT_RESET();
-        if(bass) BASS_BEAT_RESET();
+        if(treble) beatResetTreble();
+        if(mid) beatResetMid();
+        if(bass) beatResetBass();
       } 
 #endif //USE_SOUND
 

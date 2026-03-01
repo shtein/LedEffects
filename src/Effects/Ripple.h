@@ -111,11 +111,8 @@ protected:
           //Light right led
           if(ripple.getCenter() + ripple.getOffset() < numLeds) 
             leds[ripple.getCenter() + ripple.getOffset()] += hsv;
-
-      }    
-      
+      }          
     }
-
   }
 
 protected:

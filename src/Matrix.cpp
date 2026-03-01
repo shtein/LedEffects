@@ -12,10 +12,6 @@ XYDraw::XYDraw(CRGB *leds, uint16_t numLeds, uint8_t flags){
   _flags    = flags;
 }
 
-XYDraw::~XYDraw(){ 
-}
-
-
 CRGB & XYDraw::operator()(int16_t x, int16_t y){
   int16_t index = xy(x, y);
 
@@ -272,7 +268,7 @@ public:
       }
       else{
         //Recalculate point on Hypotenuse
-        _p =  (int16_t)((_a * (int32_t)x + _b + 32768) >> 16);
+        _p =  (int8_t)((_a * (int32_t)x + _b + 32768) >> 16);
         y = 0;
       }
     }
@@ -291,9 +287,6 @@ public:
 protected:
   int8_t _dx;  //x coordinate relative to 0
   int8_t _dy;  //y coordinate relative to 0
-
-  int8_t _x;   //current x
-  int8_t _y;   //current y
   int8_t _p;   //current y on the Hypotenuse
 
   //Hypotenuse is defined as y(x) = -height/width * x + (y0 + height + x0 * heigh / width )
@@ -305,7 +298,7 @@ protected:
   int8_t _xs;
   int8_t _ys;
 
-  //x or y moving variable true if y
+  //x or y moving variable true if dx < dy
   bool _revert; 
 };
 
@@ -386,11 +379,11 @@ void XYDraw::mirrorRightTriangleHorizontally( int16_t x0, int16_t y0,
 
 
 void XYDraw::mirrorRightTriangleVertically( int16_t x0, int16_t y0,
-                                             int16_t dx, int16_t dy,
-                                             int16_t my,   
-                                             int16_t shiftx, 
-                                             int16_t shifty
-                                           ){
+                                            int16_t dx, int16_t dy,
+                                            int16_t my,   
+                                            int16_t shiftx, 
+                                            int16_t shifty
+                                          ){
 
   RightTrianglePoints en(dx, dy);
 
@@ -428,13 +421,11 @@ void XYDraw::mirrorRightTriangleButterfly(int16_t x0, int16_t y0,
 void kaleidoscope(CRGB *leds, uint16_t numLeds){        
   XYDraw xy(leds, numLeds);
 
-  
-
   xy.mirrorRightTriangleButterfly(0, xy.height() / 2 - 1, 
                                   xy.width() / 2, -xy.height() / 2,
                                   xy.width() / 2 - 1, -xy.height() / 2 + 1
                                 );
-  xy.mirrorRectangleHorizontally(0, 0, xy.width()/2, xy.height()/2, xy.width()/2, xy.width() % 2 - 1);
+  xy.mirrorRectangleHorizontally(0, 0, xy.width() / 2, xy.height() / 2, xy.width() / 2, xy.width() % 2 - 1);
   xy.mirrorRectangleVertically(0, 0, xy.width(), xy.height() / 2, xy.height() / 2, 0, xy.height() % 2 - 1);
 };
 

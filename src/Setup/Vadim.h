@@ -40,9 +40,6 @@
   END_MODE()
 
   BEGIN_MODE("Flags")      
-    ADD_EFFECT(el_Confetti, tl_UkrainianFlag )
-    ADD_EFFECT(el_Noise, tl_UkrainianFlag )
-    ADD_EFFECT(el_TwinkleFox, tl_UkrainianFlag)    
     ADD_EFFECT(el_Confetti, tl_July_4th )
     ADD_EFFECT(el_Noise, tl_July_4th )
     ADD_EFFECT(el_TwinkleFox, tl_July_4th)    

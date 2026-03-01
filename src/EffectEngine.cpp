@@ -78,7 +78,8 @@ void putNtfObject(NtfBase &resp, const EFFECT_DATA &data){
   resp.put_F(rs_Flags, data.flags);
   
   if(data.flags & ECF_HSV) {
-    resp.put_F(rs_HSV, EFFECT_PARAM_HSV(data));
+    EEResp_EffectColor clr = {data.bytes[0], data.bytes[1], data.bytes[2]}; 
+    resp.put_F(rs_HSV, clr);
   }
   
   if(data.flags & ECF_RGB){    
@@ -173,7 +174,7 @@ void putNtfObject(NtfBase &resp, const EEResp_EffectList &data){
   resp.endArray();
 }
 
-struct EEResp_TransformList{};
+
 
 void putNtfObject(NtfBase &resp, const EEResp_TransformList &data){
   resp.beginArray_F(rs_Transforms);
@@ -188,19 +189,10 @@ void putNtfObject(NtfBase &resp, const EEResp_TransformList &data){
   resp.endArray();
 }
 
-
-struct EEResp_NumLeds{  
-  uint16_t maxLeds;
-  uint16_t numLeds;
-};
-
  void putNtfObject(NtfBase &resp, const EEResp_NumLeds &data){
   resp.put_F(rs_MaxLeds, data.maxLeds);
   resp.put_F(rs_NumLeds, data.numLeds);
 }
-
-struct EEResp_Version{  
-};
 
 void putNtfObject(NtfBase &resp, const EEResp_Version &data){
   EFFECT_ENGINE_VERSION ver;
@@ -390,8 +382,7 @@ bool EffectEngine::onCmdEE(const struct CtrlQueueItem &itm){
       onModeChange(itm.data);
     //All get commands to process with NTF
     case EEMC_GET_MODE:      
-      NTF_RESP(itm.cmd, EEResp_Mode, _cfgEngine.modeNum, _cfgMode);
-      
+      NTF_RESP(itm.cmd, EEResp_Mode, _cfgEngine.modeNum, _cfgMode);      
     break;
 
     case EEMC_EFFECT:    

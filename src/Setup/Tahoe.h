@@ -48,12 +48,6 @@ BEGIN_EFFECTS(EFF_RANDOM_START_EFFECT)
   END_MODE()
 
 /*
-  BEGIN_MODE("Ukraine")      
-    ADD_EFFECT(el_Confetti, tl_UkrainianFlag )
-    ADD_EFFECT(el_Noise, tl_UkrainianFlag )
-    ADD_EFFECT(el_TwinkleFox, tl_UkrainianFlag )
-  END_MODE()
-
   BEGIN_MODE("Israel")      
     ADD_EFFECT(el_Confetti, tl_IsraelFlag )
     ADD_EFFECT(el_Noise, tl_IsraelFlag )

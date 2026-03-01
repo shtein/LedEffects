@@ -24,7 +24,6 @@ DECLARE_GRADIENT_PALETTE( patriot_black_gp );
 DECLARE_GRADIENT_PALETTE( july4_2_gp );
 
 //Other usefull palettes
-extern const TProgmemRGBPalette16 UkraineFlag_p FL_PROGMEM;
 extern const TProgmemRGBPalette16 IsraelFlag_p FL_PROGMEM;
 extern const TProgmemRGBPalette16 PortugalFlag_p FL_PROGMEM;
 extern const TProgmemRGBPalette16 RedGreenWhite_p FL_PROGMEM;
@@ -105,7 +104,6 @@ DECLARE_TRANSFORM_SCHEMA_TYPE(getPal_July4th)
 DECLARE_TRANSFORM_SCHEMA_TYPE(getPal_TwinkleFox)
 DECLARE_TRANSFORM_SCHEMA_TYPE(getPal_SnowAndIce)
 DECLARE_TRANSFORM_SCHEMA_TYPE(getPal_ValentinesDay)
-DECLARE_TRANSFORM_SCHEMA_TYPE(getPal_UkraineFlag)
 DECLARE_TRANSFORM_SCHEMA_TYPE(getPal_PortugalFlag)
 DECLARE_TRANSFORM_SCHEMA_TYPE(getPal_Noise)
 
@@ -123,7 +121,6 @@ enum TransformPalList{
   tl_TwinkleFox,
   tl_SnowAndIce,
   tl_Valentines,
-  tl_UkrainianFlag,
   tl_PortugalFlag,
   tl_IsraelFlag,
   tl_Noise,

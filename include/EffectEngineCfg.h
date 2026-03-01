@@ -124,9 +124,4 @@ bool getEffectConfig(uint8_t mode, uint8_t effect, EFFECT_CONFIG &cfg);
 bool setEffectConfig(uint8_t mode, uint8_t effect, const EFFECT_CONFIG &cfg);
 
 
-#ifdef NTF_ENABLED  
-  void putNtfObject(NtfBase &resp, const CHSV &data);
-#endif
-
-
 #endif //__EFFECT_ENGINE_CFG_H
