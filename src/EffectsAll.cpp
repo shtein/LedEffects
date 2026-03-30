@@ -76,32 +76,33 @@
   #define NO_EFFECT_MATRIX_CIRCLES
 #endif
 
-
-DEFINE_STR_PROGMEM(rs_Effect_StaticColor,          "Static color")
-DEFINE_STR_PROGMEM(rs_Effect_Blur,                 "Blur")
-DEFINE_STR_PROGMEM(rs_Effect_ColorWipe,            "Color wipe")
-DEFINE_STR_PROGMEM(rs_Effect_EmergencyLights,      "Emergency lights")
-DEFINE_STR_PROGMEM(rs_Effect_FadeInOut,            "Fade in out")
-DEFINE_STR_PROGMEM(rs_Effect_Juggle,               "Juggle")
-DEFINE_STR_PROGMEM(rs_Effect_MeteorRain,           "Meteor rain")
-DEFINE_STR_PROGMEM(rs_Effect_MoodBlobs,            "Mood blobs")
-DEFINE_STR_PROGMEM(rs_Effect_PaletteTransform,     "Palette transform")
-DEFINE_STR_PROGMEM(rs_Effect_Noise,                "Noise")
-DEFINE_STR_PROGMEM(rs_Effect_Plasma,               "Plasma")
-DEFINE_STR_PROGMEM(rs_Effect_Confetti,             "Confetti")
-DEFINE_STR_PROGMEM(rs_Effect_PacificOcean,         "Pacific ocean")
-DEFINE_STR_PROGMEM(rs_Effect_Rainbow,              "Rainbow")
-DEFINE_STR_PROGMEM(rs_Effect_TheaterChaseRainbow,  "Theater chase rainbow")
-DEFINE_STR_PROGMEM(rs_Effect_RainbowMove,          "Rainbow move")
-DEFINE_STR_PROGMEM(rs_Effect_Ripple,               "Ripple" )
-DEFINE_STR_PROGMEM(rs_Effect_RunningLigts,         "Running lights")
-DEFINE_STR_PROGMEM(rs_Effect_TwinkleFox,           "Twinkle fox")
-DEFINE_STR_PROGMEM(rs_Effect_Fire,                 "Fire")
-DEFINE_STR_PROGMEM(rs_Effect_Matrix_Drops,         "Matrix drops")
-DEFINE_STR_PROGMEM(rs_Effect_Matrix_Bouncing_Dots, "Matrix bouncing dots")
-DEFINE_STR_PROGMEM(rs_Effect_Matrix_Circles,       "Matrix circles")
-DEFINE_STR_PROGMEM(rs_Effect_SoundVUM,             "Sound VUM")
-DEFINE_STR_PROGMEM(rs_Effect_SoundMatrixRGB,       "Sound matrix RGB")
+#ifdef NTF_ENABLED
+  DEFINE_STR_PROGMEM(rs_Effect_StaticColor,          "Static color")
+  DEFINE_STR_PROGMEM(rs_Effect_Blur,                 "Blur")
+  DEFINE_STR_PROGMEM(rs_Effect_ColorWipe,            "Color wipe")
+  DEFINE_STR_PROGMEM(rs_Effect_EmergencyLights,      "Emergency lights")
+  DEFINE_STR_PROGMEM(rs_Effect_FadeInOut,            "Fade in out")
+  DEFINE_STR_PROGMEM(rs_Effect_Juggle,               "Juggle")
+  DEFINE_STR_PROGMEM(rs_Effect_MeteorRain,           "Meteor rain")
+  DEFINE_STR_PROGMEM(rs_Effect_MoodBlobs,            "Mood blobs")
+  DEFINE_STR_PROGMEM(rs_Effect_PaletteTransform,     "Palette transform")
+  DEFINE_STR_PROGMEM(rs_Effect_Noise,                "Noise")
+  DEFINE_STR_PROGMEM(rs_Effect_Plasma,               "Plasma")
+  DEFINE_STR_PROGMEM(rs_Effect_Confetti,             "Confetti")
+  DEFINE_STR_PROGMEM(rs_Effect_PacificOcean,         "Pacific ocean")
+  DEFINE_STR_PROGMEM(rs_Effect_Rainbow,              "Rainbow")
+  DEFINE_STR_PROGMEM(rs_Effect_TheaterChaseRainbow,  "Theater chase rainbow")
+  DEFINE_STR_PROGMEM(rs_Effect_RainbowMove,          "Rainbow move")
+  DEFINE_STR_PROGMEM(rs_Effect_Ripple,               "Ripple" )
+  DEFINE_STR_PROGMEM(rs_Effect_RunningLigts,         "Running lights")
+  DEFINE_STR_PROGMEM(rs_Effect_TwinkleFox,           "Twinkle fox")
+  DEFINE_STR_PROGMEM(rs_Effect_Fire,                 "Fire")
+  DEFINE_STR_PROGMEM(rs_Effect_Matrix_Drops,         "Matrix drops")
+  DEFINE_STR_PROGMEM(rs_Effect_Matrix_Bouncing_Dots, "Matrix bouncing dots")
+  DEFINE_STR_PROGMEM(rs_Effect_Matrix_Circles,       "Matrix circles")
+  DEFINE_STR_PROGMEM(rs_Effect_SoundVUM,             "Sound VUM")
+  DEFINE_STR_PROGMEM(rs_Effect_SoundMatrixRGB,       "Sound matrix RGB")
+ #endif //NTF_ENABLED 
 
 
 uint8_t getEffectFlags(uint8_t effectId){
@@ -176,7 +177,7 @@ bool getEffect(uint8_t effectId, EFFECT_DESCRIPTION &ed){
     break;        
 #endif //NO_EFFECT_PALLETE_TRANSFORM  
 
-#if !defined(NO_EFFECT_NOISE) || defined(NO_EFFECT_NOISE)
+#if !defined(NO_EFFECT_NOISE) || defined(EFFECT_NOISE)
     case el_Noise:
       GET_EFFECT(ed, EffectNoise, rs_Effect_Noise, ECF_TRANSFORM);      
     break;        

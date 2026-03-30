@@ -50,13 +50,13 @@ class Effect{
     void getSound();
     bool onCmdSound(const struct CtrlQueueItem &itm);
 
-    uint16_t beatCheckBass(uint16_t delta) const;
+    uint16_t beatCheckBass(uint16_t delta, uint8_t sensForBanAg = BASS_PEAK_SENS_BUS, uint8_t sensForAvg = BASS_PEAK_SENS_AVG) const;
     void beatResetBass() { _ctxSound.bassTicks = 0; }
 
-    uint16_t beatCheckMid(uint16_t delta) const;
+    uint16_t beatCheckMid(uint16_t delta, uint8_t sensForBanAg = MID_PEAK_SENS_BUS, uint8_t sensForAvg = MID_PEAK_SENS_AVG) const;
     void beatResetMid() { _ctxSound.midTicks = 0; }
 
-    uint16_t beatCheckTreble(uint16_t delta) const;
+    uint16_t beatCheckTreble(uint16_t delta, uint8_t sensForBanAg = TREBLE_PEAK_SENS_BUS, uint8_t sensForAvg = TREBLE_PEAK_SENS_AVG) const;
     void beatResetTreble() { _ctxSound.trebleTicks = 0; }
 #endif    
 
@@ -109,7 +109,7 @@ class Effect{
 #ifdef USE_SOUND
 
 #define SOUND_FADE_10(fade) (fade * getSpeedDelay() / 10)
-#define BASS_PEAK_CHECK_TIME   180
+#define BASS_PEAK_CHECK_TIME   150
 #define MID_PEAK_CHECK_TIME    100
 #define TREBLE_PEAK_CHECK_TIME 50
 

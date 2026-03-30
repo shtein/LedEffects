@@ -593,7 +593,7 @@ bool getPalTransform(uint8_t transformId, TRANSFORM_DESCRIPTION &td){
     break;
 #endif    
 
-#ifndef NOPALLETTE_NOISE
+#ifndef NO_PALLETTE_NOISE
     case tl_Noise:
       GET_PAL_TRANSFORM(td, getPal_Noise, PSTR("Noise"));
     break;

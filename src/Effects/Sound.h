@@ -290,7 +290,6 @@ bool mode1_RGBMid(uint16_t &value,              //Context value
   }
 
   
-  
   return timeDelta > 300 ? true : false;  
  }
 
@@ -314,11 +313,6 @@ bool mode1_RGBTreble(uint16_t &value,              //Context value
     draw.pixel(x, y, CRGB::DeepSkyBlue);
   }
 
-  if(timeDelta <= 100){
-    tr.randomPointY(x, y);
-    draw.pixel(x, y, CRGB::SkyBlue);
-  }
-  
   
   return (x == tr.x && y == tr.y)  /*|| x == tr.x && y == tr.cornerY()) ||  (x == tr.cornerX() && y == tr.y) */ ? true : false;  //Return true if it is at the corner
 }
@@ -347,7 +341,7 @@ bool mode2_RGBTreble(uint16_t &value,              //Context value
   }
 
   //Pixels
-  uint8_t step = timeDelta <= 100 ? 3 : timeDelta < 150 ? 2 : 1;
+  uint8_t step = timeDelta <= 180 ? 2 : 1;
   do {
       
     draw.pixel(s->x, s->y, CRGB::Blue);
@@ -381,9 +375,70 @@ bool mode2_RGBTreble(uint16_t &value,              //Context value
   } while(--step);
 
 
-  //Second pixel if possble
   return false;
 }
+
+//Treble drawing mode 3
+bool mode3_RGBTreble(uint16_t &value,              //Context value
+                     uint16_t timeDelta,           //Time delta
+                     XYDraw &draw,                 //Drawing object
+                     const RightTriangle8_t &tr    //Triangle
+                    ){  
+
+    struct S{
+    uint8_t dir:1; //0 - left, 1 - right
+    uint8_t x:7;
+    uint8_t y;
+  };
+
+  S *s = (S *)&value;
+  
+  if(value == 0){
+    //Initial
+    s->x = tr.x;
+    s->y = tr.cornerY();
+
+    s->dir = tr.topSided() ? 0 : 1; //up or down
+  }
+
+  //Pixels
+  uint8_t step = timeDelta <= 180 ? 2 : 1;
+  do {
+      
+    draw.pixel(s->x, s->y, CRGB::Blue);
+    
+    if( s->x == tr.cornerX())
+      return true; //Return true if it is at the corner
+
+    //Move 
+    if(s->dir == 1){ 
+      //Movinf down
+      if(s->y == tr.hypotenuseY(s->x)){
+        //Change direction
+        s->dir = 0;
+        s->x   = tr.leftSided() ? s->x + 1 : s->x - 1;
+      }
+      else{
+        s->y++;
+      }
+    }
+    else{
+      //Moving up
+      if(s->y == tr.y){
+        //Change direction
+        s->dir = 1;
+        s->x  = tr.leftSided() ? s->x + 1 : s->x - 1;
+      }
+      else{
+        s->y--;
+      }
+    }
+  } while(--step);
+
+  
+  return false;
+}
+
 
 
 class EffectSoundRGB: public Effect{
@@ -454,8 +509,6 @@ protected:
     uint16_t timeDelta = beatCheckMid(MID_PEAK_CHECK_TIME);
     if(timeDelta){ 
 
-      //DBG_OUTLN("%d %d %d %d %d", _sc->getStats(ssgAverage).getAverage(), _sc->getStats(ssgAverage).getStdDev(), _sc->getMid(), _sc->getStats(ssgAverageMid).getAverage(), _sc->getStats(ssgAverageMid).getStdDev());  
-
       if(mode1_RGBMid(_ctxSound.midValue, timeDelta, draw, tr))
       {
         //Reset
@@ -478,7 +531,7 @@ protected:
     draw.fadeToBlackRightTriangle(tr.x, tr.y, tr.width(), tr.height(), SOUND_FADE_10(20));
     
     //Check time and peak
-    uint16_t timeDelta = beatCheckTreble(TREBLE_PEAK_CHECK_TIME);
+    uint16_t timeDelta = beatCheckTreble(TREBLE_PEAK_CHECK_TIME, 96, 152);
     if(timeDelta){ 
 
       bool done = true;
@@ -486,12 +539,13 @@ protected:
         default:
         case 0: done = mode1_RGBTreble(_ctxSound.trebleValue, timeDelta, draw, tr); break;
         case 1: done = mode2_RGBTreble(_ctxSound.trebleValue, timeDelta, draw, tr); break;          
+        case 2: done = mode3_RGBTreble(_ctxSound.trebleValue, timeDelta, draw, tr); break;
       }
 
       if (done) {
         //Reset
         _ctxSound.trebleValue = 0;
-        _trebleFunc = random8(2);
+        _trebleFunc = random8(3);
       }
       
       //Set next check time

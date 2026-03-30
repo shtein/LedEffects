@@ -210,25 +210,25 @@ bool Effect::onCmdSound(const struct CtrlQueueItem &itm){
   return true;
 }
 
-uint16_t Effect::beatCheckBass(uint16_t delta) const {
+uint16_t Effect::beatCheckBass(uint16_t delta, uint8_t sensForBanAg, uint8_t sensForAvg) const {
   uint16_t n =  (uint16_t)_ctxSound.bassTicks * (uint16_t)getSpeedDelay();
-  if( n >= delta && _sc->isBassPeak())
+  if( n >= delta && _sc->isBassPeak(sensForBanAg, sensForAvg))
     return n;
     
   return 0;
 }
 
-uint16_t Effect::beatCheckMid(uint16_t delta) const {
+uint16_t Effect::beatCheckMid(uint16_t delta, uint8_t sensForBanAg, uint8_t sensForAvg) const {
   uint16_t n =  (uint16_t) _ctxSound.midTicks * (uint16_t)getSpeedDelay();
-  if( n >= delta && _sc->isMidPeak())
+  if( n >= delta && _sc->isMidPeak(sensForBanAg, sensForAvg))
     return n;
     
   return 0;
 }
 
-uint16_t Effect::beatCheckTreble(uint16_t delta) const {
+uint16_t Effect::beatCheckTreble(uint16_t delta, uint8_t sensForBanAg, uint8_t sensForAvg) const {
   uint16_t n =  (uint16_t) _ctxSound.trebleTicks * (uint16_t)getSpeedDelay();
-  if( n >= delta && _sc->isTreblePeak())
+  if( n >= delta && _sc->isTreblePeak(sensForBanAg, sensForAvg))
     return n;
     
   return 0;
