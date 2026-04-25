@@ -268,20 +268,28 @@ public:
       }
         
       //Check for bounce with boundaries
+
+      //Border touch point
+      //Pnt8_t tp = Pnt8_t(FP2I(obj.pos.x), FP2I(obj.pos.y));
+      
       if(obj.movesAwayLeft(xmin)){
         obj.vel.x = -obj.vel.x;
+        //tp.x = 0;
       }
 
       if(obj.movesAwayRight(xmax)){
         obj.vel.x = -obj.vel.x;
+        //tp.x = xy.width() - 1;
       }
 
       if(obj.movesAwayUp(ymin)){
         obj.vel.y = -obj.vel.y;    
+        //tp.y = 0;
       }
 
       if(obj.movesAwayDown(ymax)){
         obj.vel.y = -obj.vel.y;      
+        //tp.y = xy.height() - 1;
       }          
 
       moveGravity(obj, 1);
@@ -291,7 +299,22 @@ public:
       int8_t x = FP2I(obj.pos.x);
       int8_t y = FP2I(obj.pos.y);
       
-      xy.pixel(x, y, ColorFromPalette(_ctx.palCurrent, _dots[i].colorIndex, 255, LINEARBLEND));
+      CRGB clr = ColorFromPalette(_ctx.palCurrent, _dots[i].colorIndex, 255, LINEARBLEND);
+      xy.pixel(x, y, clr);
+/*
+      //Draw border collision points
+      if(tp.x == 0 || tp.x == xy.width() - 1 || tp.y == 0 || tp.y == xy.height() - 1){
+        Rect2Line8_t rl(xy.width() - 1, xy.height() - 1);
+        int16_t t = rl.toLine(tp);
+        for(int i = -2; i <= 2; i++){
+
+          if(i == 0) continue;
+
+          Pnt8_t p = rl.toRect(t + i);
+          xy.pixel(p.x, p.y, clr);
+        }
+      }
+*/      
     }
 
   

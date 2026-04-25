@@ -303,4 +303,65 @@ typedef RightTriangle<int16_t> RightTriangle16_t;
 typedef RightTriangle<int32_t> RightTriangle32_t;
 
 
+//////////////////////////////////////
+//Rect2Line - convert coordinates on the rectangle to the line and back
+template <typename T>
+struct Rect2Line{
+  T width;
+  T hight;
+
+  
+  Rect2Line (T w, T h) __attribute__((always_inline)){
+    width = w; 
+    hight = h;
+  }
+
+  T length() const __attribute__((always_inline)){
+    return 2 * (width + hight);
+  } 
+
+  T toLine(T x, T y) const __attribute__((always_inline)){
+    
+    T t = 0; 
+
+    if(y == 0 && x < width) t = x;
+    if(x == width && y < hight) t = width + y;
+    if(y == hight && x > 0) t = 2 * width + hight - x;
+    if(x == 0 && y > 0) t = 2 * ( width + hight) - y;
+
+    return t;
+  }
+
+  T toLine(const Pnt<T> &p) const __attribute__((always_inline)){
+    return toLine(p.x, p.y);
+  } 
+
+  Pnt<T> toRect(T t) const __attribute__((always_inline)){
+    t = (t + length()) % length(); //Wrap around
+
+    Pnt<T> p;
+
+    if(t < width){
+      p.x = t;
+      p.y = 0;
+    } else if(t < (width + hight)){
+      p.x = width;
+      p.y = t - width;
+    } else if(t < (2 * width + hight)){
+      p.x = 2 * width + hight - t;
+      p.y = hight;
+    } else {
+      p.x = 0;
+      p.y = 2 * (width + hight) - t;
+    }
+
+    return p;
+  }
+};
+
+typedef Rect2Line<int8_t>  Rect2Line8_t;
+typedef Rect2Line<int16_t> Rect2Line16_t;
+typedef Rect2Line<int32_t> Rect2Line32_t;
+
+
 #endif //__MATRIXUTILS_H

@@ -255,9 +255,38 @@ void testBounce2d(){
     TEST_ASSERT_EQUAL_INT16(testData[i].vel2After.x, testData[i].obj2.vel.x);
     TEST_ASSERT_EQUAL_INT16(testData[i].vel2After.y, testData[i].obj2.vel.y);
   }
-  
 
   
+}
+
+void testRect2Line(){
+
+  struct {
+    int8_t t;
+    int8_t x;
+    int8_t y;    
+  } testData[] = {
+    {0, 0, 0}, {1, 1, 0}, {14, 14, 0}, {15, 15, 0},
+    {16, 15, 1}, {17, 15, 2}, {29, 15, 14}, {30, 15, 15},
+    {31, 14, 15}, {32, 13, 15}, {44, 1, 15}, {45, 0, 15},
+    {46, 0, 14}, {47, 0, 13}, {59, 0, 1}, {60, 0, 0}, {-1, 0, 1}, {-2, 0, 2 }
+  };  
+
+  Rect2Line8_t rl(15, 15);
+
+  for(size_t i = 0; i < sizeof(testData) / sizeof(testData[0]); i++){
+    
+    Pnt<int8_t> p = rl.toRect(testData[i].t);    
+    TEST_ASSERT_EQUAL_INT8(testData[i].x, p.x);
+    TEST_ASSERT_EQUAL_INT8(testData[i].y, p.y);
+
+    if(testData[i].t < 0 || testData[i].t >= rl.length()) 
+      continue; //Skip negative t for toLine test
+    
+    int8_t t = rl.toLine(p);
+    TEST_ASSERT_EQUAL_INT8(testData[i].t, t);
+  }
+
   
 }
 
@@ -274,7 +303,8 @@ int main(int , char **){
   RUN_TEST(testObjMoveAwayRight);
   RUN_TEST(testObjMoveAwayUp);
   RUN_TEST(testObjMoveAwayDown);
-  
+  RUN_TEST(testRect2Line);
+
   UNITY_END();
   return 0;
 }

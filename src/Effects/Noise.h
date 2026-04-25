@@ -55,8 +55,7 @@ class EffectNoise: public EffectPaletteTransform{
           xy(x, y) = getCurrentPalColor(inoise8(x * XSCALE + (256 - beatsin16(3, 0, 512)), 
                                                 y * YSCALE + NOISE_DIST
                                                ), 128
-                                       );
-                                              
+                                       );                  
         }
       }
     

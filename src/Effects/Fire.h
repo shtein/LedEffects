@@ -57,11 +57,14 @@ inline void EffectFire::proceed(CRGB *leds, uint16_t numLeds){
     //Process sound
     getSound();
     
+    bool silence    = !(_cfg.flags & ECF_SOUND) || _sc->isSound(false, 5000);
     bool bassBeat   = beatCheckBass(BASS_PEAK_CHECK_TIME);
     bool midBeat    = beatCheckMid(MID_PEAK_CHECK_TIME);
     bool trebleBeat = beatCheckTreble(TREBLE_PEAK_CHECK_TIME);
 
-    if(/*bassBeat ||*/ midBeat || trebleBeat){ 
+    
+
+    if((bassBeat || midBeat || trebleBeat) && !silence){ 
       //Increase speed on mid beat
       _ctxSound.midValue =  qadd8(_ctxSound.midValue, 180);    
     }
@@ -81,7 +84,7 @@ inline void EffectFire::proceed(CRGB *leds, uint16_t numLeds){
    _ctxSound.midValue = qsub8(_ctxSound.midValue, 8);
 
    xScale -= _ctxSound.midValue >> 4;
-   yScale -= _ctxSound.midValue >> 4;
+   yScale -= _ctxSound.midValue >> 3;
 
 #endif //USE_SOUND
 
