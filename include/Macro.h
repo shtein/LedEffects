@@ -43,13 +43,9 @@
 #endif
 
 
-#ifdef NTF_ENABLED
-  #define _NTF_INIT() NtfSet ntf;   
-  #define _NTF_ADD(a) ntf.addNtf(a);   
-  #define _NTF_RESP() ntf.put(resp); 
+#ifdef NTF_ENABLED  
+  #define _NTF_RESP() ntfSerial(resp); 
 #else  
-  #define _NTF_INIT()
-  #define _NTF_ADD(a)  
   #define _NTF_RESP()  
 #endif //NTF_ENABLED
 
@@ -75,8 +71,8 @@
     static SerialInputBinary inSerBin; \
     static CtrlItemSerialBinary ctrlSr(&inSerBin); \
     cp.addControl(&ctrlSr);
-  #else
-    #define _SERIAL_BINARY_INPUT()
+#else
+  #define _SERIAL_BINARY_INPUT()
 #endif //SERIAL_BINARY_ENABLED
 
 
@@ -84,16 +80,9 @@
   #define _SERIAL_INPUT() \
     static SerialInput inSer; \
     static CtrlItemSerial<parseCommandInput> ctrlSer(&inSer); \
-    cp.addControl(&ctrlSer); \
-    _NTF_ADD(&ctrlSer);
+    cp.addControl(&ctrlSer);   
 #else
-  #ifdef NTF_ENABLED
-    #define _SERIAL_INPUT() \
-      static NtfSerial ntfSer; \
-      _NTF_ADD(&ntfSer);
-  #else
-    #define _SERIAL_INPUT()
-  #endif //NTF_ENABLED
+  #define _SERIAL_INPUT()
 #endif //SERIAL_ENABLED
 
 #ifdef WRITE_CONFIG_ONLY
@@ -147,7 +136,6 @@ void _CFG_LOOP(){}
 #define BEGIN_EFFECT_ENGINE() \
 static EffectEngine ee; \
 static CtrlPanel cp; \
-_NTF_INIT(); \
 \
 void _ENGINE_SETUP(){ \
   _DELAY_ON_START(); \
@@ -272,20 +260,5 @@ void _ENGINE_LOOP() \
 
 #endif //USE_IR_REMOTE
 
-
-//Wifi and Web
-#ifdef WIFI_ENABLED
-#define WEB_INPUT(port) \
-  static WebApiInput inWeb; \
-  static CtrlItemWebApi<parseCommandInput> ctrlWeb(&inWeb); \
-  cp.addControl(&ctrlWeb); \
-  _NTF_ADD(&ctrlWeb); \
-  initWebServer(port);
-
-#define WIFI_INPUT() \
-  static CtrlWifiStatus ctrlWifi(EEMC_WIFI_STATUS_CHANGE); \
-  cp.addControl(&ctrlWifi);
-  
-#endif
 
 #endif //__MACRO_H  
