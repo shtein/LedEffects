@@ -38,6 +38,14 @@
   #define _GET_EFFECT_NAME(ed, ename)
 #endif
 
+#ifdef ESPHOME_CTRL
+  #define _GET_EFFECT_INSTANCE(ed, EffectClass) 
+#else
+  #define _GET_EFFECT_INSTANCE(ed, EffectClass) \
+    static EffectClass e; \
+    ed.effect = &e;  
+#endif
+
 #define _EFFECT_FLAGS_NONE(flags, ...)
 #define _EFFECT_FLAGS_DEFINED(flags, ...) flags = ARG_NUM_1(__VA_ARGS__)
 
@@ -45,8 +53,7 @@
 
 #define GET_EFFECT(ed, EffectClass, ename, ...) \
   { \
-    static EffectClass e; \
-    ed.effect     = &e; \
+    _GET_EFFECT_INSTANCE(ed, EffectClass); \
     _GET_EFFECT_FLAGS(ed.flags, ##__VA_ARGS__); \
     _GET_EFFECT_NAME(ed, ename); \
   }
@@ -102,6 +109,7 @@
   DEFINE_STR_PROGMEM(rs_Effect_Matrix_Circles,       "Matrix circles")
   DEFINE_STR_PROGMEM(rs_Effect_SoundVUM,             "Sound VUM")
   DEFINE_STR_PROGMEM(rs_Effect_SoundMatrixRGB,       "Sound matrix RGB")
+  DEFINE_STR_PROGMEM(rs_Effect_MatrixPlasma,         "Matrix plasma")
  #endif //NTF_ENABLED 
 
 
@@ -256,6 +264,7 @@ bool getEffect(uint8_t effectId, EFFECT_DESCRIPTION &ed){
       GET_EFFECT(ed, EffectMatrixBounsingDots, rs_Effect_Matrix_Bouncing_Dots);
     break;
 #endif //NO_EFFECT_MATRIX_BOUNCING_DOTS
+
 
 #ifndef NO_EFFECT_MATRIX_CIRCLES
     case el_Matrix_Circles:

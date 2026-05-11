@@ -44,7 +44,7 @@ class EffectNoise: public EffectPaletteTransform{
       EffectPaletteTransform::proceed(leds, numLeds);
 
       //Prepare for the next move
-      NOISE_DIST += beatsin8(10, 1, 4);  
+      NOISE_DIST += beatsin8(10, 2, 4);  
 
 #ifdef USE_MATRIX
       XYDraw xy(leds, numLeds);
