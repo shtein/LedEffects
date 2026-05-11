@@ -68,9 +68,7 @@ enum SoundVUMType{
 //Timeout to save config
 #define SAVE_CONFIG_TIMEOUT 30000
 
-#ifdef NTF_BINARY_ENABLED
 #include <CtrlSerial.h>
-#endif 
 
 #ifdef NTF_ENABLED
 #include <Notification.h>
@@ -101,7 +99,7 @@ DECLARE_STR_PROGMEM(rs_SndStdDev)
 DECLARE_STR_PROGMEM(rs_SoundVIM)
 #endif  
 
-extern NtfSet ntf;
+
 
 #endif //NTF_ENABLED
 
