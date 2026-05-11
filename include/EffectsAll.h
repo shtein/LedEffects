@@ -37,7 +37,9 @@ enum EffectList{
 struct EFFECT_DESCRIPTION{ 
   uint8_t   effectId;
   uint8_t   flags;
+#ifndef ESPHOME_CTRL  
   Effect   *effect;        //Pointer to an effect  
+#endif  
 #ifdef NTF_ENABLED  
   const char *effectName;  //Name of the effect, this is PROGMEM
 #endif  
