@@ -109,7 +109,6 @@
   DEFINE_STR_PROGMEM(rs_Effect_Matrix_Circles,       "Matrix circles")
   DEFINE_STR_PROGMEM(rs_Effect_SoundVUM,             "Sound VUM")
   DEFINE_STR_PROGMEM(rs_Effect_SoundMatrixRGB,       "Sound matrix RGB")
-  DEFINE_STR_PROGMEM(rs_Effect_MatrixPlasma,         "Matrix plasma")
  #endif //NTF_ENABLED 
 
 

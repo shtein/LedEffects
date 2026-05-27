@@ -397,7 +397,7 @@ bool EffectEngine::onCmdEE(const struct CtrlQueueItem &itm){
         cfg.speedDelay = _curEffect->getSpeedDelay();
       }
 
-      NTF_RESP(itm.cmd, EEResp_Effect, _cfgMode.effectNum, cfg);    
+      NTF_RESP(itm.cmd, EEResp_Effect, _cfgMode.effectNum, cfg);       
     }     
     break;
 

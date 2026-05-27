@@ -247,14 +247,12 @@ public:
 
     XYDraw xy(leds, numLeds, XY_DRAW_ADD_COLORS);
 
-    //Boundaries
-    int16_t xmin = 0;
-    int16_t xmax = I2FP(xy.width() - 1);
-    int16_t ymin = 0;
-    int16_t ymax = I2FP(xy.height() - 1);
 
+    //Object collision
+
+    //Distance for collision
     int16_t dist = I2FP(1);
-
+    
     for(size_t i = 0; i < MATRIX_BOUNCING_DOTS_MAX_OBJECTS; i++){
       Obj16_t &obj = _dots[i].obj;
 
@@ -266,57 +264,51 @@ public:
           bounce2d<int16_t>(obj, _dots[i].mass, obj2, _dots[j].mass);          
         }       
       }
-        
-      //Check for bounce with boundaries
-
-      //Border touch point
-      //Pnt8_t tp = Pnt8_t(FP2I(obj.pos.x), FP2I(obj.pos.y));
+    }
       
+        
+    //Boundaries
+    int16_t xmin = 0;
+    int16_t xmax = I2FP(xy.width() - 1);
+    int16_t ymin = 0;
+    int16_t ymax = I2FP(xy.height() - 1);
+  
+
+    for(size_t i = 0; i < MATRIX_BOUNCING_DOTS_MAX_OBJECTS; i++){
+      Obj16_t &obj = _dots[i].obj;
+
+      //Move with gravity
+      moveGravity(obj, 1);
+ 
+
+      //Check for bounce with boundaries
       if(obj.movesAwayLeft(xmin)){
-        obj.vel.x = -obj.vel.x;
-        //tp.x = 0;
+        //obj.pos.x = MIRROR(obj.pos.x, xmin);
+        obj.vel.x = -obj.vel.x;        
       }
 
       if(obj.movesAwayRight(xmax)){
+        //obj.pos.x = MIRROR(obj.pos.x, xmax);
         obj.vel.x = -obj.vel.x;
-        //tp.x = xy.width() - 1;
       }
 
       if(obj.movesAwayUp(ymin)){
+        //obj.pos.y = MIRROR(obj.pos.y, ymin);
         obj.vel.y = -obj.vel.y;    
-        //tp.y = 0;
       }
 
       if(obj.movesAwayDown(ymax)){
-        obj.vel.y = -obj.vel.y;      
-        //tp.y = xy.height() - 1;
+        //obj.pos.y = MIRROR(obj.pos.y, ymax);
+        obj.vel.y = -obj.vel.y;          
       }          
-
-      moveGravity(obj, 1);
-
-
+      
       //Draw dot
       int8_t x = FP2I(obj.pos.x);
       int8_t y = FP2I(obj.pos.y);
       
       CRGB clr = ColorFromPalette(_ctx.palCurrent, _dots[i].colorIndex, 255, LINEARBLEND);
       xy.pixel(x, y, clr);
-/*
-      //Draw border collision points
-      if(tp.x == 0 || tp.x == xy.width() - 1 || tp.y == 0 || tp.y == xy.height() - 1){
-        Rect2Line8_t rl(xy.width() - 1, xy.height() - 1);
-        int16_t t = rl.toLine(tp);
-        for(int i = -2; i <= 2; i++){
-
-          if(i == 0) continue;
-
-          Pnt8_t p = rl.toRect(t + i);
-          xy.pixel(p.x, p.y, clr);
-        }
-      }
-*/      
     }
-
   
   };
 
