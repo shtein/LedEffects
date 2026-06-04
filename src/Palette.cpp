@@ -428,12 +428,6 @@ BEGIN_TRANSFORM_SCHEMA_GRADIENT_PALETTE(getPal_Halloween)
   TRANSOFRM_PALETTE(pumpkin_glow_gp)
 END_TRANSFORM_SCHEMA()
 
-///////////////////
-//Halloween 
-BEGIN_TRANSFORM_SCHEMA_GRADIENT_PALETTE(getPal_HalloweenScene)
-  TRANSOFRM_PALETTE(purple_mist_gp)  
-END_TRANSFORM_SCHEMA()
-
 
 ///////////////////
 //Patriot - US 4th of July
@@ -581,7 +575,7 @@ bool getPalTransform(uint8_t transformId, TRANSFORM_DESCRIPTION &td){
     break;
 #endif
 
-#ifndef NO_PALLETET_PORTUGAL_FLAG
+#ifndef NO_PALLETE_PORTUGAL_FLAG
     case tl_PortugalFlag:
       GET_PAL_TRANSFORM(td, getPal_PortugalFlag, PSTR("Portugal Flag"));
     break;

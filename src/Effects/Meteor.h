@@ -29,10 +29,10 @@ public:
   uint8_t getHue() const;
 
 protected:
-  uint16_t _pos:10;  //current position
-  uint16_t _vel:3;   //meteor velocity
-  uint16_t _size:3;  //meteor size
-  uint8_t  _hue;     //meteor color
+  uint16_t _pos;  //current position
+  uint8_t  _vel;  //meteor velocity
+  uint8_t _size;  //meteor size
+  uint8_t  _hue;  //meteor color
 };
 
 inline Meteor::Meteor(){

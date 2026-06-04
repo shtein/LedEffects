@@ -65,14 +65,16 @@ class Effect{
     ///////////////////
     //Structure to support real-time processing elements to save some memory
     struct EFFECT_CONTEXT {       
-      int            step;        //current step
+      int16_t        step;        //current step
 
       CRGBPalette16  palCurrent;  //palette 1
-      CRGBPalette16  palTarget;   //palette 2      
-      
-      //Reusable data items                      
-      CRGB  rgb;  
-      union {                      
+      CRGBPalette16  palTarget;   //palette 2     
+
+      CRGB  rgb;                  //current color, could be used for simple effects to save memory for local variables
+
+
+      //Reusable data items                            
+      union {                              
         uint8_t  byte;
         int8_t   ch;
         uint16_t word;

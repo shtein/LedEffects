@@ -25,7 +25,6 @@ BEGIN_EFFECTS(EFF_RANDOM_START_EFFECT)
     ADD_EFFECT(el_Noise, tl_Halloween)
     ADD_EFFECT(el_TwinkleFox, tl_Halloween) 
   END_MODE()
-
   
   BEGIN_MODE("Chrms")      
     ADD_EFFECT(el_Confetti, tl_Christmas )
@@ -43,10 +42,9 @@ END_EFFECTS()
   
 
 BEGIN_EFFECT_ENGINE()     
-  //Leds
+  //267 LEDs. Two strips are connected via splitter/amplifier.
   BEGIN_LEDS()
-    ADD_STRIP(NEOPIXEL, LED_PIN)
-    ADD_STRIP(NEOPIXEL, LED_PIN2)
+    ADD_STRIP(NEOPIXEL, LED_PIN)    
   END_LEDS()
 
   //Control    

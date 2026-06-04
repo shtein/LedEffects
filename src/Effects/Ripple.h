@@ -18,8 +18,8 @@ public:
   uint8_t  getColorIndex() const;
 
 protected:
-  uint16_t _center:10;    //Drop center
-  uint16_t _offset:6;     //Drop current offset
+  uint16_t _center;    //Drop center
+  uint8_t  _offset;     //Drop current offset
   uint8_t  _colorIndex;   //Color index, could be hue or an index in a palette
 };
 
