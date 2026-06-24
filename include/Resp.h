@@ -7,6 +7,15 @@
 struct __attribute__((packed)) EEResp_Version{  
 };
 
+struct __attribute__((packed)) EEResp_Status{  
+  uint8_t status;
+};
+
+struct __attribute__((packed)) EEResp_Brightness{  
+  uint8_t brightness;
+};
+
+
 struct __attribute__((packed)) EEResp_NumLeds{  
   uint16_t maxLeds;
   uint16_t numLeds;
@@ -37,7 +46,7 @@ struct __attribute__((packed)) EEResp_EffectTransform{
 };
 
 struct __attribute__((packed)) EEResp_EffectColor{
-  uint8_t hsv[3];
+  uint8_t rgb[3];
 };
 
 struct __attribute__((packed)) EEResp_EffectSpeed{  

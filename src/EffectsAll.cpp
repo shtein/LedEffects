@@ -132,7 +132,7 @@ bool getEffect(uint8_t effectId, EFFECT_DESCRIPTION &ed){
 
 #ifndef NO_EFFECT_STATIC_COLOR    
     case el_StaticColor:
-      GET_EFFECT(ed, EffectStatic, rs_Effect_StaticColor, ECF_HSV);
+      GET_EFFECT(ed, EffectStatic, rs_Effect_StaticColor, ECF_RGB);
     break;
 #endif //NO_EFFECT_STATIC_COLOR
 

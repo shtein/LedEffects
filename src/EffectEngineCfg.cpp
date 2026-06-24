@@ -9,16 +9,16 @@
 
 //  Engine Config  |   Spare  |        Offsets       |      Mode Config     |    Effects Configs   |      Mode Config     |    Effects Configs   |
 // ----------------|---------------------------------|----------------------|----------------------|----------------------|----------------------|
-//     7 bytes     |  4 bytes |  MAX_MODES * 1 bytes |        20 bytes      |  effects * 12 bytes  |         ...          |         ...          |
+//     8 bytes     |  3 bytes |  MAX_MODES * 1 bytes |        20 bytes      |  effects * 12 bytes  |         ...          |         ...          |
 // ----------------------------------------------------------------------------------------------------------------------------------------------|
 
 // Engine config structure
 
-//  version - 2 bytes  |              engine - 5 bytes                     |
-// -------------------------------------------------------------|----------|
-// | verhigh | verlow  |  flags  | modes   |  mode   |        numLeds      |
-// |  8 bit  | 8 bit   |  8 bit  |  8 bit  | 8 bit   |        16 bit       |
-// ------------------------------------------------------------------------|
+//  version - 2 bytes  |              engine - 6 bytes                                |
+// -------------------------------------------------------------|---------------------|
+// | verhigh | verlow  |  flags  | modes   |  mode   |        numLeds      |brightness|
+// |  8 bit  | 8 bit   |  8 bit  |  8 bit  | 8 bit   |        16 bit       |  8 bit   |
+// -----------------------------------------------------------------------------------|
 
 
 
@@ -42,7 +42,7 @@
 
 //Sizes
 #define EFFECT_ENGINE_SIZE           sizeof(EFFECT_ENGINE_CONFIG)
-#define EFFECT_ENGINE_SPARE_SIZE     4 //4 spare bytes
+#define EFFECT_ENGINE_SPARE_SIZE     3 //3 spare bytes
 #define INDEX_SIZE                   MODES_MAX
 #define EFFECT_MODE_SIZE             sizeof(EFFECT_MODE_CONFIG)
 #define EFFECT_SIZE                  sizeof(EFFECT_CONFIG)
@@ -107,10 +107,11 @@ bool prepareEngineConfig(uint8_t flags){
   ee << (uint8_t)EFFECT_ENGINE_VERSION_HIGH << (uint8_t)EFFECT_ENGINE_VERSION_LOW;
 
   EFFECT_ENGINE_CONFIG cfgEng;
-  cfgEng.flags    = flags;
-  cfgEng.numLeds  = 0;
-  cfgEng.numModes = 0;
-  cfgEng.modeNum  = 0;
+  cfgEng.flags      = flags;
+  cfgEng.numLeds    = 0;
+  cfgEng.numModes   = 0;
+  cfgEng.modeNum    = 0;
+  cfgEng.brightness = BRIGHTNESS;
 
   setEngineConfigInt(ee, cfgEng);
 
@@ -135,9 +136,10 @@ bool setEngineConfig(const EFFECT_ENGINE_CONFIG &cfg){
   }
 
   //Convert data
-  cfgInt.flags   = cfg.flags;
-  cfgInt.modeNum = cfg.modeNum;
-  cfgInt.numLeds = cfg.numLeds;
+  cfgInt.flags      = cfg.flags;
+  cfgInt.modeNum    = cfg.modeNum;
+  cfgInt.numLeds    = cfg.numLeds;
+  cfgInt.brightness = cfg.brightness;
 
   return setEngineConfigInt(ee, cfgInt);
 }

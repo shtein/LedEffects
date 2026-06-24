@@ -59,11 +59,9 @@ END_EFFECTS()
 
 //Effect Engine
 BEGIN_EFFECT_ENGINE()
-  //Leds
+  //Three strips are connected via splitter/amplifier.
   BEGIN_LEDS()
     ADD_STRIP(WS2811, LED_PIN2)
-    ADD_STRIP(WS2811, LED_PIN3)    
-    ADD_STRIP(WS2811, LED_PIN4)
   END_LEDS()
 
 //Control    

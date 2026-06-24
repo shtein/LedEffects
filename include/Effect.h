@@ -48,7 +48,6 @@ class Effect{
     //Sound
     void getSoundBands(sc_band_t &bands, bool scale);
     void getSound();
-    bool onCmdSound(const struct CtrlQueueItem &itm);
 
     uint16_t beatCheckBass(uint16_t delta, uint8_t sensForBanAg = BASS_PEAK_SENS_BUS, uint8_t sensForAvg = BASS_PEAK_SENS_AVG) const;
     void beatResetBass() { _ctxSound.bassTicks = 0; }

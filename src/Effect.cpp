@@ -9,46 +9,13 @@
 #include "Macro.h"
 #include "Resp.h"
 
-#ifdef USE_SOUND  
-#include <SoundCapture.h>
-
-#ifdef NTF_ENABLED
-
-//Getting/setting effect speed
-struct EEResp_EffectSound{  
-  uint8_t flags;
-  uint8_t lower;
-  uint8_t upper;
-  const RunningStats &min;
-  const RunningStats &max;
-  const RunningStats &average;
-};
-
-void putNtfObject(NtfBase &resp, const RunningStats &data){
-  resp.put_F(rs_SndAverage, data.getAverage());
-  resp.put_F(rs_SndStdDev, data.getStdDev());
-} 
-
-void putNtfObject(NtfBase &resp, const EEResp_EffectSound &data){
-  resp.put_F(rs_Flags, data.flags);
-  resp.put_F(rs_SndLower, data.lower);
-  resp.put_F(rs_SndUpper, data.upper);
-  
-  resp.put_F(rs_SndMin, data.min);
-  resp.put_F(rs_SndMax, data.max);
-  resp.put_F(rs_SndAverage, data.average);
-}
-#endif //NTF_ENABLED
-
-#endif //USE_SOUND
-
 
 #ifdef NTF_ENABLED
 
  void putNtfObject(NtfBase &resp, const EEResp_EffectColor &data){
-  resp.put_F(rs_Hue, data.hsv[0]);
-  resp.put_F(rs_Sat, data.hsv[1]);
-  resp.put_F(rs_Val, data.hsv[2]);
+  resp.put_F(rs_Red, data.rgb[0]);
+  resp.put_F(rs_Green, data.rgb[1]);
+  resp.put_F(rs_Blue, data.rgb[2]);
 }
 
 //Getting/setting pallete transform rutine
@@ -105,12 +72,6 @@ bool Effect::onCmd(const struct CtrlQueueItem &itm){
     break;
 
     default:
-    #if defined (USE_SOUND) && !defined(NO_SOUND_COMMANDS)      
-        //Sound command
-      if(_cfg.flags & ECF_SOUND){
-        return onCmdSound(itm);
-      }    
-    #endif //USE_SOUND
     return false;
   } 
 
@@ -170,46 +131,6 @@ void Effect::getSound(){
   _ctxSound.trebleTicks++;  
 }
 
-bool Effect::onCmdSound(const struct CtrlQueueItem &itm){  
-  
-  switch(itm.cmd){    
-    case EEMC_SOUND_LOW:
-      _ctxSound.lower = itm.data.translate(_ctxSound.lower, SOUND_LOWER_MIN, SOUND_UPPER_MAX);
-    break;
-
-    case EEMC_SOUND_HIGH:
-      _ctxSound.upper = itm.data.translate(_ctxSound.upper, SOUND_LOWER_MIN, SOUND_UPPER_MAX);
-    break;
-    
-    case EEMC_SOUND_LOG:
-      _ctxSound.flags = itm.data.value == 0 ? _ctxSound.flags & ~SC_MAP_LOG : _ctxSound.flags | SC_MAP_LOG; 
-    break;
-
-    case EEMC_SOUND_USE_MAX:
-      _ctxSound.flags = itm.data.value == 0 ? _ctxSound.flags & ~SC_MAP_USE_MAX : _ctxSound.flags | SC_MAP_USE_MAX; 
-    break;
-
-    case EEMC_SOUND_USE_MIN:
-      _ctxSound.flags = itm.data.value == 0 ? _ctxSound.flags & ~SC_MAP_USE_MIN : _ctxSound.flags | SC_MAP_USE_MIN; 
-    break;
-
-    case EEMC_SOUND_NOISE:
-      _ctxSound.flags = itm.data.value == 0 ? _ctxSound.flags & ~SC_MAP_ABOVE_NOISE : _ctxSound.flags | SC_MAP_ABOVE_NOISE;
-    break;
-
-    case EEMC_GET_SOUND:
-    break;
-
-    default:
-    return false;
-  }
-
-  //NTF_RESP(itm.cmd, EEResp_EffectSound, {_ctxSound.flags, _ctxSound.lower, _ctxSound.upper, _statsSound.get(SoundStatGet::ssgMin),_statsSound.get(SoundStatGet::ssgMax), _statsSound.get(SoundStatGet::ssgAverage))
-
-
-  return true;
-}
-
 uint16_t Effect::beatCheckBass(uint16_t delta, uint8_t sensForBanAg, uint8_t sensForAvg) const {
   uint16_t n =  (uint16_t)_ctxSound.bassTicks * (uint16_t)getSpeedDelay();
   if( n >= delta && _sc->isBassPeak(sensForBanAg, sensForAvg))
@@ -242,13 +163,14 @@ uint16_t Effect::beatCheckTreble(uint16_t delta, uint8_t sensForBanAg, uint8_t s
 bool EffectColor::onCmd(const struct CtrlQueueItem &itm){  
 //Process command  
   switch(itm.cmd){
-    case EEMC_COLOR_HUE: 
-    case EEMC_COLOR_SAT: 
-    case EEMC_COLOR_VAL:
-      //Update corresponding color value
-      _cfg.bytes[itm.cmd - EEMC_COLOR_HUE] = (uint8_t)itm.data.translate( (int)_cfg.bytes[itm.cmd - EEMC_COLOR_HUE], 0, 255);
+    case EEMC_COLOR: {
+      CRGB *rgb = (CRGB *)itm.data.str;
+      _cfg.bytes[0] = rgb->r;
+      _cfg.bytes[1] = rgb->g;
+      _cfg.bytes[2] = rgb->b; 
+    }
     //Notfification
-    case EEMC_GET_COLOR_HSV:
+    case EEMC_GET_COLOR:
       NTF_RESP(itm.cmd, EEResp_EffectColor, _cfg.bytes[0], _cfg.bytes[1], _cfg.bytes[2]);
     break;
 

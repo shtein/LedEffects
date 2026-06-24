@@ -2,6 +2,7 @@
 #define __MACRO_H
 
 #include <alutils.h>
+#include <CtrlSerial.h>
 
 ///////////////////////////////////////
 //Macros for temp variable names

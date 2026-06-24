@@ -19,6 +19,8 @@ DEFINE_STR_PROGMEM(rs_VerCfg,       "verCfg")
 DEFINE_STR_PROGMEM(rs_VerEng,       "verEng")
 DEFINE_STR_PROGMEM(rs_NumLeds,      "numLeds")
 DEFINE_STR_PROGMEM(rs_MaxLeds,      "maxLeds")
+DEFINE_STR_PROGMEM(rs_Status,       "status")
+DEFINE_STR_PROGMEM(rs_Brightness,   "brightness")
 DEFINE_STR_PROGMEM(rs_Index,        "idx")
 DEFINE_STR_PROGMEM(rs_ModeCount,    "modeCnt")
 DEFINE_STR_PROGMEM(rs_Modes,        "modes")
@@ -29,27 +31,16 @@ DEFINE_STR_PROGMEM(rs_Effects,      "effects")
 DEFINE_STR_PROGMEM(rs_Effect,       "effect")
 DEFINE_STR_PROGMEM(rs_Id,           "id")
 DEFINE_STR_PROGMEM(rs_Speed,        "speed")
-DEFINE_STR_PROGMEM(rs_Hue,          "hue")
-DEFINE_STR_PROGMEM(rs_Sat,          "sat")
-DEFINE_STR_PROGMEM(rs_Val,          "val")
-DEFINE_STR_PROGMEM(rs_HSV,          "hsv")
+DEFINE_STR_PROGMEM(rs_Red,          "red")
+DEFINE_STR_PROGMEM(rs_Green,        "green")
+DEFINE_STR_PROGMEM(rs_Blue,         "blue")
+DEFINE_STR_PROGMEM(rs_RGB,          "rgb")
 DEFINE_STR_PROGMEM(rs_Transforms,   "transforms")
 DEFINE_STR_PROGMEM(rs_Transform,    "transform")
 DEFINE_STR_PROGMEM(rs_Flags,        "flags")
 DEFINE_STR_PROGMEM(rs_Dsc,          "dsc")
 DEFINE_STR_PROGMEM(rs_Cfg,          "cfg")
 DEFINE_STR_PROGMEM(rs_Kaleidoscope, "kldsc")
-#ifdef USE_SOUND
-DEFINE_STR_PROGMEM(rs_Sound,        "sound")
-DEFINE_STR_PROGMEM(rs_SndLower,     "lower")
-DEFINE_STR_PROGMEM(rs_SndUpper,     "upper")
-DEFINE_STR_PROGMEM(rs_SndMin,       "min")  
-DEFINE_STR_PROGMEM(rs_SndMax,       "max")  
-DEFINE_STR_PROGMEM(rs_SndAverage,   "avg")  
-DEFINE_STR_PROGMEM(rs_SndStdDev,    "stddev")
-DEFINE_STR_PROGMEM(rs_SoundVIM,     "vim")
-#endif
-
 
 ////////////////////////////////////////////
 //Notifictaions serialization
@@ -77,9 +68,9 @@ void putNtfObject(NtfBase &resp, const EFFECT_DATA &data){
 
   resp.put_F(rs_Flags, data.flags);
   
-  if(data.flags & ECF_HSV) {
+  if(data.flags & ECF_RGB) {
     EEResp_EffectColor clr = {data.bytes[0], data.bytes[1], data.bytes[2]}; 
-    resp.put_F(rs_HSV, clr);
+    resp.put_F(rs_RGB, clr);
   }
   
   if(data.flags & ECF_RGB){    
@@ -107,7 +98,6 @@ void putNtfObject(NtfBase &resp, const EFFECT_DATA &data){
   }
   
 #endif
-
 } 
 
 void putNtfObject(NtfBase &resp, const EFFECT_CONFIG &data){  
@@ -207,7 +197,15 @@ void putNtfObject(NtfBase &resp, const EEResp_Version &data){
   resp.put_F(rs_VerEng, verStr);
 }
 
-#endif
+void putNtfObject(NtfBase &resp, const EEResp_Status &data){
+  resp.put_F(rs_Status, data.status);
+}
+
+void putNtfObject(NtfBase &resp, const EEResp_Brightness &data){
+  resp.put_F(rs_Brightness, data.brightness);
+}
+
+#endif //NTF_ENABLED
 
 
 ////////////////////////////////////////////
@@ -238,11 +236,7 @@ void EffectEngine::init() {
  
   //Don't uncomment it if you don;t know what it is 
   //FastLED.setMaxPowerInVoltsAndMilliamps(5,1000);
-  #ifdef BRIGHTNESS
-    FastLED.setBrightness(BRIGHTNESS);
-  #endif
-
-
+  
 
   fill_solid(_leds, MAX_LEDS, CRGB::Black);
 
@@ -257,6 +251,9 @@ void EffectEngine::init() {
   if(_cfgEngine.flags & EFF_RANDOM_START_MODE){
     _cfgEngine.modeNum  = random8(_cfgEngine.numModes); //random mode
   }
+
+ //Set brightness
+  FastLED.setBrightness(_cfgEngine.brightness);
 
   //Read mode config
   getModeConfig(_cfgEngine.modeNum, _cfgMode);
@@ -340,7 +337,7 @@ void EffectEngine::onModeChange(const struct CtrlQueueData &data){
     setMode(mode);  
   }
 
-  DBG_OUTLN("Mode changed %d", mode );
+  //DBG_OUTLN("Mode changed %d", mode );
 }
 
 
@@ -354,7 +351,7 @@ void EffectEngine::onEffectChange(const struct CtrlQueueData &data){
   //Change effect
   setEffect(effectNum);
 
-  DBG_OUTLN("Effect changfed %d", effectNum );
+  //DBG_OUTLN("Effect changfed %d", effectNum );
 }
 
 void EffectEngine::onNumLedsChange(const struct CtrlQueueData &data){
@@ -378,6 +375,25 @@ bool EffectEngine::onCmdEE(const struct CtrlQueueItem &itm){
   
   //Process command
   switch(itm.cmd){
+
+    case EEMC_STATUS:
+      _cfgEngine.flags = (itm.data.value != 0) ? (_cfgEngine.flags & ~EFF_ENGINE_OFF) : (_cfgEngine.flags | EFF_ENGINE_OFF);
+      if(_cfgEngine.flags & EFF_ENGINE_OFF){
+        fill_solid(_leds, MAX_LEDS, CRGB::Black);
+      }
+    case EEMC_GET_STATUS: {      
+      NTF_RESP(itm.cmd, EEResp_Status, (_cfgEngine.flags & EFF_ENGINE_OFF) ? false : true);
+    }
+    break;
+
+    case EEMC_BRIGHTNESS:
+      _cfgEngine.brightness = (uint8_t)itm.data.value;
+      FastLED.setBrightness(_cfgEngine.brightness);
+    case EEMC_GET_BRIGHTNESS: {
+      NTF_RESP(itm.cmd, EEResp_Brightness, _cfgEngine.brightness);
+    }
+    break;  
+
     case EEMC_MODE:            
       onModeChange(itm.data);
     //All get commands to process with NTF
@@ -475,8 +491,8 @@ void EffectEngine::loop(const struct CtrlQueueItem &itm){
     preSaveConfig(); 
   }
 
-  //Current effect
-  if(_curEffect != NULL){
+  //Current effect and engine is not off
+  if(_curEffect != NULL && (_cfgEngine.flags & EFF_ENGINE_OFF) == 0){
 
     //Is it time to process ?
      if(DELTA_MILLS(_millis) >= _curEffect->getSpeedDelay()){
@@ -552,34 +568,9 @@ DEFINE_STR_PROGMEM(rs_CmdParam_Sat,           "sat|s")
 DEFINE_STR_PROGMEM(rs_CmdParam_Val,           "sat|v")
 DEFINE_STR_PROGMEM(rs_CmdParam_Trans,         "transpal|t")
 DEFINE_STR_PROGMEM(rs_CmdParam_Leds,          "leds|l")
+DEFINE_STR_PROGMEM(rs_CmdParam_Status,        "status|st")
+DEFINE_STR_PROGMEM(rs_CmdParam_Brightness,    "brightness|br")
 
-#if defined (USE_SOUND) && !defined(NO_SOUND_COMMANDS)
-DEFINE_STR_PROGMEM(rs_CmdParam_Snd,           "snd")
-DEFINE_STR_PROGMEM(rs_CmdParam_UseLog,        "ulog")
-DEFINE_STR_PROGMEM(rs_CmdParam_UseMax,        "umax")
-DEFINE_STR_PROGMEM(rs_CmdParam_UseMin,        "umin")
-DEFINE_STR_PROGMEM(rs_CmdParam_UseNoise,      "unoise")
-DEFINE_STR_PROGMEM(rs_CmdParam_Lower,         "lwr")
-DEFINE_STR_PROGMEM(rs_CmdParam_Upper,         "upr")
-
-BEGIN_PARSE_ROUTINE(parseSoundCommandInput)
-  BEGIN_GROUP_TOKEN(rs_CmdParam_Snd) 
-    VALUE_IS_TOKEN(rs_CmdParam_Get, EEMC_GET_SOUND)  
-    BEGIN_GROUP_TOKEN(rs_CmdParam_Set)
-      VALUE_IS_PAIR(rs_CmdParam_UseLog, EEMC_SOUND_LOG, CTF_VAL_ABS)
-      VALUE_IS_PAIR(rs_CmdParam_UseMin, EEMC_SOUND_USE_MIN, CTF_VAL_ABS)
-      VALUE_IS_PAIR(rs_CmdParam_UseMax, EEMC_SOUND_USE_MAX, CTF_VAL_ABS)
-      VALUE_IS_PAIR(rs_CmdParam_UseNoise, EEMC_SOUND_NOISE, CTF_VAL_ABS)
-      VALUE_IS_PAIR(rs_CmdParam_Lower, EEMC_SOUND_LOW, CTF_VAL_ABS)
-      VALUE_IS_PAIR(rs_CmdParam_Upper, EEMC_SOUND_HIGH, CTF_VAL_ABS)
-    END_GROUP_TOKEN()               
-  END_GROUP_TOKEN()
-END_PARSE_ROUTINE()
-
-#define SOUND_COMMANDS() PARSE_SUB_ROUTINE(parseSoundCommandInput) 
-#else 
-#define SOUND_COMMANDS()
-#endif
 
 
 BEGIN_PARSE_ROUTINE(parseCommandInput)  
@@ -587,7 +578,7 @@ BEGIN_PARSE_ROUTINE(parseCommandInput)
   VALUE_IS_TOKEN(rs_CmdParam_EffectList, EEMC_GET_EFFECT_LIST)        //All effects
   VALUE_IS_TOKEN(rs_CmdParam_TransformList, EEMC_GET_TRANSFORM_LIST)  //All transform palettes
   VALUE_IS_TOKEN(rs_CmdParam_ModeList, EEMC_GET_MODE_LIST)            //All modes
-  
+
   BEGIN_GROUP_TOKEN(rs_CmdParam_Mode) //mode 
     VALUE_IS_TOKEN(rs_CmdParam_Get, EEMC_GET_MODE)
     BEGIN_GROUP_TOKEN(rs_CmdParam_Set) //sets     
@@ -607,24 +598,18 @@ BEGIN_PARSE_ROUTINE(parseCommandInput)
     
     BEGIN_GROUP_TOKEN(rs_CmdParam_Speed) //current speed
       VALUE_IS_TOKEN(rs_CmdParam_Get, EEMC_GET_SPEED)
-      VALUE_IS_PAIR(rs_CmdParam_Set, EEMC_SPEED, CTF_VAL_ABS)      
+      VALUE_IS_PAIR(rs_CmdParam_Set, EEMC_SPEED, CTF_VAL_ABS)   
     END_GROUP_TOKEN()    
     
-    BEGIN_GROUP_TOKEN(rs_CmdParam_Color) //set hsv 
-      VALUE_IS_TOKEN(rs_CmdParam_Get, EEMC_GET_COLOR_HSV)
-      BEGIN_GROUP_TOKEN(rs_CmdParam_Set) //set hsv    
-        VALUE_IS_PAIR(rs_CmdParam_Hue, EEMC_COLOR_HUE, CTF_VAL_ABS)  //hue
-        VALUE_IS_PAIR(rs_CmdParam_Sat, EEMC_COLOR_SAT, CTF_VAL_ABS)  //saturation
-        VALUE_IS_PAIR(rs_CmdParam_Val, EEMC_COLOR_VAL, CTF_VAL_ABS)  //value
-      END_GROUP_TOKEN()
+    BEGIN_GROUP_TOKEN(rs_CmdParam_Color) //Color
+      VALUE_IS_TOKEN(rs_CmdParam_Get, EEMC_GET_COLOR)            
+      VALUE_IS_BYTES(rs_CmdParam_Set, EEMC_COLOR, 3) //RGB color            
     END_GROUP_TOKEN()  
 
     BEGIN_GROUP_TOKEN(rs_CmdParam_Trans) //set palette transform
       VALUE_IS_TOKEN(rs_CmdParam_Get, EEMC_GET_TRANSFORM)
       VALUE_IS_PAIR(rs_CmdParam_Set, EEMC_TRANSFORM, CTF_VAL_ABS)                  
     END_GROUP_TOKEN()
-
-    SOUND_COMMANDS()
     
   END_GROUP_TOKEN() //effect
 
@@ -633,5 +618,14 @@ BEGIN_PARSE_ROUTINE(parseCommandInput)
     VALUE_IS_PAIR(rs_CmdParam_Set, EEMC_NUMLEDS, CTF_VAL_ABS) //sets     
   END_GROUP_TOKEN() //leds
   
+  BEGIN_GROUP_TOKEN(rs_CmdParam_Status) //status
+    VALUE_IS_TOKEN(rs_CmdParam_Get, EEMC_GET_STATUS)
+    VALUE_IS_PAIR(rs_CmdParam_Set, EEMC_STATUS, CTF_VAL_ABS)
+  END_GROUP_TOKEN() //status
+
+  BEGIN_GROUP_TOKEN(rs_CmdParam_Brightness) //brightness
+    VALUE_IS_TOKEN(rs_CmdParam_Get, EEMC_GET_BRIGHTNESS)
+    VALUE_IS_PAIR(rs_CmdParam_Set, EEMC_BRIGHTNESS, CTF_VAL_ABS, 0, 255)
+  END_GROUP_TOKEN() //brightness
 
 END_PARSE_ROUTINE()

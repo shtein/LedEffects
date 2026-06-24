@@ -5,8 +5,9 @@
 #include "EffectEngineCfg.h"
 
 //Engine flags
-#define EFF_RANDOM_START_MODE     0x01
-#define EFF_RANDOM_START_EFFECT   0x02
+#define EFF_RANDOM_START_MODE     0x01 //Start with random mode
+#define EFF_RANDOM_START_EFFECT   0x02 //Start with random effect
+#define EFF_ENGINE_OFF            0x04 //Engine is off
 
 typedef CRGB EELEDS[MAX_LEDS];
 

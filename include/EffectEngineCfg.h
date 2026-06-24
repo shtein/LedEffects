@@ -32,6 +32,7 @@ struct __attribute__((packed)) EFFECT_ENGINE_CONFIG{
   uint8_t               numModes;     //Number of modes
   uint8_t               modeNum;      //Current mode
   uint16_t              numLeds;      //Number of leds
+  uint8_t               brightness;   //Brightness
 };
 
 
@@ -61,7 +62,6 @@ bool setModeConfig(uint8_t mode, const EFFECT_MODE_CONFIG &cfg);
 ///////////////////////
 // Effect Config Flags
 #define ECF_NONE          0x00
-#define ECF_HSV           0x01
 #define ECF_RGB           0x02
 #define ECF_TRANSFORM     0x04
 #define ECF_KALEYDOSCOPE  0x08
@@ -73,7 +73,7 @@ bool setModeConfig(uint8_t mode, const EFFECT_MODE_CONFIG &cfg);
 // Effect data
 
 #define EFFECT_PARAM_TRANSFORM(s) s.bytes[0]
-#define EFFECT_PARAM_HSV(s) (*(CHSV *)s.bytes)
+#define EFFECT_PARAM_RGB(s) (*(CRGB *)s.bytes)
 #define EFFECT_PARAM_SOUNDVUM(s) s.bytes[1]
 
 
@@ -89,9 +89,9 @@ struct __attribute__((packed)) EFFECT_DATA{
     flags = f;    
   }
 
-  EFFECT_DATA(uint8_t f, const CHSV &hsv) __attribute__((always_inline)){
-    flags = f | ECF_HSV;    
-    EFFECT_PARAM_HSV((*this)) = hsv;
+  EFFECT_DATA(uint8_t f, const CRGB &rgb) __attribute__((always_inline)){
+    flags = f | ECF_RGB;    
+    EFFECT_PARAM_RGB((*this)) = rgb;
   }
 
   inline EFFECT_DATA(uint8_t f, TransformPalList t) __attribute__((always_inline)){
