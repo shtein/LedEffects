@@ -19,7 +19,7 @@ DEFINE_STR_PROGMEM(rs_VerCfg,       "verCfg")
 DEFINE_STR_PROGMEM(rs_VerEng,       "verEng")
 DEFINE_STR_PROGMEM(rs_NumLeds,      "numLeds")
 DEFINE_STR_PROGMEM(rs_MaxLeds,      "maxLeds")
-DEFINE_STR_PROGMEM(rs_Status,       "status")
+DEFINE_STR_PROGMEM(rs_State,        "state")
 DEFINE_STR_PROGMEM(rs_Brightness,   "brightness")
 DEFINE_STR_PROGMEM(rs_Index,        "idx")
 DEFINE_STR_PROGMEM(rs_ModeCount,    "modeCnt")
@@ -197,8 +197,8 @@ void putNtfObject(NtfBase &resp, const EEResp_Version &data){
   resp.put_F(rs_VerEng, verStr);
 }
 
-void putNtfObject(NtfBase &resp, const EEResp_Status &data){
-  resp.put_F(rs_Status, data.status);
+void putNtfObject(NtfBase &resp, const EEResp_State &data){
+  resp.put_F(rs_State, data.state);
 }
 
 void putNtfObject(NtfBase &resp, const EEResp_Brightness &data){
@@ -376,13 +376,13 @@ bool EffectEngine::onCmdEE(const struct CtrlQueueItem &itm){
   //Process command
   switch(itm.cmd){
 
-    case EEMC_STATUS:
+    case EEMC_STATE:
       _cfgEngine.flags = (itm.data.value != 0) ? (_cfgEngine.flags & ~EFF_ENGINE_OFF) : (_cfgEngine.flags | EFF_ENGINE_OFF);
       if(_cfgEngine.flags & EFF_ENGINE_OFF){
         fill_solid(_leds, MAX_LEDS, CRGB::Black);
       }
-    case EEMC_GET_STATUS: {      
-      NTF_RESP(itm.cmd, EEResp_Status, (_cfgEngine.flags & EFF_ENGINE_OFF) ? false : true);
+    case EEMC_GET_STATE: {      
+      NTF_RESP(itm.cmd, EEResp_State, (_cfgEngine.flags & EFF_ENGINE_OFF) ? false : true);
     }
     break;
 
@@ -568,7 +568,7 @@ DEFINE_STR_PROGMEM(rs_CmdParam_Sat,           "sat|s")
 DEFINE_STR_PROGMEM(rs_CmdParam_Val,           "sat|v")
 DEFINE_STR_PROGMEM(rs_CmdParam_Trans,         "transpal|t")
 DEFINE_STR_PROGMEM(rs_CmdParam_Leds,          "leds|l")
-DEFINE_STR_PROGMEM(rs_CmdParam_Status,        "status|st")
+DEFINE_STR_PROGMEM(rs_CmdParam_State,         "state|st")
 DEFINE_STR_PROGMEM(rs_CmdParam_Brightness,    "brightness|br")
 
 
@@ -618,9 +618,9 @@ BEGIN_PARSE_ROUTINE(parseCommandInput)
     VALUE_IS_PAIR(rs_CmdParam_Set, EEMC_NUMLEDS, CTF_VAL_ABS) //sets     
   END_GROUP_TOKEN() //leds
   
-  BEGIN_GROUP_TOKEN(rs_CmdParam_Status) //status
-    VALUE_IS_TOKEN(rs_CmdParam_Get, EEMC_GET_STATUS)
-    VALUE_IS_PAIR(rs_CmdParam_Set, EEMC_STATUS, CTF_VAL_ABS)
+  BEGIN_GROUP_TOKEN(rs_CmdParam_State) //state
+    VALUE_IS_TOKEN(rs_CmdParam_Get, EEMC_GET_STATE)
+    VALUE_IS_PAIR(rs_CmdParam_Set, EEMC_STATE, CTF_VAL_ABS)
   END_GROUP_TOKEN() //status
 
   BEGIN_GROUP_TOKEN(rs_CmdParam_Brightness) //brightness

@@ -21,13 +21,13 @@
 #define EEMC_GET_TRANSFORM_LIST  0x26   //Available pallete transforms
 #define EEMC_GET_VERSION         0x27   //Get version
 #define EEMC_GET_BRIGHTNESS      0x28   //Get brightness
-#define EEMC_GET_STATUS          0x29   //On/Off command
+#define EEMC_GET_STATE           0x29   //On/Off command
 
 #define EEMC_MODE        (EEMC_LED | EEMC_GET_MODE)       //Mode changed
 #define EEMC_EFFECT      (EEMC_LED | EEMC_GET_EFFECT)     //Effect changed
 #define EEMC_NUMLEDS     (EEMC_LED | EEMC_GET_NUMLEDS)    //Number of leds changed
 #define EEMC_BRIGHTNESS  (EEMC_LED | EEMC_GET_BRIGHTNESS) //Brightness changed
-#define EEMC_STATUS      (EEMC_LED | EEMC_GET_STATUS)     //On/Off changed
+#define EEMC_STATE       (EEMC_LED | EEMC_GET_STATE)     //On/Off changed
 
 //Effect commands
 #define EEMC_GET_CFG        0x01   //Get effect config
@@ -63,7 +63,7 @@ DECLARE_STR_PROGMEM(rs_Mode)
 DECLARE_STR_PROGMEM(rs_Effect)
 DECLARE_STR_PROGMEM(rs_NumLeds)
 DECLARE_STR_PROGMEM(rs_MaxLeds)
-DECLARE_STR_PROGMEM(rs_Status)
+DECLARE_STR_PROGMEM(rs_State)
 DECLARE_STR_PROGMEM(rs_Brightness)
 DECLARE_STR_PROGMEM(rs_Speed)
 DECLARE_STR_PROGMEM(rs_Red)

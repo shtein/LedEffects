@@ -7,8 +7,8 @@
 struct __attribute__((packed)) EEResp_Version{  
 };
 
-struct __attribute__((packed)) EEResp_Status{  
-  uint8_t status;
+struct __attribute__((packed)) EEResp_State{  
+  uint8_t state;
 };
 
 struct __attribute__((packed)) EEResp_Brightness{  
