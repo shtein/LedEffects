@@ -54,6 +54,7 @@
 //Effects   
 BEGIN_EFFECTS(EFF_RANDOM_START_EFFECT)
   BEGIN_MODE("Regular")            
+    ADD_EFFECT(el_StaticColor, CHSV(HUE_RED, 0xFF, 0xFF))
     ADD_EFFECT(el_Ripple)
     ADD_EFFECT(el_Plasma, tl_Plasma)        
     ADD_EFFECT(el_Confetti, tl_Confetti)
@@ -61,10 +62,8 @@ BEGIN_EFFECTS(EFF_RANDOM_START_EFFECT)
     ADD_EFFECT(el_MoodBlobs)
     ADD_EFFECT(el_Juggle)
     ADD_EFFECT(el_TwinkleFox, tl_TwinkleFox)
-    ADD_EFFECT(el_PacificOcean)
-    ADD_EFFECT(el_StaticColor, CHSV(HUE_RED, 0xFF, 0xFF))
+    ADD_EFFECT(el_PacificOcean)    
   END_MODE()
-
 
   BEGIN_MODE("Halloween")      
     ADD_EFFECT(el_Confetti, tl_Autumn )
@@ -114,7 +113,7 @@ BEGIN_EFFECT_ENGINE()
 
   
     BEGIN_PUSH_BUTTON(MODE_PIN)    
-      PUSH_BUTTON_TO_CMD(PB_CONTROL_PUSH_LONG, EEMC_MODE)
+      PUSH_BUTTON_TO_CMD(PB_CONTROL_PUSH_LONG, EEMC_STATE)
       PUSH_BUTTON_TO_CMD(PB_CONTROL_CLICK_SHORT, EEMC_EFFECT)      
     END_PUSH_BUTTON() 
   

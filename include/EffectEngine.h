@@ -29,11 +29,14 @@ class EffectEngine{
     bool onCmd(const struct CtrlQueueItem &itm);
     bool onCmdEE(const struct CtrlQueueItem &itm);
 
+    void onStateChange(const struct CtrlQueueData &data);
     void onModeChange(const struct CtrlQueueData &data);
     void onNumLedsChange(const struct CtrlQueueData &data);
     void onEffectChange(const struct CtrlQueueData &data); 
 
     //Internal routines
+    bool isOn() const { return (_cfgEngine.flags & EFF_ENGINE_OFF) == 0; }
+    void setState(bool on);
     void setMode(uint8_t mode);
     void setEffect(uint8_t effectNum);
 

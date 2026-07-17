@@ -237,7 +237,6 @@ void EffectEngine::init() {
   //Don't uncomment it if you don;t know what it is 
   //FastLED.setMaxPowerInVoltsAndMilliamps(5,1000);
   
-
   fill_solid(_leds, MAX_LEDS, CRGB::Black);
 
   //Read engine config
@@ -263,11 +262,21 @@ void EffectEngine::init() {
     _cfgMode.effectNum = random8(_cfgMode.numEffects); //random effect
   }
 
-  //Set mode
+  //Set effect
   setEffect(_cfgMode.effectNum);
 
   //Light LEDs
   FastLED.show();
+}
+
+void EffectEngine::setState(bool on){
+  if(on){
+    _cfgEngine.flags &= ~EFF_ENGINE_OFF;
+    setEffect(_cfgMode.effectNum);      
+  } else {
+    _cfgEngine.flags |= EFF_ENGINE_OFF;
+    fill_solid(_leds, MAX_LEDS, CRGB::Black);
+  }
 }
 
 void EffectEngine::setMode(uint8_t mode){  
@@ -326,6 +335,20 @@ void EffectEngine::setEffect(uint8_t effectNum){
 //////////////////////////////
 //Command handlers
 
+void EffectEngine::onStateChange(const struct CtrlQueueData &data){
+  
+  //Get current state
+  bool state    = isOn();
+  //Get new state
+  bool stateNew = data.translate(isOn(), 0, 1) != 0;
+
+  //Do nothing if did not change
+  if(state == stateNew)
+    return;
+    
+  setState(stateNew);
+}
+
 void EffectEngine::onModeChange(const struct CtrlQueueData &data){ 
   //Get new mode value    
   uint8_t mode = (uint8_t)data.translate(_cfgEngine.modeNum, 0, _cfgEngine.numModes - 1);
@@ -377,17 +400,14 @@ bool EffectEngine::onCmdEE(const struct CtrlQueueItem &itm){
   switch(itm.cmd){
 
     case EEMC_STATE:
-      _cfgEngine.flags = (itm.data.value != 0) ? (_cfgEngine.flags & ~EFF_ENGINE_OFF) : (_cfgEngine.flags | EFF_ENGINE_OFF);
-      if(_cfgEngine.flags & EFF_ENGINE_OFF){
-        fill_solid(_leds, MAX_LEDS, CRGB::Black);
-      }
+      onStateChange(itm.data);
     case EEMC_GET_STATE: {      
-      NTF_RESP(itm.cmd, EEResp_State, (_cfgEngine.flags & EFF_ENGINE_OFF) ? false : true);
+      NTF_RESP(itm.cmd, EEResp_State, isOn());
     }
     break;
 
     case EEMC_BRIGHTNESS:
-      _cfgEngine.brightness = (uint8_t)itm.data.value;
+      _cfgEngine.brightness = (uint8_t)itm.data.translate(_cfgEngine.brightness, 0, 255);
       FastLED.setBrightness(_cfgEngine.brightness);
     case EEMC_GET_BRIGHTNESS: {
       NTF_RESP(itm.cmd, EEResp_Brightness, _cfgEngine.brightness);
@@ -396,7 +416,6 @@ bool EffectEngine::onCmdEE(const struct CtrlQueueItem &itm){
 
     case EEMC_MODE:            
       onModeChange(itm.data);
-    //All get commands to process with NTF
     case EEMC_GET_MODE:      
       NTF_RESP(itm.cmd, EEResp_Mode, _cfgEngine.modeNum, _cfgMode);      
     break;
@@ -492,11 +511,10 @@ void EffectEngine::loop(const struct CtrlQueueItem &itm){
   }
 
   //Current effect and engine is not off
-  if(_curEffect != NULL && (_cfgEngine.flags & EFF_ENGINE_OFF) == 0){
+  if(_curEffect != NULL && isOn()){
 
     //Is it time to process ?
-     if(DELTA_MILLS(_millis) >= _curEffect->getSpeedDelay()){
-
+     if(DELTA_MILLS(_millis) >= _curEffect->getSpeedDelay()){      
         //Proceed
         _curEffect->draw(_leds, _cfgEngine.numLeds );
 
@@ -506,10 +524,12 @@ void EffectEngine::loop(const struct CtrlQueueItem &itm){
         updateLeds = true;
      }
   }
+
   
   //Updates leds and set timer to save configuration
   if(updateLeds){
      FastLED.show();
+     DBG_OUTLN("Leds updated");
   }
 
   //See if we need to safe config
@@ -558,14 +578,12 @@ DEFINE_STR_PROGMEM(rs_CmdParam_ModeList,      "modelist|ml")
 DEFINE_STR_PROGMEM(rs_CmdParam_Mode,          "mode|m")
 DEFINE_STR_PROGMEM(rs_CmdParam_Get,           "get|g|")
 DEFINE_STR_PROGMEM(rs_CmdParam_Set,           "set|s")
+DEFINE_STR_PROGMEM(rs_CmdParam_Toggle,        "toggle|tg")
 DEFINE_STR_PROGMEM(rs_CmdParam_Next,          "next|n|")
 DEFINE_STR_PROGMEM(rs_CmdParam_Prev,          "prev|p")
 DEFINE_STR_PROGMEM(rs_CmdParam_Effect,        "effect|e")
 DEFINE_STR_PROGMEM(rs_CmdParam_Speed,         "speed|s")
 DEFINE_STR_PROGMEM(rs_CmdParam_Color,         "color|c")
-DEFINE_STR_PROGMEM(rs_CmdParam_Hue,           "hue|h")
-DEFINE_STR_PROGMEM(rs_CmdParam_Sat,           "sat|s")
-DEFINE_STR_PROGMEM(rs_CmdParam_Val,           "sat|v")
 DEFINE_STR_PROGMEM(rs_CmdParam_Trans,         "transpal|t")
 DEFINE_STR_PROGMEM(rs_CmdParam_Leds,          "leds|l")
 DEFINE_STR_PROGMEM(rs_CmdParam_State,         "state|st")
@@ -620,7 +638,8 @@ BEGIN_PARSE_ROUTINE(parseCommandInput)
   
   BEGIN_GROUP_TOKEN(rs_CmdParam_State) //state
     VALUE_IS_TOKEN(rs_CmdParam_Get, EEMC_GET_STATE)
-    VALUE_IS_PAIR(rs_CmdParam_Set, EEMC_STATE, CTF_VAL_ABS)
+    VALUE_IS_PAIR(rs_CmdParam_Set, EEMC_STATE, CTF_VAL_ABS, 0, 1) //sets
+    VALUE_IS_TOKEN(rs_CmdParam_Toggle, EEMC_STATE, 0, CTF_VAL_NEXT) //sets
   END_GROUP_TOKEN() //status
 
   BEGIN_GROUP_TOKEN(rs_CmdParam_Brightness) //brightness

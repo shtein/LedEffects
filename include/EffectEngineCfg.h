@@ -8,7 +8,7 @@
 // All functions below return true/false
 
 //Current version
-#define EFFECT_ENGINE_VERSION_HIGH   0x07
+#define EFFECT_ENGINE_VERSION_HIGH   0x08
 #define EFFECT_ENGINE_VERSION_LOW    0x00
 
 // Limits - 10 modes and 40 effects

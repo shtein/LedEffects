@@ -8,29 +8,21 @@
   //Effects   
   BEGIN_EFFECTS(0)
     BEGIN_MODE("Effects")
+      ADD_EFFECT(el_StaticColor, CHSV(HUE_BLUE, 0xFF, 0xFF))
       ADD_EFFECT(el_MeteorRain)
       ADD_EFFECT(el_Ripple)   
       ADD_EFFECT(el_Plasma, tl_Plasma)
       ADD_EFFECT(el_Confetti, tl_Confetti)
       ADD_EFFECT(el_Blur)
       ADD_EFFECT(el_TheaterChaseRainbow)
-      ADD_EFFECT(el_RainbowMove)
       ADD_EFFECT(el_Noise, tl_Default)            
       ADD_EFFECT(el_MoodBlobs) 
-      ADD_EFFECT(el_Rainbow)
       ADD_EFFECT(el_FadeInOut)
       ADD_EFFECT(el_RunningLights)           
       ADD_EFFECT(el_Juggle)
       ADD_EFFECT(el_TwinkleFox, tl_TwinkleFox)
       ADD_EFFECT(el_PacificOcean)
     END_MODE()
-
-    BEGIN_MODE("Static")
-      ADD_EFFECT(el_StaticColor, CHSV(HUE_BLUE, 0xFF, 0xFF))        
-      ADD_EFFECT(el_StaticColor, CHSV(HUE_PURPLE, 0xFF, 0xFF))
-      ADD_EFFECT(el_StaticColor, CHSV(HUE_ORANGE, 0xFF, 0xFF))
-    END_MODE()
-
   END_EFFECTS()
 
 
@@ -47,7 +39,7 @@ BEGIN_EFFECT_ENGINE()
   BEGIN_CONTROL_MAP()
     
     BEGIN_PUSH_BUTTON(MODE_PIN)    
-      PUSH_BUTTON_TO_CMD(PB_CONTROL_PUSH_LONG, EEMC_MODE)
+      PUSH_BUTTON_TO_CMD(PB_CONTROL_PUSH_LONG, EEMC_STATE)
       PUSH_BUTTON_TO_CMD(PB_CONTROL_CLICK_SHORT, EEMC_EFFECT)      
     END_PUSH_BUTTON()     
   
