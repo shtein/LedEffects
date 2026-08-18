@@ -2,7 +2,6 @@
 
 #include <Controls.h>
 #include <EEPROMCfg.h>
-#include <CtrlWiFi.h>
 
 
 #include "Effect.h"

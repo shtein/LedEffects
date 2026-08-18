@@ -31,6 +31,7 @@ class EffectTwinkleFox: public EffectPaletteTransform{
 protected:
   void reset(){
     EffectPaletteTransform::reset();
+    setSpeedDelay(10);
     _ctx.rgb = _ctx.palCurrent[0]; //background
   }
 
@@ -38,23 +39,9 @@ protected:
     //Call parent 
     EffectPaletteTransform::proceed(leds, numLeds);
 
-    //Default background is black
-    CRGB bg = CRGB::Black;
 
-    //If first two colors of the palletter are the same use it for backround
-    if(_ctx.palCurrent[0] == _ctx.palCurrent[1] ){
-
-      bg = _ctx.palCurrent[0];
-
-      //Check how bright background is
-      uint8_t bglight = bg.getAverageLight();
-      bg.nscale8_video(bglight > 64 ? 16 : bglight > 16 ? 64 : 86);      
-    }
-    
-    if(_ctx.rgb != bg){
-      bg  = blend(_ctx.rgb, bg, 35);
-      _ctx.rgb = bg;
-    }  
+    //Get background color
+    CRGB bg = calculateBackgroundColor();
 
     //Init pseudo random elements
     uint16_t rnd   = 11337;
@@ -70,18 +57,46 @@ protected:
       uint8_t speedMultiplier =  ((((rnd & 0xFF) >> 4) + (rnd & 0x0F)) & 0x0F) + 0x08;
 
       //Get new color
-      CRGB color = computeOneTwinkle( (uint32_t)((clk * speedMultiplier) >> 3) + clkOffs, rnd >> 8);
+      CRGB color = computeOneTwinkle( (uint32_t)((clk * speedMultiplier) >> 3) + clkOffs, 
+                                      rnd >> 8, 
+                                      TWINKLE_SPEED, 
+                                      TWINKLE_DENSITY );
 
       //Proceed with setting color to current led
       int16_t deltabright = color.getAverageLight() - bg.getAverageLight();
       leds[i] = deltabright >= 32 || (!bg) ? color : deltabright > 0 ? blend( bg, color, deltabright * 8) : bg;
+      //leds[i] = color;
     }
+
 
   }
 
-  CRGB computeOneTwinkle( uint32_t ms, uint8_t salt) const{
+  CRGB calculateBackgroundColor() {
+       //Default background is black
+    CRGB bg = CRGB::Black;
+
+    //If first two colors of the palletter are the same use it for backround
+    if(_ctx.palCurrent[0] == _ctx.palCurrent[1] ){
+
+      bg = _ctx.palCurrent[0];
+
+      //Check how bright background is
+      uint8_t bglight = bg.getAverageLight();
+      bg.nscale8_video(bglight > 64 ? 16 : bglight > 16 ? 64 : 86);      
+    }
+    
+    //Blend with previous background if different
+    if(_ctx.rgb != bg){
+      bg  = blend(_ctx.rgb, bg, 35);
+      _ctx.rgb = bg;
+    }  
+
+    return bg;
+  }
+
+  CRGB computeOneTwinkle( uint32_t ms, uint8_t salt, uint8_t twinkleSpeed, uint8_t twinkleDensity) const{
     //Another magic here
-    uint16_t ticks       = ms >> (8 - TWINKLE_SPEED);
+    uint16_t ticks       = ms >> (8 - twinkleSpeed);
     uint8_t fastcycle8   = ticks;
     uint16_t slowcycle16 = (ticks >> 8) + salt;
 
@@ -91,7 +106,7 @@ protected:
     uint8_t slowcycle8   = (slowcycle16 & 0xFF) + (slowcycle16 >> 8);  
     uint8_t bright       = 0;
 
-    if( ((slowcycle8 & 0x0E)/2) < TWINKLE_DENSITY) {
+    if( ((slowcycle8 & 0x0E)/2) < twinkleDensity) {
       bright = attackDecayWave8(fastcycle8);
     }
 
@@ -100,8 +115,11 @@ protected:
       color = ColorFromPalette( Effect::_ctx.palCurrent, slowcycle8 - salt, bright, NOBLEND);
       coolLikeIncandescent( color, fastcycle8);
     }
+
     return color;
   }
+
+  
 };
 
 

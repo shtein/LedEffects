@@ -7,8 +7,6 @@
 #include <AnalogInput.h>
 #include <Controls.h>
 #include <CtrlSerial.h>
-#include <CtrlWiFi.h>
-#include <CtrlWebSrv.h>
 #include <SoundCapture.h>
 #include "Pins.h"
 

@@ -243,6 +243,7 @@ public:
 
     EffectPaletteTransform::proceed(leds, numLeds);
     
+    
     fadeToBlackBy(leds, numLeds, MATRIX_OBJECTS_FADE );
 
     XYDraw xy(leds, numLeds, XY_DRAW_ADD_COLORS);
@@ -265,7 +266,7 @@ public:
         }       
       }
     }
-      
+
         
     //Boundaries
     int16_t xmin = 0;
@@ -307,10 +308,12 @@ public:
       int8_t y = FP2I(obj.pos.y);
       
       CRGB clr = ColorFromPalette(_ctx.palCurrent, _dots[i].colorIndex, 255, LINEARBLEND);
+      
       xy.pixel(x, y, clr);
     }
   
   };
+
 
 protected:  
   struct {  
