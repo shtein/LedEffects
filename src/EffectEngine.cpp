@@ -528,7 +528,7 @@ void EffectEngine::loop(const struct CtrlQueueItem &itm){
   //Updates leds and set timer to save configuration
   if(updateLeds){
      FastLED.show();
-     DBG_OUTLN("Leds updated");
+     //DBG_OUTLN("Leds updated");
   }
 
   //See if we need to safe config

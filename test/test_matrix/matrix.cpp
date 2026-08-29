@@ -305,7 +305,7 @@ int main(int , char **){
   RUN_TEST(testObjMoveAwayDown);
   RUN_TEST(testRect2Line);
 
-  UNITY_END();
-  return 0;
+  
+  return UNITY_END();
 }
 

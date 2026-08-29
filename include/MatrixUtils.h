@@ -148,10 +148,10 @@ struct Obj {
     }
       
     //Check distance
-    if((upper_type_t<T>)dist * dist < posRel * posRel){      
+    if((upper_type_t<T>)dist * dist < posRel * posRel){
       return false;
     }
-    
+
     return true;
   }
 };
@@ -185,6 +185,12 @@ void bounce2d(Obj<T> &obj1, uint8_t m1, Obj<T> &obj2, uint8_t m2){
 
   //Normal vector
   Pnt<T> n = obj2.pos - obj1.pos;
+  if(n.x == 0 && n.y == 0){
+    n = obj2.vel - obj1.vel;   // approach axis; frame-invariant
+    if(n.x == 0 && n.y == 0){
+      return; // No relative motion, no bounce needed
+    }
+  }
 
   //Tangent ortogonal vector
   Pnt<T> t = n.ortogonal();

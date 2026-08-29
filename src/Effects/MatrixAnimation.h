@@ -218,6 +218,9 @@ void moveGravity(Obj<T> &obj, int16_t t){
 #define I2FP(v) ((int16_t)((v) << 8))
 #define FP2I(v) ((int8_t)((v) >> 8))
 
+
+#define MAX_VEL_SQ 250000
+
 class EffectMatrixBounsingDots: public EffectPaletteTransform{
 public:
   void reset(){
@@ -242,65 +245,70 @@ public:
   void proceed(CRGB *leds, uint16_t numLeds) {
 
     EffectPaletteTransform::proceed(leds, numLeds);
-    
-    
+        
     fadeToBlackBy(leds, numLeds, MATRIX_OBJECTS_FADE );
 
     XYDraw xy(leds, numLeds, XY_DRAW_ADD_COLORS);
 
-
-    //Object collision
-
     //Distance for collision
     int16_t dist = I2FP(1);
-    
-    for(size_t i = 0; i < MATRIX_BOUNCING_DOTS_MAX_OBJECTS; i++){
-      Obj16_t &obj = _dots[i].obj;
 
-      //Check for bounce  with other objects
-      for(size_t j = i + 1; j < MATRIX_BOUNCING_DOTS_MAX_OBJECTS; j++){
-        Obj16_t &obj2 = _dots[j].obj;
-
-        if(obj.collides(obj2, dist)){                              
-          bounce2d<int16_t>(obj, _dots[i].mass, obj2, _dots[j].mass);          
-        }       
-      }
-    }
-
-        
     //Boundaries
     int16_t xmin = 0;
     int16_t xmax = I2FP(xy.width() - 1);
     int16_t ymin = 0;
     int16_t ymax = I2FP(xy.height() - 1);
-  
+    
+    for(size_t i = 0; i < MATRIX_BOUNCING_DOTS_MAX_OBJECTS; i++){
+      Obj16_t &obj = _dots[i].obj;
+      uint8_t mass = _dots[i].mass;
 
+      //Check for bounce  with other objects
+      for(size_t j = i + 1; j < MATRIX_BOUNCING_DOTS_MAX_OBJECTS; j++){
+        Obj16_t &obj2 = _dots[j].obj;
+        uint8_t mass2 = _dots[j].mass;
+
+        if(obj.collides(obj2, dist)){
+          bounce2d<int16_t>(obj, mass, obj2, mass2);
+        }
+        else{
+          // If objects are not colliding, check if they occupy the same cell and nudge them apart if necessary
+          //checkUnmerge(obj, mass, obj2, mass2, dist, xmax);
+                      
+        } 
+      }
+    }
+            
+  
+    //Boundary checks and drawing
     for(size_t i = 0; i < MATRIX_BOUNCING_DOTS_MAX_OBJECTS; i++){
       Obj16_t &obj = _dots[i].obj;
 
       //Move with gravity
       moveGravity(obj, 1);
  
+      uint32_t velSq = (uint32_t)obj.vel.x * obj.vel.x + (uint32_t)obj.vel.y * obj.vel.y;
 
       //Check for bounce with boundaries
       if(obj.movesAwayLeft(xmin)){
         //obj.pos.x = MIRROR(obj.pos.x, xmin);
-        obj.vel.x = -obj.vel.x;        
+        obj.vel.x = -obj.vel.x - (velSq > MAX_VEL_SQ ? 1 : 0);                
       }
 
       if(obj.movesAwayRight(xmax)){
         //obj.pos.x = MIRROR(obj.pos.x, xmax);
-        obj.vel.x = -obj.vel.x;
+        obj.vel.x = -obj.vel.x + (velSq > MAX_VEL_SQ  ? 1 : 0);
+
       }
 
       if(obj.movesAwayUp(ymin)){
         //obj.pos.y = MIRROR(obj.pos.y, ymin);
-        obj.vel.y = -obj.vel.y;    
+        obj.vel.y = -obj.vel.y - (velSq > MAX_VEL_SQ ? 1 : 0);            
       }
 
       if(obj.movesAwayDown(ymax)){
         //obj.pos.y = MIRROR(obj.pos.y, ymax);
-        obj.vel.y = -obj.vel.y;          
+        obj.vel.y = -obj.vel.y + (velSq > MAX_VEL_SQ ? 1 : 0);          
       }          
       
       //Draw dot

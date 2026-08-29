@@ -27,7 +27,7 @@
 #define EEMC_EFFECT      (EEMC_LED | EEMC_GET_EFFECT)     //Effect changed
 #define EEMC_NUMLEDS     (EEMC_LED | EEMC_GET_NUMLEDS)    //Number of leds changed
 #define EEMC_BRIGHTNESS  (EEMC_LED | EEMC_GET_BRIGHTNESS) //Brightness changed
-#define EEMC_STATE       (EEMC_LED | EEMC_GET_STATE)     //On/Off changed
+#define EEMC_STATE       (EEMC_LED | EEMC_GET_STATE)      //On/Off changed
 
 //Effect commands
 #define EEMC_GET_CFG        0x01   //Get effect config
