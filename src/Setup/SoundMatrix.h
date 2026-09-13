@@ -17,6 +17,7 @@ BEGIN_EFFECTS(0)
     ADD_EFFECT_KALEYDOSCOPE(el_TwinkleFox, tl_TwinkleFox)    
     ADD_EFFECT(el_Noise, tl_Noise)
     ADD_EFFECT(el_Matrix_Bouncing_Dots, tl_TwinkleFox)
+    ADD_EFFECT(el_Juggle)
   END_MODE()
 END_EFFECTS()
 

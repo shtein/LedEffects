@@ -160,7 +160,7 @@ bool getEffect(uint8_t effectId, EFFECT_DESCRIPTION &ed){
     break;
 #endif //NO_EFFECT_FADE_INOUT    
 
-#ifndef NO_EFFECT_JUGGLE
+#if !defined(NO_EFFECT_JUGGLE) || defined(EFFECT_JUGGLE)
     case el_Juggle:
       GET_EFFECT(ed, EffectJuggle, rs_Effect_Juggle);
     break;

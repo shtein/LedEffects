@@ -180,10 +180,9 @@ protected:
 ///////////////////////////////////////////////
 //EffectMatrixBounsingDots
 
+
 ////////////////////////////////////////
 // Move gravity to the bottom routine
-
-
 
 // How to calculate gc:
 // hight - number of pixels in height
@@ -212,14 +211,19 @@ void moveGravity(Obj<T> &obj, int16_t t){
 
 
 #ifndef MATRIX_BOUNCING_DOTS_MAX_OBJECTS
-  #define MATRIX_BOUNCING_DOTS_MAX_OBJECTS 5
+  #define MATRIX_BOUNCING_DOTS_MAX_OBJECTS 7
 #endif
 
 #define I2FP(v) ((int16_t)((v) << 8))
 #define FP2I(v) ((int8_t)((v) >> 8))
 
+////////////////////////////////////
+// Energey cap to skeep speed not exceeding a certain limit
+// m*v^2/2 > 400000
+// v^2 > 800000 / m
+// MAX_VEL_SQ = 800000
 
-#define MAX_VEL_SQ 250000
+#define MAX_VEL_SQ 800000
 
 class EffectMatrixBounsingDots: public EffectPaletteTransform{
 public:
@@ -271,11 +275,6 @@ public:
         if(obj.collides(obj2, dist)){
           bounce2d<int16_t>(obj, mass, obj2, mass2);
         }
-        else{
-          // If objects are not colliding, check if they occupy the same cell and nudge them apart if necessary
-          //checkUnmerge(obj, mass, obj2, mass2, dist, xmax);
-                      
-        } 
       }
     }
             
@@ -283,45 +282,42 @@ public:
     //Boundary checks and drawing
     for(size_t i = 0; i < MATRIX_BOUNCING_DOTS_MAX_OBJECTS; i++){
       Obj16_t &obj = _dots[i].obj;
+      uint8_t mass = _dots[i].mass;
 
       //Move with gravity
       moveGravity(obj, 1);
  
-      uint32_t velSq = (uint32_t)obj.vel.x * obj.vel.x + (uint32_t)obj.vel.y * obj.vel.y;
+      // Calculate the squared velocity to enforce the maximum velocity cap
+      uint32_t velSq    = ((uint32_t)obj.vel.x * obj.vel.x + (uint32_t)obj.vel.y * obj.vel.y);
+      uint32_t maxVelSq = MAX_VEL_SQ / mass;
 
       //Check for bounce with boundaries
-      if(obj.movesAwayLeft(xmin)){
-        //obj.pos.x = MIRROR(obj.pos.x, xmin);
-        obj.vel.x = -obj.vel.x - (velSq > MAX_VEL_SQ ? 1 : 0);                
+      if(obj.movesAwayLeft(xmin)){        
+        obj.vel.x = -obj.vel.x - (velSq > maxVelSq ? 1 : 0);                
       }
 
       if(obj.movesAwayRight(xmax)){
-        //obj.pos.x = MIRROR(obj.pos.x, xmax);
-        obj.vel.x = -obj.vel.x + (velSq > MAX_VEL_SQ  ? 1 : 0);
-
+        obj.vel.x = -obj.vel.x + (velSq > maxVelSq ? 1 : 0);
       }
 
-      if(obj.movesAwayUp(ymin)){
-        //obj.pos.y = MIRROR(obj.pos.y, ymin);
-        obj.vel.y = -obj.vel.y - (velSq > MAX_VEL_SQ ? 1 : 0);            
+      if(obj.movesAwayUp(ymin)){      
+        obj.vel.y = -obj.vel.y - (velSq > maxVelSq ? 1 : 0);            
       }
 
       if(obj.movesAwayDown(ymax)){
-        //obj.pos.y = MIRROR(obj.pos.y, ymax);
-        obj.vel.y = -obj.vel.y + (velSq > MAX_VEL_SQ ? 1 : 0);          
+        obj.vel.y = -obj.vel.y + (velSq > maxVelSq ? 1 : 0);          
       }          
       
       //Draw dot
       int8_t x = FP2I(obj.pos.x);
       int8_t y = FP2I(obj.pos.y);
       
-      CRGB clr = ColorFromPalette(_ctx.palCurrent, _dots[i].colorIndex, 255, LINEARBLEND);
-      
+      CRGB clr = getCurrentPalColor(_dots[i].colorIndex);
+          
       xy.pixel(x, y, clr);
     }
   
   };
-
 
 protected:  
   struct {  
