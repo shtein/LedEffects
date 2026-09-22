@@ -44,10 +44,10 @@
   #error "MAX_LEDS is not defined"
 #endif //MAX_LEDS
 
-#ifndef BRIGHTNESS
-  #define BRIGHTNESS 255
-#endif //BRIGHTNESS
+#ifndef LED_BRIGHTNESS
+  #define LED_BRIGHTNESS 255
+#endif //LED_BRIGHTNESS
 
-#include <Fastled.h>
+#include <FastLED.h>
 
 #endif //__LEDEFFECTS_H

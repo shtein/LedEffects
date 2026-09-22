@@ -111,7 +111,7 @@ bool prepareEngineConfig(uint8_t flags){
   cfgEng.numLeds    = 0;
   cfgEng.numModes   = 0;
   cfgEng.modeNum    = 0;
-  cfgEng.brightness = BRIGHTNESS;
+  cfgEng.brightness = LED_BRIGHTNESS;
 
   setEngineConfigInt(ee, cfgEng);
 
