@@ -8,7 +8,7 @@
   //Effects   
   BEGIN_EFFECTS(0)
     BEGIN_MODE("Effects")
-      ADD_EFFECT(el_StaticColor, CHSV(HUE_BLUE, 0xFF, 0xFF))
+      ADD_EFFECT(el_StaticColor, CRGB(0x00, 0x00, 0xFF).raw)
       ADD_EFFECT(el_MeteorRain)
       ADD_EFFECT(el_Ripple)   
       ADD_EFFECT(el_Plasma, tl_Plasma)

@@ -52,7 +52,7 @@
 //Effects   
 BEGIN_EFFECTS(EFF_RANDOM_START_EFFECT)
   BEGIN_MODE("Regular")            
-    ADD_EFFECT(el_StaticColor, CHSV(HUE_RED, 0xFF, 0xFF))
+    ADD_EFFECT(el_StaticColor, CRGB(0xFF, 0x00, 0x00).raw)
     ADD_EFFECT(el_Ripple)
     ADD_EFFECT(el_Plasma, tl_Plasma)        
     ADD_EFFECT(el_Confetti, tl_Confetti)

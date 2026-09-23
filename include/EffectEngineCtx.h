@@ -53,7 +53,6 @@ enum SoundVUMType{
 #define SAVE_CONFIG_TIMEOUT 30000
 
 
-
 #ifdef NTF_ENABLED
 #include <Notification.h>
 

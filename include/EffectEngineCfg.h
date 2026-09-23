@@ -73,7 +73,7 @@ bool setModeConfig(uint8_t mode, const EFFECT_MODE_CONFIG &cfg);
 // Effect data
 
 #define EFFECT_PARAM_TRANSFORM(s) s.bytes[0]
-#define EFFECT_PARAM_RGB(s) (*(CRGB *)s.bytes)
+#define EFFECT_PARAM_RGB(s) (s.bytes)
 #define EFFECT_PARAM_SOUNDVUM(s) s.bytes[1]
 
 
@@ -89,9 +89,9 @@ struct __attribute__((packed)) EFFECT_DATA{
     flags = f;    
   }
 
-  EFFECT_DATA(uint8_t f, const CRGB &rgb) __attribute__((always_inline)){
-    flags = f | ECF_RGB;    
-    EFFECT_PARAM_RGB((*this)) = rgb;
+  EFFECT_DATA(uint8_t f, const uint8_t (&rgb)[3]) __attribute__((always_inline)){
+    flags = f | ECF_RGB;      
+    memcpy(EFFECT_PARAM_RGB((*this)), rgb, 3);
   }
 
   inline EFFECT_DATA(uint8_t f, TransformPalList t) __attribute__((always_inline)){
