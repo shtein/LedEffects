@@ -47,4 +47,7 @@ struct EFFECT_DESCRIPTION{
 uint8_t getEffectFlags(uint8_t effectId);
 bool getEffect(uint8_t effectId, EFFECT_DESCRIPTION &ed);
 
+
+
+
 #endif //__EFFECTS_ALL_H
